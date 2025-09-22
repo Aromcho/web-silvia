@@ -62,24 +62,48 @@ export default function Properties() {
   // Función para obtener propiedades por tipo
   const getPropertiesByType = async (type) => {
     try {
-      console.log(`Fetching properties for type: ${type}`)
+      console.log(`🔍 Fetching properties for type: ${type}`)
       let result = []
       
       switch (type) {
         case 'destacadas':
-          result = await tokkoService.getFeaturedProperties(6);
+          // Obtener más propiedades y filtrar localmente las destacadas
+          const allForFeatured = await tokkoService.getProperties({ limit: 15 });
+          result = allForFeatured.filter(property => property.is_starred_on_web).slice(0, 6);
+          // Si no hay destacadas suficientes, tomar las primeras como "destacadas"
+          if (result.length < 3) {
+            result = allForFeatured.slice(0, 6);
+          }
           break;
         case 'alquiler-temporario':
-          result = await tokkoService.getPropertiesByOperation(2, 6);
+          // Usar operation_type 2 para alquiler
+          result = await tokkoService.getProperties({ 
+            operation_type: 2, // Rent
+            limit: 6,
+            offset: 3 // Offset para variedad
+          });
           break;
         case 'casas':
-          result = await tokkoService.getPropertiesByType('Casa', 6);
+          // Usar property_type 3 para casas
+          result = await tokkoService.getProperties({ 
+            property_type: 3, // House
+            limit: 6 
+          });
           break;
         case 'departamentos':
-          result = await tokkoService.getPropertiesByType('Departamento', 6);
+          // Usar property_type 2 para departamentos
+          result = await tokkoService.getProperties({ 
+            property_type: 2, // Apartment
+            limit: 6,
+            offset: 2 // Offset para variedad
+          });
           break;
         case 'terrenos':
-          result = await tokkoService.getPropertiesByType('Terreno', 6);
+          // Usar property_type 1 para terrenos
+          result = await tokkoService.getProperties({ 
+            property_type: 1, // Land
+            limit: 6 
+          });
           break;
         default:
           result = [];

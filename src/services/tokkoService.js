@@ -77,51 +77,74 @@ class TokkoService {
    * @returns {Promise<Array>} List of properties
    */
   async getProperties(filters = {}) {
-    const queryParams = new URLSearchParams();
-    
-    // Agregar filtros comunes de Tokko API
-    if (filters.operation) {
-      // Mapear operaciones: 1 = venta, 2 = alquiler
-      const operationType = filters.operation === 'venta' ? '1' : '2';
-      queryParams.append('operation_type', operationType);
+    try {
+      console.log('🔍 Getting properties with filters:', filters);
+      
+      const queryParams = new URLSearchParams({
+        key: TOKKO_API_KEY,
+        format: 'json',
+        limit: filters.limit || 20,
+        offset: filters.offset || 0
+      });
+
+      // Filtros directos que sabemos que funcionan
+      if (filters.property_type) {
+        queryParams.append('property_type', filters.property_type);
+      }
+
+      if (filters.property_types && filters.property_types.length > 0) {
+        // Usar el primer tipo de la lista para filtros simples
+        queryParams.append('property_type', filters.property_types[0]);
+      }
+
+      if (filters.operation_type) {
+        queryParams.append('operation_type', filters.operation_type);
+      }
+
+      if (filters.operation_types && filters.operation_types.length > 0) {
+        // Usar el primer tipo de operación de la lista
+        queryParams.append('operation_type', filters.operation_types[0]);
+      }
+
+      // Filtros de precio
+      if (filters.price_from || filters.minPrice) {
+        queryParams.append('price_from', filters.price_from || filters.minPrice);
+      }
+      if (filters.price_to || filters.maxPrice) {
+        queryParams.append('price_to', filters.price_to || filters.maxPrice);
+      }
+
+      // Otros filtros
+      if (filters.location) {
+        queryParams.append('location__name__icontains', filters.location);
+      }
+      
+      if (filters.suite_amount_from || filters.bedrooms) {
+        queryParams.append('suite_amount_from', filters.suite_amount_from || filters.bedrooms);
+      }
+      
+      if (filters.bathroom_amount_from || filters.bathrooms) {
+        queryParams.append('bathroom_amount_from', filters.bathroom_amount_from || filters.bathrooms);
+      }
+      
+      if (filters.surface_from || filters.minSurface) {
+        queryParams.append('surface_from', filters.surface_from || filters.minSurface);
+      }
+      if (filters.surface_to || filters.maxSurface) {
+        queryParams.append('surface_to', filters.surface_to || filters.maxSurface);
+      }
+
+      const endpoint = `/property/?${queryParams.toString()}`;
+      console.log('� Request URL:', `${TOKKO_API_URL}${endpoint}`.replace(TOKKO_API_KEY, 'HIDDEN_KEY'));
+      
+      const response = await this.request(endpoint);
+      console.log('📊 API Response - Properties count:', response.objects ? response.objects.length : 0);
+      
+      return response.objects || [];
+    } catch (error) {
+      console.error('❌ Error fetching properties:', error);
+      throw error;
     }
-    
-    if (filters.type) {
-      queryParams.append('property_type', filters.type);
-    }
-    
-    if (filters.location) {
-      queryParams.append('location', filters.location);
-    }
-    
-    if (filters.minPrice) {
-      queryParams.append('price_from', filters.minPrice);
-    }
-    
-    if (filters.maxPrice) {
-      queryParams.append('price_to', filters.maxPrice);
-    }
-    
-    if (filters.bedrooms) {
-      queryParams.append('suite_amount_from', filters.bedrooms);
-    }
-    
-    if (filters.bathrooms) {
-      queryParams.append('bathroom_amount_from', filters.bathrooms);
-    }
-    
-    // Parámetros por defecto
-    queryParams.append('limit', filters.limit || '20');
-    queryParams.append('offset', filters.offset || '0');
-    queryParams.append('format', 'json');
-    
-    const endpoint = `/property/?${queryParams.toString()}`;
-    console.log('Requesting Tokko API with filters:', filters);
-    
-    const response = await this.request(endpoint);
-    console.log('Tokko API Response - Properties count:', response.objects ? response.objects.length : 0);
-    
-    return response.objects || [];
   }
 
   /**
@@ -327,37 +350,69 @@ class TokkoService {
   }
 
   /**
-   * Get properties by operation type
+   * Get properties by operation type with additional filters
    * @param {number} operationType - 1 for sale, 2 for rent
    * @param {number} limit - Number of properties to return
+   * @param {object} additionalFilters - Additional filters to apply
    * @returns {Promise<Array>} List of properties
    */
-  async getPropertiesByOperation(operationType, limit = 6) {
-    const queryParams = new URLSearchParams();
-    queryParams.append('operation_type', operationType.toString());
-    queryParams.append('limit', limit.toString());
-    queryParams.append('format', 'json');
-    
-    const endpoint = `/property/?${queryParams.toString()}`;
-    const response = await this.request(endpoint);
-    return response.objects || [];
+  async getPropertiesByOperation(operationType, limit = 6, additionalFilters = {}) {
+    const filters = {
+      operation_type: operationType,
+      limit: limit,
+      ...additionalFilters
+    };
+    return await this.getProperties(filters);
   }
 
   /**
-   * Get properties by type
+   * Get properties by type with additional filters
    * @param {string} propertyType - Property type name
    * @param {number} limit - Number of properties to return
+   * @param {object} additionalFilters - Additional filters to apply
    * @returns {Promise<Array>} List of properties
    */
-  async getPropertiesByType(propertyType, limit = 6) {
-    const queryParams = new URLSearchParams();
-    queryParams.append('property_type__name__icontains', propertyType);
-    queryParams.append('limit', limit.toString());
-    queryParams.append('format', 'json');
-    
-    const endpoint = `/property/?${queryParams.toString()}`;
-    const response = await this.request(endpoint);
-    return response.objects || [];
+  async getPropertiesByType(propertyType, limit = 6, additionalFilters = {}) {
+    const filters = {
+      property_type__name__icontains: propertyType,
+      limit: limit,
+      ...additionalFilters
+    };
+    return await this.getProperties(filters);
+  }
+
+  /**
+   * Get properties in a specific price range
+   * @param {number} minPrice - Minimum price
+   * @param {number} maxPrice - Maximum price
+   * @param {number} limit - Number of properties to return
+   * @param {object} additionalFilters - Additional filters to apply
+   * @returns {Promise<Array>} List of properties
+   */
+  async getPropertiesByPriceRange(minPrice, maxPrice, limit = 20, additionalFilters = {}) {
+    const filters = {
+      price_from: minPrice,
+      price_to: maxPrice,
+      limit: limit,
+      ...additionalFilters
+    };
+    return await this.getProperties(filters);
+  }
+
+  /**
+   * Get properties by location
+   * @param {string} location - Location name (partial match)
+   * @param {number} limit - Number of properties to return
+   * @param {object} additionalFilters - Additional filters to apply
+   * @returns {Promise<Array>} List of properties
+   */
+  async getPropertiesByLocation(location, limit = 20, additionalFilters = {}) {
+    const filters = {
+      location__name__icontains: location,
+      limit: limit,
+      ...additionalFilters
+    };
+    return await this.getProperties(filters);
   }
 
   /**

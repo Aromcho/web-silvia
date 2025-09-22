@@ -7,13 +7,16 @@ const PropertiesSearch = () => {
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({
-    operation: 'venta',
+    operation: 'venta', // 1 = venta, 2 = alquiler
     type: '',
     location: '',
     minPrice: '',
     maxPrice: '',
     bedrooms: '',
-    bathrooms: ''
+    bathrooms: '',
+    minSurface: '',
+    maxSurface: '',
+    currency: 'USD'
   });
 
   // Mock data para desarrollo
@@ -61,15 +64,93 @@ const PropertiesSearch = () => {
 
   useEffect(() => {
     loadProperties();
-  }, [filters]);
+  }, [filters]); // Recargar cuando cambien los filtros
 
   const loadProperties = async () => {
     setLoading(true);
     try {
-      console.log('Loading properties with filters:', filters);
-      // Usar el servicio de Tokko actualizado
-      const apiProperties = await tokkoService.getProperties(filters);
-      console.log('Properties loaded from API:', apiProperties.length, apiProperties);
+      console.log('🔍 Loading properties with filters:', filters);
+      
+      // Mapear filtros para la API de Tokko
+      const apiFilters = {
+        limit: 20,
+        offset: 0
+      };
+
+      // Tipo de operación
+      if (filters.operation) {
+        const operationMapping = {
+          'venta': 1,           // Sale
+          'alquiler': 2,        // Rent
+          'alquiler_temporal': 2 // Usar Rent como fallback
+        };
+        
+        if (operationMapping[filters.operation]) {
+          apiFilters.operation_type = operationMapping[filters.operation];
+          console.log('📋 Applied operation filter:', filters.operation, '→', apiFilters.operation_type);
+        }
+      }
+
+      // Tipo de propiedad - usar IDs que funcionan
+      if (filters.type) {
+        const typeMapping = {
+          'terreno': 1,        // Land
+          'lote': 1,           // Land
+          'departamento': 2,   // Apartment
+          'casa': 3,           // House
+          'oficina': 5,        // Office
+          'ph': 3,             // House como fallback
+          'local': 7,          // Business Premises
+          'hotel': 8           // Commercial Building
+        };
+        
+        if (typeMapping[filters.type]) {
+          apiFilters.property_type = typeMapping[filters.type];
+          console.log('🏠 Applied type filter:', filters.type, '→', apiFilters.property_type);
+        }
+      }
+
+      // Ubicación
+      if (filters.location) {
+        apiFilters.location__name__icontains = filters.location;
+        console.log('📍 Applied location filter:', filters.location);
+      }
+
+      // Precio
+      if (filters.minPrice) {
+        apiFilters.price_from = parseInt(filters.minPrice);
+        console.log('💰 Applied min price filter:', filters.minPrice);
+      }
+      if (filters.maxPrice) {
+        apiFilters.price_to = parseInt(filters.maxPrice);
+        console.log('💰 Applied max price filter:', filters.maxPrice);
+      }
+
+      // Dormitorios
+      if (filters.bedrooms) {
+        apiFilters.suite_amount_from = parseInt(filters.bedrooms);
+        console.log('🛏️ Applied bedrooms filter:', filters.bedrooms);
+      }
+
+      // Baños
+      if (filters.bathrooms) {
+        apiFilters.bathroom_amount_from = parseInt(filters.bathrooms);
+        console.log('🚿 Applied bathrooms filter:', filters.bathrooms);
+      }
+
+      // Superficie
+      if (filters.minSurface) {
+        apiFilters.surface_from = parseInt(filters.minSurface);
+        console.log('📐 Applied min surface filter:', filters.minSurface);
+      }
+      if (filters.maxSurface) {
+        apiFilters.surface_to = parseInt(filters.maxSurface);
+        console.log('📐 Applied max surface filter:', filters.maxSurface);
+      }
+
+      console.log('📡 Final API filters:', apiFilters);
+      const apiProperties = await tokkoService.getProperties(apiFilters);
+      console.log('✅ Properties loaded from API:', apiProperties.length);
       setProperties(apiProperties);
     } catch (error) {
       console.error('Error loading properties:', error);
@@ -137,10 +218,7 @@ const PropertiesSearch = () => {
     <div className="properties-search">
       <div className="container">
         {/* Header */}
-        <div className="properties-header">
-          <h1>Todas las Propiedades</h1>
-          <p>Encontrá la propiedad perfecta con nuestros filtros de búsqueda</p>
-        </div>
+        
 
         {/* Filtros de búsqueda */}
         <div className="search-filters">
@@ -170,7 +248,10 @@ const PropertiesSearch = () => {
                   <option value="departamento">Departamento</option>
                   <option value="ph">PH</option>
                   <option value="terreno">Terreno</option>
+                  <option value="lote">Lote</option>
                   <option value="local">Local</option>
+                  <option value="oficina">Oficina</option>
+                  <option value="hotel">Hotel</option>
                 </select>
               </div>
 
@@ -220,6 +301,43 @@ const PropertiesSearch = () => {
                   <option value="3">3+</option>
                   <option value="4">4+</option>
                 </select>
+              </div>
+
+              {/* Baños */}
+              <div className="filter-group">
+                <label>Baños</label>
+                <select 
+                  value={filters.bathrooms}
+                  onChange={(e) => handleFilterChange('bathrooms', e.target.value)}
+                >
+                  <option value="">Cualquiera</option>
+                  <option value="1">1+</option>
+                  <option value="2">2+</option>
+                  <option value="3">3+</option>
+                  <option value="4">4+</option>
+                </select>
+              </div>
+
+              {/* Superficie mínima */}
+              <div className="filter-group">
+                <label>Superficie mín. (m²)</label>
+                <input
+                  type="number"
+                  placeholder="Desde"
+                  value={filters.minSurface}
+                  onChange={(e) => handleFilterChange('minSurface', e.target.value)}
+                />
+              </div>
+
+              {/* Superficie máxima */}
+              <div className="filter-group">
+                <label>Superficie máx. (m²)</label>
+                <input
+                  type="number"
+                  placeholder="Hasta"
+                  value={filters.maxSurface}
+                  onChange={(e) => handleFilterChange('maxSurface', e.target.value)}
+                />
               </div>
             </div>
 

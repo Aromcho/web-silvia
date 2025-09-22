@@ -21,7 +21,7 @@ const Footer = () => {
                 />
               </div>
               <p className="footer-description">
-                Más de 15 años de experiencia en el mercado inmobiliario de Mar de las Pampas. 
+                Más de 8 años de experiencia en el mercado inmobiliario de Mar de las Pampas. 
                 Te acompañamos en cada paso para encontrar la propiedad perfecta.
               </p>
               <div className="footer-social">
@@ -78,7 +78,14 @@ const Footer = () => {
                     <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" stroke="currentColor" strokeWidth="2"/>
                     <circle cx="12" cy="10" r="3" stroke="currentColor" strokeWidth="2"/>
                   </svg>
-                  <span>Mar de las Pampas, Buenos Aires</span>
+                  <span>Central: Calle 34 y Mar del Plata - Mar Azul</span>
+                </div>
+                <div className="contact-item">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" stroke="currentColor" strokeWidth="2"/>
+                    <circle cx="12" cy="10" r="3" stroke="currentColor" strokeWidth="2"/>
+                  </svg>
+                  <span> Sucursal:Av del Plata y Uritorco - Mar de las Pampas</span>
                 </div>
                 <div className="contact-item">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
