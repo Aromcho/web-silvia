@@ -91,9 +91,9 @@ const About = () => {
                       />
                     </div>
                     <div className="office-details">
-                      <h5>Oficina Central</h5>
-                      <p>Av. Principal 1234, Centro</p>
-                      <p>Lun-Vie: 9:00-18:00</p>
+                      <h5>Central</h5>
+                      <p>Calle 34 y Mar del Plata - Mar Azul</p>
+                      <p>Lun-Vie: 10:00-18:00</p>
                     </div>
                   </div>
                   <div className="office-card">
@@ -106,9 +106,9 @@ const About = () => {
                       />
                     </div>
                     <div className="office-details">
-                      <h5>Sucursal Norte</h5>
-                      <p>Calle Secundaria 567, Barrio Norte</p>
-                      <p>Lun-Sab: 9:00-17:00</p>
+                      <h5>Sucursal</h5>
+                      <p>Av del Plata y Uritorco - Mar de las Pampas</p>
+                      <p>Lun-Sab: 10:00-18:00</p>
                     </div>
                   </div>
                 </div>
