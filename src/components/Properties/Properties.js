@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react'
 import Link from 'next/link'
 import tokkoService from '../../services/tokkoService'
+import PropertyCard from '../PropertyCard/PropertyCard'
 import './Properties.css'
 
 export default function Properties() {
@@ -160,86 +161,6 @@ export default function Properties() {
     }
   }
 
-  // Función para obtener la imagen principal
-  const getMainImage = (property) => {
-    // Tokko API structure
-    if (property.photos && property.photos.length > 0) {
-      return property.photos[0].image || property.photos[0].thumb
-    }
-    
-    // Fallback para otros formatos
-    if (property.images && property.images.length > 0) {
-      return property.images[0]
-    }
-    
-    return 'https://via.placeholder.com/400x300/34495e/ffffff?text=Sin+Imagen'
-  }
-
-  // Componente de tarjeta de propiedad
-  const PropertyCard = ({ property }) => (
-    <div className="property-card">
-      <div className="property-image">
-        <img 
-          src={getMainImage(property)} 
-          alt={property.publication_title || property.title || property.address?.street_name || 'Propiedad'}
-          onError={(e) => {
-            e.target.src = 'https://via.placeholder.com/400x300/34495e/ffffff?text=Sin+Imagen'
-          }}
-        />
-        {property.is_starred_on_web && (
-          <div className="property-badge">Destacada</div>
-        )}
-        <div className="property-type-badge">
-          {property.operations && property.operations.length > 0 
-            ? (property.operations[0].operation_type === 'Sale' || property.operations[0].operation_id === 1 ? 'Venta' : 'Alquiler')
-            : (property.operation?.operation_type === 1 ? 'Venta' : 'Alquiler')
-          }
-        </div>
-      </div>
-      <div className="property-info">
-        <h3 className="property-title">
-          {property.publication_title || property.title || property.address?.street_name || 'Propiedad'}
-        </h3>
-        <p className="property-price">
-          {formatPrice(property)}
-        </p>
-        <p className="property-location">
-          📍 {property.address?.city || property.location?.name || property.location || 'Ubicación no disponible'}, {property.address?.state || ''}
-        </p>
-        <div className="property-details">
-          {property.surface && (
-            <span className="detail-item">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                <path d="M3 9L12 2L21 9V20C21 20.5304 20.7893 21.0391 20.4142 21.4142C20.0391 21.7893 19.5304 22 19 22H5C4.46957 22 3.96086 21.7893 3.58579 21.4142C3.21071 21.0391 3 20.5304 3 20V9Z" stroke="currentColor" strokeWidth="2"/>
-              </svg>
-              {property.surface}m²
-            </span>
-          )}
-          {property.suite_amount && (
-            <span className="detail-item">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                <path d="M7 7h10v10H7z" stroke="currentColor" strokeWidth="2"/>
-              </svg>
-              {property.suite_amount} dorm.
-            </span>
-          )}
-          {property.bathroom_amount && (
-            <span className="detail-item">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="2"/>
-              </svg>
-              {property.bathroom_amount} baños
-            </span>
-          )}
-        </div>
-        <div className="property-actions">
-          <button className="btn-view">Ver Detalles</button>
-          <button className="btn-contact">Contactar</button>
-        </div>
-      </div>
-    </div>
-  )
-
   // Componente de sección con scroll horizontal
   const PropertySection = ({ title, type, properties }) => {
     if (!properties || properties.length === 0) return null
@@ -255,7 +176,7 @@ export default function Properties() {
         <div className="properties-scroll-container">
           <div className="properties-grid">
             {properties.map((property) => (
-              <PropertyCard key={property.id} property={property} />
+              <PropertyCard key={property.id} property={property} formatPrice={formatPrice} />
             ))}
           </div>
         </div>
