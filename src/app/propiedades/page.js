@@ -1,3 +1,4 @@
+import { Suspense } from 'react'
 import PropertiesSearchNew from '../../components/PropertiesSearch/PropertiesSearchNew';
 
 export const metadata = {
@@ -8,5 +9,9 @@ export const metadata = {
 };
 
 export default function PropertiesPage() {
-  return <PropertiesSearchNew />;
+  return (
+    <Suspense fallback={null}>
+      <PropertiesSearchNew />
+    </Suspense>
+  );
 }
