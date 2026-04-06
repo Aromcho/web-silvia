@@ -1,0 +1,34 @@
+.page-hero {
+  padding: 120px 0 60px;
+  background: linear-gradient(135deg, var(--primary-color) 0%, #006b4d 100%);
+  color: var(--white-color);
+  text-align: center;
+  position: relative;
+  isolation: isolate;
+  z-index: 1;
+}
+
+.page-hero h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.page-hero p {
+  font-size: 1.2rem;
+  opacity: 0.9;
+}
+
+@media (max-width: 768px) {
+  .page-hero {
+    padding: 100px 0 40px;
+  }
+  
+  .page-hero h1 {
+    font-size: 2rem;
+  }
+  
+  .page-hero p {
+    font-size: 1rem;
+  }
+}

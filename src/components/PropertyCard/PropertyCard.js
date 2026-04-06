@@ -1,17 +1,28 @@
 import React from 'react'
+import Link from 'next/link'
 import { 
   FaHome, 
   FaBed, 
   FaBath, 
   FaMapMarkerAlt,
-  FaEye,
   FaWhatsapp
 } from 'react-icons/fa'
 import './PropertyCard.css'
 
 export default function PropertyCard({ property, formatPrice }) {
+  const normalizePropertyTypeLabel = (text) => {
+    if (!text || typeof text !== 'string') return text
+    return text
+      .replace(/\bhoteles\b/gi, 'Complejos')
+      .replace(/\bhotel\b/gi, 'Complejo')
+  }
+
+  const propertyTitle = normalizePropertyTypeLabel(
+    property.address?.street_name || property.real_address || property.address || property.publication_title || property.title || 'Propiedad'
+  )
+
   return (
-    <div className="modern-property-card">
+    <Link href={`/propiedad/${property.id}`} className="modern-property-card">
       <div className="property-image">
         <img 
           src={
@@ -20,27 +31,37 @@ export default function PropertyCard({ property, formatPrice }) {
             property.images?.[0] || 
             'https://via.placeholder.com/400x300/34495e/ffffff?text=Sin+Imagen'
           } 
-          alt={property.publication_title || property.title || property.address?.street_name || 'Propiedad'}
+          alt={propertyTitle}
           onError={(e) => {
             e.target.src = 'https://via.placeholder.com/400x300/34495e/ffffff?text=Sin+Imagen';
           }}
         />
         <div className="property-badge">
-          {property.operations && property.operations.length > 0 
-            ? (property.operations[0].operation_type === 'Sale' || property.operations[0].operation_id === 1 ? 'Venta' : 'Alquiler')
-            : (property.operation?.operation_type === 1 || property.operation === 'venta' ? 'Venta' : 'Alquiler')
-          }
-        </div>
-        <div className="property-overlay">
-          <button className="quick-view-btn">
-            <FaEye /> Vista rápida
-          </button>
+          {(() => {
+            if (property.operations && property.operations.length > 0) {
+              const operationType = property.operations[0].operation_type
+              
+              // Verificar si es Venta
+              if (operationType && (operationType.includes('Venta') || operationType === 'Sale' || property.operations[0].operation_id === 1)) {
+                return 'Venta'
+              }
+              
+              // Verificar si es Alquiler (incluye "Alquiler" y "Alquiler temporario")
+              if (operationType && (operationType.includes('Alquiler') || operationType === 'Rent' || property.operations[0].operation_id === 2)) {
+                return 'Alquiler'
+              }
+              
+              // Retornar el tipo tal cual viene de la API
+              return operationType || 'Consultar'
+            }
+            return 'Consultar'
+          })()}
         </div>
       </div>
       
       <div className="property-content">
         <h4 className="property-title">
-          {property.publication_title || property.title || property.address?.street_name || 'Propiedad'}
+          {propertyTitle}
         </h4>
         <p className="property-price">{formatPrice(property)}</p>
         
@@ -75,12 +96,19 @@ export default function PropertyCard({ property, formatPrice }) {
             <span>Ver Detalles</span>
             <span className="btn-arrow">→</span>
           </button>
-          <button className="btn-contact">
+          <button 
+            className="btn-contact"
+            onClick={(e) => {
+              e.preventDefault()
+              e.stopPropagation()
+              window.open(`https://wa.me/5491165048694?text=Hola! Me interesa la propiedad: ${propertyTitle || 'Propiedad'}`, '_blank')
+            }}
+          >
             <FaWhatsapp />
             <span>Contactar</span>
           </button>
         </div>
       </div>
-    </div>
+    </Link>
   )
 }

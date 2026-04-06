@@ -1,6 +1,7 @@
 import "./globals.css";
 import Header from "../components/Header/Header";
 import Footer from "../components/Footer/Footer";
+import WhatsAppChat from "../components/WhatsAppChat/WhatsAppChat";
 
 export const metadata = {
   title: "Silvia Fernández - Inmobiliaria",
@@ -27,6 +28,7 @@ export default function RootLayout({ children }) {
           {children}
         </main>
         <Footer />
+        <WhatsAppChat />
       </body>
     </html>
   );

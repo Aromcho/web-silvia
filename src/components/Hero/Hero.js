@@ -1,13 +1,20 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { useRouter } from 'next/navigation';
+import { autocompleteProperties } from '../../services/propertyService';
+import { FaHome, FaBuilding, FaMapMarkerAlt } from 'react-icons/fa';
 import './Hero.css';
 
 const Hero = () => {
+  const router = useRouter();
   const [searchForm, setSearchForm] = useState({
     operation: 'venta',
     type: '',
     location: '',
   });
+  const [suggestions, setSuggestions] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const suggestionsRef = useRef(null);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -15,73 +22,111 @@ const Hero = () => {
       ...prev,
       [name]: value
     }));
+
+    // Autocompletado para ubicación
+    if (name === 'location' && value.length > 2) {
+      handleAutocomplete(value);
+    } else if (name === 'location') {
+      setSuggestions([]);
+      setShowSuggestions(false);
+    }
+  };
+
+  const handleAutocomplete = async (query) => {
+    try {
+      const results = await autocompleteProperties(query);
+      setSuggestions(results);
+      setShowSuggestions(results.length > 0);
+    } catch (error) {
+      console.error('Error en autocompletado:', error);
+      setSuggestions([]);
+    }
+  };
+
+  const selectSuggestion = (suggestion) => {
+    setSearchForm(prev => ({
+      ...prev,
+      location: suggestion.value
+    }));
+    setSuggestions([]);
+    setShowSuggestions(false);
   };
 
   const handleSearch = (e) => {
     e.preventDefault();
-    console.log('Searching with filters:', searchForm);
+    
+    // Construir query params para redirección
+    const params = new URLSearchParams();
+    
+    if (searchForm.operation) {
+      params.append('operation', searchForm.operation);
+    }
+    if (searchForm.type) {
+      params.append('type', searchForm.type);
+    }
+    if (searchForm.location) {
+      params.append('location', searchForm.location);
+    }
+    
+    // Redirigir a página de búsqueda
+    router.push(`/propiedades?${params.toString()}`);
   };
+
+  // Cerrar sugerencias al hacer click fuera
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (suggestionsRef.current && !suggestionsRef.current.contains(event.target)) {
+        setShowSuggestions(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const quickAccessCards = [
     { 
       id: 'alquiler', 
       title: 'Alquiler', 
-      icon: (
-        <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
-          <path d="M21 2L19 4M19 4L15 8L19 12L23 8L19 4ZM19 4V2M15 8L13 10L5 18V21H8L16 13L15 8Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-        </svg>
-      )
+      icon: <FaHome className="card-icon-element" />
     },
     { 
       id: 'lotes', 
       title: 'Lotes - Terrenos', 
-      icon: (
-        <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
-          <path d="M21 16V8C20.9996 7.64928 20.9071 7.30481 20.7315 7.00116C20.556 6.69751 20.3037 6.44536 20 6.27L13 2.27C12.696 2.09446 12.3511 2.00205 12 2.00205C11.6489 2.00205 11.304 2.09446 11 2.27L4 6.27C3.69626 6.44536 3.44398 6.69751 3.26846 7.00116C3.09294 7.30481 3.00036 7.64928 3 8V16C3.00036 16.3507 3.09294 16.6952 3.26846 16.9988C3.44398 17.3025 3.69626 17.5546 4 17.73L11 21.73C11.304 21.9055 11.6489 21.9979 12 21.9979C12.3511 21.9979 12.696 21.9055 13 21.73L20 17.73C20.3037 17.5546 20.556 17.3025 20.7315 16.9988C20.9071 16.6952 20.9996 16.3507 21 16Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-        </svg>
-      )
+      icon: <FaMapMarkerAlt className="card-icon-element" />
     },
     { 
       id: 'casas', 
       title: 'Casas', 
-      icon: (
-        <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
-          <path d="M3 9L12 2L21 9V20C21 20.5304 20.7893 21.0391 20.4142 21.4142C20.0391 21.7893 19.5304 22 19 22H5C4.46957 22 3.96086 21.7893 3.58579 21.4142C3.21071 21.0391 3 20.5304 3 20V9Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          <path d="M9 22V12H15V22" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-        </svg>
-      )
+      icon: <FaHome className="card-icon-element" />
     },
     { 
       id: 'departamentos', 
       title: 'Departamentos', 
-      icon: (
-        <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
-          <path d="M3 21H21M3 10H21M5 6L12 3L19 6M4 10V21M20 10V21M8 14V18M12 14V18M16 14V18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-        </svg>
-      )
+      icon: <FaBuilding className="card-icon-element" />
     },
     { 
       id: 'complejos', 
       title: 'Complejos', 
-      icon: (
-        <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
-          <path d="M18 2H6C4.89543 2 4 2.89543 4 4V20C4 21.1046 4.89543 22 6 22H18C19.1046 22 20 21.1046 20 20V4C20 2.89543 19.1046 2 18 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          <path d="M9 6H9.01M15 6H15.01M9 10H9.01M15 10H15.01M9 14H9.01M15 14H15.01M9 18H15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-        </svg>
-      )
+      icon: <FaBuilding className="card-icon-element" />
     }
   ];
 
   const handleQuickAccess = (cardId) => {
+    const params = new URLSearchParams();
+    
     if (cardId === 'alquiler') {
-      setSearchForm(prev => ({ ...prev, operation: 'alquiler' }));
+      params.append('operation', 'alquiler');
+      router.push(`/propiedades?${params.toString()}`);
+    } else if (cardId === 'lotes') {
+      router.push('/lotes-terrenos');
+    } else if (cardId === 'complejos') {
+      router.push('/complejos');
     } else {
-      setSearchForm(prev => ({ 
-        ...prev, 
-        operation: 'venta',
-        type: cardId === 'lotes' ? 'terreno' : 
-             cardId === 'complejos' ? 'hotel' : cardId 
-      }));
+      // Para casas y departamentos
+      params.append('operation', 'venta');
+      params.append('type', cardId);
+      router.push(`/propiedades?${params.toString()}`);
     }
   };
 
@@ -143,21 +188,41 @@ const Hero = () => {
                       className="search-select"
                     >
                       <option value="">Tipo de propiedad</option>
-                      <option value="casa">Casa</option>
-                      <option value="departamento">Departamento</option>
-                      <option value="ph">PH</option>
-                      <option value="terreno">Terreno</option>
-                      <option value="hotel">Complejo</option>
+                      <option value="Casa">Casa</option>
+                      <option value="Departamento">Departamento</option>
+                      <option value="PH">PH</option>
+                      <option value="Terreno">Terreno</option>
+                      <option value="Local">Local</option>
+                      <option value="Complejo">Complejo</option>
                     </select>
                     
-                    <input
-                      type="text"
-                      name="location"
-                      placeholder="Ubicación"
-                      value={searchForm.location}
-                      onChange={handleInputChange}
-                      className="search-input"
-                    />
+                    <div className="autocomplete-wrapper" ref={suggestionsRef}>
+                      <input
+                        type="text"
+                        name="location"
+                        placeholder="Ubicación (ciudad, barrio, dirección...)"
+                        value={searchForm.location}
+                        onChange={handleInputChange}
+                        className="search-input"
+                        autoComplete="off"
+                      />
+                      {showSuggestions && suggestions.length > 0 && (
+                        <ul className="autocomplete-suggestions">
+                          {suggestions.map((suggestion, index) => (
+                            <li 
+                              key={index}
+                              onClick={() => selectSuggestion(suggestion)}
+                              className="autocomplete-item"
+                            >
+                              <strong>{suggestion.value}</strong>
+                              {suggestion.secundvalue && (
+                                <small>{suggestion.secundvalue}</small>
+                              )}
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
                   </div>
                   
                   <button type="submit" className="search-btn">

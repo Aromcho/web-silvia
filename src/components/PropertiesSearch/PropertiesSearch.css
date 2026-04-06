@@ -38,6 +38,46 @@
   margin: 0 auto;
 }
 
+/* Filtros siempre visibles */
+.filters-always-visible {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+/* Botón de toggle filtros - oculto por defecto en desktop */
+.toggle-filters-btn {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.875rem;
+  background-color: var(--primary-color);
+  color: var(--white-color);
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.toggle-filters-btn:hover {
+  background-color: #006b4d;
+}
+
+.toggle-filters-btn svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* Filtros colapsables */
+.filters-collapsible {
+  max-height: 1000px;
+  overflow: visible;
+  transition: all 0.3s ease;
+}
+
 .filters-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -306,13 +346,64 @@
 }
 
 /* Responsive */
+@media (max-width: 992px) {
+  .filters-always-visible {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .filter-search {
+    grid-column: span 2;
+  }
+}
+
 @media (max-width: 768px) {
   .properties-search {
-    padding: 4rem 0 2rem;
+    padding: 5rem 0 2rem;
   }
   
   .properties-header h1 {
     font-size: 2rem;
+  }
+  
+  .search-filters {
+    padding: 1.5rem;
+  }
+  
+  /* Mostrar botón de toggle en mobile */
+  .toggle-filters-btn {
+    display: flex;
+  }
+  
+  /* Filtros colapsables ocultos por defecto en mobile */
+  .filters-collapsible {
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+  }
+  
+  .filters-collapsible.filters-open {
+    max-height: 2000px;
+    overflow: visible;
+    opacity: 1;
+    margin-top: 1.5rem;
+  }
+  
+  .filters-always-visible {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .filter-search {
+    grid-column: span 1;
+  }
+  
+  .filters-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .search-btn {
+    max-width: 100%;
   }
   
   .search-filters {

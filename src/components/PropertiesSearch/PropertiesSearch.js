@@ -1,22 +1,24 @@
 'use client';
 import { useState, useEffect } from 'react';
-import tokkoService from '../../services/tokkoService';
+import { getProperties } from '../../services/propertyService';
 import './PropertiesSearch.css';
 
-const PropertiesSearch = () => {
+const PropertiesSearch = ({ defaultFilters = {} }) => {
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showFilters, setShowFilters] = useState(false);
   const [filters, setFilters] = useState({
-    operation: 'venta', // 1 = venta, 2 = alquiler
-    type: '',
-    location: '',
+    operation: defaultFilters.operation || 'venta',
+    type: defaultFilters.type || '',
+    location: defaultFilters.location || '',
     minPrice: '',
     maxPrice: '',
     bedrooms: '',
     bathrooms: '',
     minSurface: '',
     maxSurface: '',
-    currency: 'USD'
+    currency: 'USD',
+    sortBy: 'recent'
   });
 
   // Mock data para desarrollo
@@ -71,7 +73,7 @@ const PropertiesSearch = () => {
     try {
       console.log('🔍 Loading properties with filters:', filters);
       
-      // Mapear filtros para la API de Tokko
+      // Mapear filtros para la API
       const apiFilters = {
         limit: 20,
         offset: 0
@@ -79,79 +81,58 @@ const PropertiesSearch = () => {
 
       // Tipo de operación
       if (filters.operation) {
-        const operationMapping = {
-          'venta': 1,           // Sale
-          'alquiler': 2,        // Rent
-          'alquiler_temporal': 2 // Usar Rent como fallback
-        };
-        
-        if (operationMapping[filters.operation]) {
-          apiFilters.operation_type = operationMapping[filters.operation];
-          console.log('📋 Applied operation filter:', filters.operation, '→', apiFilters.operation_type);
-        }
+        apiFilters.operation = filters.operation;
+        console.log('📋 Applied operation filter:', filters.operation);
       }
 
-      // Tipo de propiedad - usar IDs que funcionan
+      // Tipo de propiedad
       if (filters.type) {
-        const typeMapping = {
-          'terreno': 1,        // Land
-          'lote': 1,           // Land
-          'departamento': 2,   // Apartment
-          'casa': 3,           // House
-          'oficina': 5,        // Office
-          'ph': 3,             // House como fallback
-          'local': 7,          // Business Premises
-          'hotel': 8           // Commercial Building
-        };
-        
-        if (typeMapping[filters.type]) {
-          apiFilters.property_type = typeMapping[filters.type];
-          console.log('🏠 Applied type filter:', filters.type, '→', apiFilters.property_type);
-        }
+        apiFilters.type = filters.type;
+        console.log('🏠 Applied type filter:', filters.type);
       }
 
       // Ubicación
       if (filters.location) {
-        apiFilters.location__name__icontains = filters.location;
+        apiFilters.location = filters.location;
         console.log('📍 Applied location filter:', filters.location);
       }
 
       // Precio
       if (filters.minPrice) {
-        apiFilters.price_from = parseInt(filters.minPrice);
+        apiFilters.minPrice = parseInt(filters.minPrice);
         console.log('💰 Applied min price filter:', filters.minPrice);
       }
       if (filters.maxPrice) {
-        apiFilters.price_to = parseInt(filters.maxPrice);
+        apiFilters.maxPrice = parseInt(filters.maxPrice);
         console.log('💰 Applied max price filter:', filters.maxPrice);
       }
 
       // Dormitorios
       if (filters.bedrooms) {
-        apiFilters.suite_amount_from = parseInt(filters.bedrooms);
+        apiFilters.bedrooms = parseInt(filters.bedrooms);
         console.log('🛏️ Applied bedrooms filter:', filters.bedrooms);
       }
 
       // Baños
       if (filters.bathrooms) {
-        apiFilters.bathroom_amount_from = parseInt(filters.bathrooms);
+        apiFilters.bathrooms = parseInt(filters.bathrooms);
         console.log('🚿 Applied bathrooms filter:', filters.bathrooms);
       }
 
       // Superficie
       if (filters.minSurface) {
-        apiFilters.surface_from = parseInt(filters.minSurface);
+        apiFilters.minSurface = parseInt(filters.minSurface);
         console.log('📐 Applied min surface filter:', filters.minSurface);
       }
       if (filters.maxSurface) {
-        apiFilters.surface_to = parseInt(filters.maxSurface);
+        apiFilters.maxSurface = parseInt(filters.maxSurface);
         console.log('📐 Applied max surface filter:', filters.maxSurface);
       }
 
       console.log('📡 Final API filters:', apiFilters);
-      const apiProperties = await tokkoService.getProperties(apiFilters);
-      console.log('✅ Properties loaded from API:', apiProperties.length);
-      setProperties(apiProperties);
+      const response = await getProperties(apiFilters);
+      console.log('✅ Properties loaded from API:', response?.properties?.length || 0);
+      setProperties(response?.properties || []);
     } catch (error) {
       console.error('Error loading properties:', error);
       setProperties([]);
@@ -173,57 +154,31 @@ const PropertiesSearch = () => {
   };
 
   const formatPrice = (property) => {
-    if (!property) return 'Consultar precio'
+    if (!property || !property.price) return 'Consultar precio';
     
-    // Manejar estructura de Tokko API
-    let price = null
-    let currency = 'ARS'
-    
-    if (property.operations && property.operations.length > 0) {
-      const operation = property.operations[0]
-      if (operation.prices && operation.prices.length > 0) {
-        price = operation.prices[0].price
-        currency = operation.prices[0].currency
-      }
-    } else {
-      price = property.price || property.total_price
-      currency = property.currency?.name || property.currency || 'ARS'
-    }
-    
-    if (!price) return 'Consultar precio'
+    const currency = property.currency || 'USD';
+    const price = property.price;
     
     try {
-      // Mapear códigos de moneda de Tokko
-      const currencyMap = {
-        'Peso Argentino': 'ARS',
-        'USD': 'USD',
-        'Dólar Estadounidense': 'USD',
-        'ARS': 'ARS'
-      }
-      
-      const mappedCurrency = currencyMap[currency] || currency
-      
       return new Intl.NumberFormat('es-AR', {
         style: 'currency',
-        currency: mappedCurrency,
+        currency: currency,
         minimumFractionDigits: 0,
         maximumFractionDigits: 0
-      }).format(price)
+      }).format(price);
     } catch (error) {
-      return `${currency} ${price.toLocaleString()}`
+      return `${currency} ${price.toLocaleString()}`;
     }
-  }
+  };
 
   return (
     <div className="properties-search">
       <div className="container">
-        {/* Header */}
-        
-
         {/* Filtros de búsqueda */}
         <div className="search-filters">
           <form onSubmit={handleSearch} className="filters-form">
-            <div className="filters-grid">
+            {/* Filtros siempre visibles */}
+            <div className="filters-always-visible">
               {/* Operación */}
               <div className="filter-group">
                 <label>Operación</label>
@@ -236,27 +191,8 @@ const PropertiesSearch = () => {
                 </select>
               </div>
 
-              {/* Tipo */}
-              <div className="filter-group">
-                <label>Tipo</label>
-                <select 
-                  value={filters.type}
-                  onChange={(e) => handleFilterChange('type', e.target.value)}
-                >
-                  <option value="">Todos</option>
-                  <option value="casa">Casa</option>
-                  <option value="departamento">Departamento</option>
-                  <option value="ph">PH</option>
-                  <option value="terreno">Terreno</option>
-                  <option value="lote">Lote</option>
-                  <option value="local">Local</option>
-                  <option value="oficina">Oficina</option>
-                  <option value="hotel">Hotel</option>
-                </select>
-              </div>
-
               {/* Ubicación */}
-              <div className="filter-group">
+              <div className="filter-group filter-search">
                 <label>Ubicación</label>
                 <input
                   type="text"
@@ -266,78 +202,128 @@ const PropertiesSearch = () => {
                 />
               </div>
 
-              {/* Precio mínimo */}
+              {/* Ordenar por */}
               <div className="filter-group">
-                <label>Precio mínimo</label>
-                <input
-                  type="number"
-                  placeholder="Desde"
-                  value={filters.minPrice}
-                  onChange={(e) => handleFilterChange('minPrice', e.target.value)}
-                />
-              </div>
-
-              {/* Precio máximo */}
-              <div className="filter-group">
-                <label>Precio máximo</label>
-                <input
-                  type="number"
-                  placeholder="Hasta"
-                  value={filters.maxPrice}
-                  onChange={(e) => handleFilterChange('maxPrice', e.target.value)}
-                />
-              </div>
-
-              {/* Dormitorios */}
-              <div className="filter-group">
-                <label>Dormitorios</label>
+                <label>Ordenar</label>
                 <select 
-                  value={filters.bedrooms}
-                  onChange={(e) => handleFilterChange('bedrooms', e.target.value)}
+                  value={filters.sortBy}
+                  onChange={(e) => handleFilterChange('sortBy', e.target.value)}
                 >
-                  <option value="">Cualquiera</option>
-                  <option value="1">1+</option>
-                  <option value="2">2+</option>
-                  <option value="3">3+</option>
-                  <option value="4">4+</option>
+                  <option value="recent">Más recientes</option>
+                  <option value="price-asc">Precio: menor a mayor</option>
+                  <option value="price-desc">Precio: mayor a menor</option>
+                  <option value="surface-desc">Mayor superficie</option>
                 </select>
               </div>
 
-              {/* Baños */}
-              <div className="filter-group">
-                <label>Baños</label>
-                <select 
-                  value={filters.bathrooms}
-                  onChange={(e) => handleFilterChange('bathrooms', e.target.value)}
-                >
-                  <option value="">Cualquiera</option>
-                  <option value="1">1+</option>
-                  <option value="2">2+</option>
-                  <option value="3">3+</option>
-                  <option value="4">4+</option>
-                </select>
-              </div>
+              {/* Botón para mostrar más filtros en mobile */}
+              <button 
+                type="button" 
+                className="toggle-filters-btn"
+                onClick={() => setShowFilters(!showFilters)}
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                  <path d="M3 4H21M3 8H21M10 12H21M10 16H21M3 12L7 16M3 16L7 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+                {showFilters ? 'Ocultar filtros' : 'Más filtros'}
+              </button>
+            </div>
 
-              {/* Superficie mínima */}
-              <div className="filter-group">
-                <label>Superficie mín. (m²)</label>
-                <input
-                  type="number"
-                  placeholder="Desde"
-                  value={filters.minSurface}
-                  onChange={(e) => handleFilterChange('minSurface', e.target.value)}
-                />
-              </div>
+            {/* Filtros adicionales (colapsables en mobile) */}
+            <div className={`filters-collapsible ${showFilters ? 'filters-open' : ''}`}>
+              <div className="filters-grid">
+                {/* Tipo */}
+                <div className="filter-group">
+                  <label>Tipo</label>
+                  <select 
+                    value={filters.type}
+                    onChange={(e) => handleFilterChange('type', e.target.value)}
+                  >
+                    <option value="">Todos</option>
+                    <option value="casa">Casa</option>
+                    <option value="departamento">Departamento</option>
+                    <option value="ph">PH</option>
+                    <option value="terreno">Terreno</option>
+                    <option value="lote">Lote</option>
+                    <option value="local">Local</option>
+                    <option value="oficina">Oficina</option>
+                    <option value="hotel">Complejo</option>
+                  </select>
+                </div>
 
-              {/* Superficie máxima */}
-              <div className="filter-group">
-                <label>Superficie máx. (m²)</label>
-                <input
-                  type="number"
-                  placeholder="Hasta"
-                  value={filters.maxSurface}
-                  onChange={(e) => handleFilterChange('maxSurface', e.target.value)}
-                />
+                {/* Precio mínimo */}
+                <div className="filter-group">
+                  <label>Precio mínimo</label>
+                  <input
+                    type="number"
+                    placeholder="Desde"
+                    value={filters.minPrice}
+                    onChange={(e) => handleFilterChange('minPrice', e.target.value)}
+                  />
+                </div>
+
+                {/* Precio máximo */}
+                <div className="filter-group">
+                  <label>Precio máximo</label>
+                  <input
+                    type="number"
+                    placeholder="Hasta"
+                    value={filters.maxPrice}
+                    onChange={(e) => handleFilterChange('maxPrice', e.target.value)}
+                  />
+                </div>
+
+                {/* Dormitorios */}
+                <div className="filter-group">
+                  <label>Dormitorios</label>
+                  <select 
+                    value={filters.bedrooms}
+                    onChange={(e) => handleFilterChange('bedrooms', e.target.value)}
+                  >
+                    <option value="">Cualquiera</option>
+                    <option value="1">1+</option>
+                    <option value="2">2+</option>
+                    <option value="3">3+</option>
+                    <option value="4">4+</option>
+                  </select>
+                </div>
+
+                {/* Baños */}
+                <div className="filter-group">
+                  <label>Baños</label>
+                  <select 
+                    value={filters.bathrooms}
+                    onChange={(e) => handleFilterChange('bathrooms', e.target.value)}
+                  >
+                    <option value="">Cualquiera</option>
+                    <option value="1">1+</option>
+                    <option value="2">2+</option>
+                    <option value="3">3+</option>
+                    <option value="4">4+</option>
+                  </select>
+                </div>
+
+                {/* Superficie mínima */}
+                <div className="filter-group">
+                  <label>Superficie mín. (m²)</label>
+                  <input
+                    type="number"
+                    placeholder="Desde"
+                    value={filters.minSurface}
+                    onChange={(e) => handleFilterChange('minSurface', e.target.value)}
+                  />
+                </div>
+
+                {/* Superficie máxima */}
+                <div className="filter-group">
+                  <label>Superficie máx. (m²)</label>
+                  <input
+                    type="number"
+                    placeholder="Hasta"
+                    value={filters.maxSurface}
+                    onChange={(e) => handleFilterChange('maxSurface', e.target.value)}
+                  />
+                </div>
               </div>
             </div>
 
@@ -374,28 +360,20 @@ const PropertiesSearch = () => {
                 <div key={property.id} className="property-card">
                   <div className="property-image">
                     <img 
-                      src={
-                        property.photos?.[0]?.image || 
-                        property.photos?.[0]?.thumb || 
-                        property.images?.[0] || 
-                        'https://via.placeholder.com/400x300/34495e/ffffff?text=Sin+Imagen'
-                      } 
-                      alt={property.publication_title || property.title || property.address?.street_name || 'Propiedad'}
+                      src={property.images?.[0] || 'https://via.placeholder.com/400x300/34495e/ffffff?text=Sin+Imagen'} 
+                      alt={property.title || 'Propiedad'}
                       onError={(e) => {
                         e.target.src = 'https://via.placeholder.com/400x300/34495e/ffffff?text=Sin+Imagen';
                       }}
                     />
                     <div className="property-badge">
-                      {property.operations && property.operations.length > 0 
-                        ? (property.operations[0].operation_type === 'Sale' || property.operations[0].operation_id === 1 ? 'Venta' : 'Alquiler')
-                        : (property.operation?.operation_type === 1 || property.operation === 'venta' ? 'Venta' : 'Alquiler')
-                      }
+                      {property.operation === 'venta' ? 'Venta' : 'Alquiler'}
                     </div>
                   </div>
                   
                   <div className="property-content">
                     <h4 className="property-title">
-                      {property.publication_title || property.title || property.address?.street_name || 'Propiedad'}
+                      {property.title || 'Propiedad'}
                     </h4>
                     <p className="property-price">{formatPrice(property)}</p>
                     
@@ -404,30 +382,30 @@ const PropertiesSearch = () => {
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                           <path d="M3 9L12 2L21 9V20C21 20.5304 20.7893 21.0391 20.4142 21.4142C20.0391 21.7893 19.5304 22 19 22H5C4.46957 22 3.96086 21.7893 3.58579 21.4142C3.21071 21.0391 3 20.5304 3 20V9Z" stroke="currentColor" strokeWidth="2"/>
                         </svg>
-                        {property.surface}m²
+                        {property.surface || 0}m²
                       </span>
                       
-                      {(property.suite_amount || property.bedrooms) > 0 && (
+                      {property.bedrooms > 0 && (
                         <span className="detail-item">
                           <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                             <path d="M7 7h10v10H7z" stroke="currentColor" strokeWidth="2"/>
                           </svg>
-                          {property.suite_amount || property.bedrooms} dorm.
+                          {property.bedrooms} dorm.
                         </span>
                       )}
                       
-                      {(property.bathroom_amount || property.bathrooms) > 0 && (
+                      {property.bathrooms > 0 && (
                         <span className="detail-item">
                           <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                             <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="2"/>
                           </svg>
-                          {property.bathroom_amount || property.bathrooms} baños
+                          {property.bathrooms} baños
                         </span>
                       )}
                     </div>
                     
                     <p className="property-location">
-                      📍 {property.address?.city || property.location?.name || property.location || 'Ubicación no disponible'}, {property.address?.state || ''}
+                      📍 {property.location || 'Ubicación no disponible'}
                     </p>
                     
                     <div className="property-actions">

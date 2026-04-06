@@ -1,10 +1,12 @@
 'use client';
 import { useState } from 'react';
 import Image from 'next/image';
+import WhatsAppChat from '../WhatsAppChat/WhatsAppChat';
 import './Header.css';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isChatOpen, setIsChatOpen] = useState(false);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -12,7 +14,7 @@ const Header = () => {
 
   return (
     <header className="header">
-      <div className="container">
+      <div className="container-hero">
         <div className="header-content">
           {/* Logo */}
           <div className="logo">
@@ -32,25 +34,34 @@ const Header = () => {
                 <a href="/" className="nav-link">Inicio</a>
               </li>
               <li className="nav-item">
-                <a href="/about" className="nav-link">Nosotros</a>
+                <a href="/propiedades" className="nav-link">Propiedades</a>
               </li>
               <li className="nav-item">
-                <a href="/#propiedades" className="nav-link">Propiedades</a>
+                <a href="/lotes-terrenos" className="nav-link">Lotes - Terrenos</a>
               </li>
               <li className="nav-item">
-                <a href="/#servicios" className="nav-link">Servicios</a>
+                <a href="/alquiler-temporario" className="nav-link">Alquiler Temporario</a>
               </li>
               <li className="nav-item">
-                <a href="/#contacto" className="nav-link">Contacto</a>
+                <a href="/complejos" className="nav-link">Complejos</a>
+              </li>
+              <li className="nav-item">
+                <a href="/nosotros" className="nav-link">Nosotros</a>
+              </li>
+              <li className="nav-item">
+                <a href="/mapa" className="nav-link">Mapa</a>
               </li>
             </ul>
           </nav>
 
           {/* CTA Button */}
           <div className="header-cta">
-            <a href="#contacto" className="btn btn-primary">
+            <button 
+              onClick={() => setIsChatOpen(true)} 
+              className="btn btn-primary"
+            >
               Consultar Ahora
-            </a>
+            </button>
           </div>
 
           {/* Mobile Menu Button */}
@@ -69,18 +80,18 @@ const Header = () => {
         <div className={`mobile-menu ${isMenuOpen ? 'mobile-menu-open' : ''}`}>
           <ul className="mobile-nav-list">
             <li><a href="/" onClick={toggleMenu}>Inicio</a></li>
-            <li><a href="/about" onClick={toggleMenu}>Nosotros</a></li>
-            <li><a href="/#propiedades" onClick={toggleMenu}>Propiedades</a></li>
-            <li><a href="/#servicios" onClick={toggleMenu}>Servicios</a></li>
-            <li><a href="/#contacto" onClick={toggleMenu}>Contacto</a></li>
+            <li><a href="/propiedades" onClick={toggleMenu}>Propiedades</a></li>
+            <li><a href="/lotes-terrenos" onClick={toggleMenu}>Lotes - Terrenos</a></li>
+            <li><a href="/alquiler-temporario" onClick={toggleMenu}>Alquiler Temporario</a></li>
+            <li><a href="/complejos" onClick={toggleMenu}>Complejos</a></li>
+            <li><a href="/nosotros" onClick={toggleMenu}>Nosotros</a></li>
+            <li><a href="/mapa" onClick={toggleMenu}>Mapa</a></li>
           </ul>
-          <div className="mobile-cta">
-            <a href="/#contacto" className="btn btn-primary" onClick={toggleMenu}>
-              Consultar Ahora
-            </a>
-          </div>
         </div>
       </div>
+      
+      {/* WhatsApp Chat Modal */}
+      <WhatsAppChat isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} />
     </header>
   );
 };

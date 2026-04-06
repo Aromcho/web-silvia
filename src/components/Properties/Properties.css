@@ -3,7 +3,7 @@
   background: #f8f9fa;
 }
 
-.container {
+.properties-section .container {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 20px;
@@ -76,47 +76,55 @@
   background: #95a5a6;
 }
 
-.properties-grid {
+.properties-section .properties-grid {
   display: flex;
-  gap: 2rem;
-  padding: 10px 0;
-  min-width: min-content;
+  flex-wrap: nowrap;
+  gap: 1rem;
+  min-width: max-content;
 }
 
-.property-card {
-  flex: 0 0 350px;
-  background: white;
-  border-radius: 16px;
-  overflow: hidden;
-  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
-  transition: all 0.3s ease;
-  cursor: pointer;
-  border: 1px solid rgba(0, 0, 0, 0.05);
+.properties-section .modern-property-card {
+  flex: 0 0 359px;
+  width: 359px;
+  min-width: 359px;
+  max-width: 359px;
 }
 
-.property-card:hover {
+.properties-section .modern-property-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 15px 40px rgba(0, 129, 92, 0.15);
 }
 
-.property-image {
+.properties-section .modern-property-card .property-image {
   position: relative;
   height: 220px;
   overflow: hidden;
 }
 
-.property-image img {
+.properties-section .modern-property-card .property-image img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   transition: transform 0.3s ease;
 }
 
-.property-card:hover .property-image img {
+.properties-section .modern-property-card:hover .property-image img {
   transform: scale(1.05);
 }
 
-.property-badge {
+/* Home: sin capa verde en hover, solo efecto sobre la imagen */
+.properties-section .modern-property-card .property-overlay,
+.properties-section .modern-property-card:hover .property-overlay {
+  opacity: 0;
+  background: transparent;
+  pointer-events: none;
+}
+
+.properties-section .modern-property-card .quick-view-btn {
+  display: none;
+}
+
+.properties-section .modern-property-card .property-badge {
   position: absolute;
   top: 1rem;
   left: 1rem;
@@ -131,7 +139,7 @@
   z-index: 2;
 }
 
-.property-type-badge {
+.properties-section .modern-property-card .property-type-badge {
   position: absolute;
   top: 1rem;
   right: 1rem;
@@ -146,11 +154,11 @@
   z-index: 2;
 }
 
-.property-info {
+.properties-section .modern-property-card .property-content {
   padding: 1.5rem;
 }
 
-.property-title {
+.properties-section .modern-property-card .property-title {
   font-size: 1.25rem;
   font-weight: 600;
   color: #2c3e50;
@@ -158,14 +166,14 @@
   line-height: 1.3;
 }
 
-.property-price {
+.properties-section .modern-property-card .property-price {
   font-size: 1.5rem;
   font-weight: 700;
   color: #00815c;
   margin-bottom: 1rem;
 }
 
-.property-location {
+.properties-section .modern-property-card .property-location {
   color: #7f8c8d;
   font-size: 0.9rem;
   margin-bottom: 1.5rem;
@@ -174,13 +182,13 @@
   gap: 0.5rem;
 }
 
-.property-details {
+.properties-section .modern-property-card .property-details {
   display: flex;
   gap: 1rem;
   margin-bottom: 1.5rem;
 }
 
-.detail-item {
+.properties-section .modern-property-card .detail-item {
   display: flex;
   align-items: center;
   gap: 0.25rem;
@@ -189,17 +197,17 @@
   font-weight: 500;
 }
 
-.detail-item svg {
+.properties-section .modern-property-card .detail-item svg {
   color: #00815c;
 }
 
-.property-actions {
+.properties-section .modern-property-card .property-actions {
   display: flex;
   gap: 0.75rem;
 }
 
-.btn-view,
-.btn-contact {
+.properties-section .modern-property-card .btn-view,
+.properties-section .modern-property-card .btn-contact {
   flex: 1;
   padding: 0.75rem;
   border: none;
@@ -210,40 +218,40 @@
   transition: all 0.3s ease;
 }
 
-.btn-view {
+.properties-section .modern-property-card .btn-view {
   background-color: transparent;
   color: #00815c;
   border: 2px solid #00815c;
 }
 
-.btn-view:hover {
+.properties-section .modern-property-card .btn-view:hover {
   background-color: #00815c;
   color: white;
 }
 
-.btn-contact {
+.properties-section .modern-property-card .btn-contact {
   background-color: #00815c;
   color: white;
 }
 
-.btn-contact:hover {
+.properties-section .modern-property-card .btn-contact:hover {
   background-color: #006b4d;
 }
 
 /* Loading and Error States */
-.loading-state, .error-state {
+.properties-section .loading-state, .properties-section .error-state {
   text-align: center;
   padding: 50px 20px;
 }
 
-.skeleton-loader {
+.properties-section .skeleton-loader {
   display: flex;
   gap: 20px;
   overflow-x: auto;
   padding: 10px 0;
 }
 
-.skeleton-card {
+.properties-section .skeleton-card {
   flex: 0 0 320px;
   background: white;
   border-radius: 12px;
@@ -251,18 +259,18 @@
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
 }
 
-.skeleton-image {
+.properties-section .skeleton-image {
   height: 200px;
   background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
   background-size: 200% 100%;
   animation: loading 1.5s infinite;
 }
 
-.skeleton-content {
+.properties-section .skeleton-content {
   padding: 20px;
 }
 
-.skeleton-line {
+.properties-section .skeleton-line {
   height: 16px;
   background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
   background-size: 200% 100%;
@@ -271,7 +279,7 @@
   border-radius: 4px;
 }
 
-.skeleton-line.short {
+.properties-section .skeleton-line.short {
   width: 60%;
 }
 
@@ -284,7 +292,7 @@
   }
 }
 
-.error-state button {
+.properties-section .error-state button {
   background: #e74c3c;
   color: white;
   border: none;
@@ -294,7 +302,7 @@
   margin-top: 15px;
 }
 
-.error-state button:hover {
+.properties-section .error-state button:hover {
   background: #c0392b;
 }
 
@@ -304,7 +312,7 @@
     padding: 50px 0;
   }
   
-  .container {
+  .properties-section .container {
     padding: 0 15px;
   }
   
@@ -318,19 +326,22 @@
     font-size: 1.6rem;
   }
   
-  .property-card {
+  .properties-section .modern-property-card {
     flex: 0 0 280px;
+    width: 280px;
+    min-width: 280px;
+    max-width: 280px;
   }
   
-  .property-info {
+  .properties-section .modern-property-card .property-content {
     padding: 15px;
   }
   
-  .property-features {
+  .properties-section .modern-property-card .property-features {
     gap: 8px;
   }
   
-  .property-features span {
+  .properties-section .modern-property-card .property-features span {
     font-size: 0.8rem;
   }
 }
@@ -341,8 +352,11 @@
     padding: 0 15px;
   }
   
-  .property-card {
+  .properties-section .modern-property-card {
     flex: 0 0 260px;
+    width: 260px;
+    min-width: 260px;
+    max-width: 260px;
   }
   
   .section-title {

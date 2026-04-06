@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react'
 import Link from 'next/link'
-import tokkoService from '../../services/tokkoService'
+import { getProperties } from '../../services/propertyService'
 import PropertyCard from '../PropertyCard/PropertyCard'
 import './Properties.css'
 
@@ -64,57 +64,42 @@ export default function Properties() {
   const getPropertiesByType = async (type) => {
     try {
       console.log(`🔍 Fetching properties for type: ${type}`)
-      let result = []
+      let apiFilters = {
+        limit: 6,
+        offset: 0,
+        order: 'DESC'
+      }
       
       switch (type) {
         case 'destacadas':
-          // Obtener más propiedades y filtrar localmente las destacadas
-          const allForFeatured = await tokkoService.getProperties({ limit: 15 });
-          result = allForFeatured.filter(property => property.is_starred_on_web).slice(0, 6);
-          // Si no hay destacadas suficientes, tomar las primeras como "destacadas"
-          if (result.length < 3) {
-            result = allForFeatured.slice(0, 6);
-          }
+          apiFilters.is_starred = true
+          apiFilters.limit = 8
           break;
         case 'alquiler-temporario':
-          // Usar operation_type 2 para alquiler
-          result = await tokkoService.getProperties({ 
-            operation_type: 2, // Rent
-            limit: 6,
-            offset: 3 // Offset para variedad
-          });
+          apiFilters.operation_type = ['Alquiler']
           break;
         case 'casas':
-          // Usar property_type 3 para casas
-          result = await tokkoService.getProperties({ 
-            property_type: 3, // House
-            limit: 6 
-          });
+          apiFilters.property_type = ['Casa']
           break;
         case 'departamentos':
-          // Usar property_type 2 para departamentos
-          result = await tokkoService.getProperties({ 
-            property_type: 2, // Apartment
-            limit: 6,
-            offset: 2 // Offset para variedad
-          });
+          apiFilters.property_type = ['Departamento']
           break;
         case 'terrenos':
-          // Usar property_type 1 para terrenos
-          result = await tokkoService.getProperties({ 
-            property_type: 1, // Land
-            limit: 6 
-          });
+          apiFilters.property_type = ['Terreno']
           break;
         default:
-          result = [];
+          break;
       }
       
-      console.log(`${type} properties fetched:`, result.length, result)
+      console.log(`📡 API filters for ${type}:`, apiFilters)
+      const response = await getProperties(apiFilters)
+      const result = response.objects || []
+      
+      console.log(`${type} properties fetched:`, result.length)
       return result
     } catch (error) {
       console.error(`Error fetching properties for type ${type}:`, error);
-      throw error
+      return []
     }
   }
 
