@@ -14,8 +14,11 @@ import {
 } from 'react-icons/fa'
 import './PropertiesSearchNew.css'
 
-const PAGE_SIZE = 24
+const PAGE_SIZE = 12
 const FILTER_DEBOUNCE_MS = 250
+const SEARCH_CACHE_KEY_PREFIX = 'silvia-search-properties-cache-v1'
+
+let cachedSearchResults = null
 
 const OPERATION_QUERY_MAP = {
   venta: ['Venta', 'Sale'],
@@ -26,7 +29,6 @@ const OPERATION_QUERY_MAP = {
 const PROPERTY_TYPE_QUERY_MAP = {
   Casa: ['Casa', 'Casas', 'House'],
   Departamento: ['Departamento', 'Departamentos', 'Apartment', 'Flat'],
-  PH: ['PH'],
   Terreno: ['Terreno', 'Terrenos', 'Lote', 'Lotes', 'Campo'],
   Local: ['Local', 'Locales', 'Local Comercial'],
   Complejo: ['Complejo', 'Complejos', 'Hotel', 'Hoteles', 'Hotelero', 'Apart Hotel', 'Emprendimiento'],
@@ -64,6 +66,61 @@ const normalizeSortOrder = (sort) => {
   return 'DESC'
 }
 
+const safeStorageGet = (key) => {
+  if (typeof window === 'undefined') return null
+
+  try {
+    return window.sessionStorage.getItem(key)
+  } catch (error) {
+    console.warn('No se pudo leer el cache de busqueda:', error)
+    return null
+  }
+}
+
+const safeStorageSet = (key, value) => {
+  if (typeof window === 'undefined') return
+
+  try {
+    window.sessionStorage.setItem(key, value)
+  } catch (error) {
+    console.warn('No se pudo guardar el cache de busqueda:', error)
+  }
+}
+
+const buildSearchCacheKey = (filtersSnapshot) => {
+  return `${SEARCH_CACHE_KEY_PREFIX}:${JSON.stringify({
+    operation: filtersSnapshot.operation || '',
+    type: filtersSnapshot.type || '',
+    location: filtersSnapshot.location || '',
+    sort: filtersSnapshot.sort || 'recent',
+  })}`
+}
+
+const readSearchCache = (cacheKey) => {
+  if (cachedSearchResults?.[cacheKey]) {
+    return cachedSearchResults[cacheKey]
+  }
+
+  const rawValue = safeStorageGet(cacheKey)
+  if (!rawValue) return null
+
+  try {
+    const parsedValue = JSON.parse(rawValue)
+    cachedSearchResults = cachedSearchResults || {}
+    cachedSearchResults[cacheKey] = parsedValue
+    return parsedValue
+  } catch (error) {
+    console.warn('No se pudo parsear el cache de busqueda:', error)
+    return null
+  }
+}
+
+const writeSearchCache = (cacheKey, value) => {
+  cachedSearchResults = cachedSearchResults || {}
+  cachedSearchResults[cacheKey] = value
+  safeStorageSet(cacheKey, JSON.stringify(value))
+}
+
 export default function PropertiesSearchNew() {
   const searchParams = useSearchParams()
   const [properties, setProperties] = useState([])
@@ -71,7 +128,7 @@ export default function PropertiesSearchNew() {
   const [loadingMore, setLoadingMore] = useState(false)
   const [totalCount, setTotalCount] = useState(0)
   const [filters, setFilters] = useState({
-    operation: searchParams.get('operation') || 'alquiler',
+    operation: searchParams.get('operation') || 'venta',
     type: searchParams.get('type') || '',
     location: searchParams.get('location') || '',
     sort: 'recent'
@@ -85,6 +142,7 @@ export default function PropertiesSearchNew() {
   const suggestionsRef = useRef(null)
   const loadMoreRef = useRef(null)
   const requestIdRef = useRef(0)
+  const cacheKeyRef = useRef(buildSearchCacheKey(filters))
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -143,8 +201,17 @@ export default function PropertiesSearchNew() {
       setHasMore(nextProperties.length === PAGE_SIZE && (pageToLoad + 1) * PAGE_SIZE < total)
 
       setProperties((previous) => {
-        const merged = replace ? nextProperties : [...previous, ...nextProperties]
-        return dedupeProperties(merged)
+          const merged = replace ? nextProperties : [...previous, ...nextProperties]
+          const deduped = dedupeProperties(merged)
+
+          writeSearchCache(cacheKeyRef.current, {
+            properties: deduped,
+            totalCount: total,
+            page: pageToLoad,
+            hasMore: nextProperties.length === PAGE_SIZE && (pageToLoad + 1) * PAGE_SIZE < total,
+          })
+
+          return deduped
       })
     } catch (error) {
       if (requestId === requestIdRef.current) {
@@ -164,6 +231,20 @@ export default function PropertiesSearchNew() {
   }
 
   useEffect(() => {
+    const cacheKey = buildSearchCacheKey(appliedFilters)
+    cacheKeyRef.current = cacheKey
+
+    const cachedData = readSearchCache(cacheKey)
+    if (cachedData) {
+      setProperties(cachedData.properties || [])
+      setTotalCount(cachedData.totalCount || 0)
+      setPage(cachedData.page || 0)
+      setHasMore(Boolean(cachedData.hasMore))
+      setLoading(false)
+      setLoadingMore(false)
+      return undefined
+    }
+
     setProperties([])
     setTotalCount(0)
     setPage(0)
@@ -273,6 +354,21 @@ export default function PropertiesSearchNew() {
     }
   }
 
+  const renderSkeletonGrid = (count = 6) => (
+    <div className="loading-grid search-loading-grid">
+      {[...Array(count)].map((_, i) => (
+        <div key={i} className="property-skeleton">
+          <div className="skeleton-image"></div>
+          <div className="skeleton-content">
+            <div className="skeleton-title"></div>
+            <div className="skeleton-price"></div>
+            <div className="skeleton-details"></div>
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+
   return (
     <div className="search-page">
 
@@ -361,13 +457,6 @@ export default function PropertiesSearchNew() {
               <span className="property-type-label">Departamento</span>
             </button>
             <button 
-              className={`property-type-btn ${filters.type === 'PH' ? 'active' : ''}`}
-              onClick={() => handleFilterChange('type', filters.type === 'PH' ? '' : 'PH')}
-            >
-              <FaHome className="property-type-icon" />
-              <span className="property-type-label">PH</span>
-            </button>
-            <button 
               className={`property-type-btn ${filters.type === 'Terreno' ? 'active' : ''}`}
               onClick={() => handleFilterChange('type', filters.type === 'Terreno' ? '' : 'Terreno')}
             >
@@ -388,6 +477,22 @@ export default function PropertiesSearchNew() {
               <FaBuilding className="property-type-icon" />
               <span className="property-type-label">Complejos</span>
             </button>
+          </div>
+
+          {/* Select para tipos de propiedad - Solo visible en mobile */}
+          <div className="property-types-mobile">
+            <select 
+              className="property-type-select"
+              value={filters.type}
+              onChange={(e) => handleFilterChange('type', e.target.value)}
+            >
+              <option value="">Todos los tipos</option>
+              <option value="Casa">Casa</option>
+              <option value="Departamento">Departamento</option>
+              <option value="Terreno">Terreno</option>
+              <option value="Local">Local</option>
+              <option value="Complejo">Complejo</option>
+            </select>
           </div>
 
           {/* Filtro de orden */}
@@ -430,9 +535,7 @@ export default function PropertiesSearchNew() {
           </div>
 
           {loading && properties.length === 0 ? (
-            <div className="loading-container">
-              <div className="loading-spinner"></div>
-            </div>
+            renderSkeletonGrid(6)
           ) : (
             <>
               <div className={`properties-grid ${viewMode === 'list' ? 'list-view' : ''}`}>
@@ -469,8 +572,7 @@ export default function PropertiesSearchNew() {
 
               {loadingMore && (
                 <div className="loading-more-state">
-                  <div className="loading-spinner loading-spinner-small"></div>
-                  <p>Cargando más propiedades...</p>
+                  {renderSkeletonGrid(3)}
                 </div>
               )}
 

@@ -11,7 +11,7 @@ export default function AlquilerTemporarioPage() {
           <p>Descubrí opciones de alquiler por temporada en las mejores ubicaciones</p>
         </div>
       </div>
-      <PropertiesGrid filters={{ operation: 'alquiler-temporario' }} />
+      <PropertiesGrid filters={{ operation: 'alquiler temporario' }} />
     </div>
   );
 }

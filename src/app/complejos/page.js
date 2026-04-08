@@ -11,7 +11,7 @@ export default function ComplejosPage() {
           <p>Explorá nuestros complejos exclusivos y emprendimientos destacados</p>
         </div>
       </div>
-      <PropertiesGrid filters={{ type: 'complejo', operation: 'venta' }} />
+      <PropertiesGrid filters={{ type: 'hotel' }} />
     </div>
   );
 }

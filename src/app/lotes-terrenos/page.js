@@ -11,7 +11,7 @@ export default function LotesPage() {
           <p>Encontrá el terreno perfecto para construir tu proyecto</p>
         </div>
       </div>
-      <PropertiesGrid filters={{ type: 'terreno', operation: 'venta' }} />
+      <PropertiesGrid filters={{ type: 'terreno' }} />
     </div>
   );
 }

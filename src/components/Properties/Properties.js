@@ -6,6 +6,46 @@ import { getProperties } from '../../services/propertyService'
 import PropertyCard from '../PropertyCard/PropertyCard'
 import './Properties.css'
 
+const HOME_PROPERTIES_CACHE_KEY = 'silvia-home-properties-cache-v1'
+let cachedSectionsData = null
+
+const readCachedSectionsData = () => {
+  if (cachedSectionsData) {
+    return cachedSectionsData
+  }
+
+  if (typeof window === 'undefined') {
+    return null
+  }
+
+  try {
+    const rawValue = window.sessionStorage.getItem(HOME_PROPERTIES_CACHE_KEY)
+    if (!rawValue) {
+      return null
+    }
+
+    cachedSectionsData = JSON.parse(rawValue)
+    return cachedSectionsData
+  } catch (error) {
+    console.warn('No se pudo leer el cache de propiedades del home:', error)
+    return null
+  }
+}
+
+const writeCachedSectionsData = (sectionsData) => {
+  cachedSectionsData = sectionsData
+
+  if (typeof window === 'undefined') {
+    return
+  }
+
+  try {
+    window.sessionStorage.setItem(HOME_PROPERTIES_CACHE_KEY, JSON.stringify(sectionsData))
+  } catch (error) {
+    console.warn('No se pudo guardar el cache de propiedades del home:', error)
+  }
+}
+
 export default function Properties() {
   const [sectionsData, setSectionsData] = useState({
     destacadas: [],
@@ -18,6 +58,14 @@ export default function Properties() {
   const [error, setError] = useState(null)
 
   useEffect(() => {
+    const cachedData = readCachedSectionsData()
+
+    if (cachedData) {
+      setSectionsData(cachedData)
+      setLoading(false)
+      return undefined
+    }
+
     const fetchAllProperties = async () => {
       try {
         setLoading(true)
@@ -43,6 +91,14 @@ export default function Properties() {
         })
 
         setSectionsData({
+          destacadas,
+          'alquiler-temporario': alquilerTemp,
+          casas,
+          departamentos,
+          terrenos
+        })
+
+        writeCachedSectionsData({
           destacadas,
           'alquiler-temporario': alquilerTemp,
           casas,
@@ -209,7 +265,7 @@ export default function Properties() {
 
   const sections = [
     {
-      title: 'Propiedades Destacadas',
+      title: 'Nuestra selección',
       type: 'destacadas',
       properties: sectionsData.destacadas
     },

@@ -192,8 +192,8 @@ width: 40%;
 .quick-access-section {
   position: absolute;
   bottom: 20px;
-  left: 20px;
-  right: 20px;
+  left: 170px;
+  right: 170px;
   z-index: 4;
 }
 
@@ -311,7 +311,7 @@ width: 40%;
 @media (max-width: 768px) {
   .hero {
     height: 100vh;
-    min-height: 700px;
+    min-height: 100vh;
   }
   
   .hero-content {
@@ -333,8 +333,8 @@ width: 40%;
   /* Cards con scroll horizontal en mobile */
   .quick-access-section {
     bottom: 10px;
-    left: 0;
-    right: 0;
+    left: 10px;
+    right: 10px;
     padding: 0;
   }
   
@@ -390,7 +390,7 @@ width: 40%;
 
 @media (max-width: 480px) {
   .hero {
-    min-height: 650px;
+    min-height: 100vh;
   }
 
   .hero-content .container {

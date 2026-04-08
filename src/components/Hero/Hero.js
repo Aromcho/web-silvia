@@ -113,19 +113,23 @@ const Hero = () => {
   ];
 
   const handleQuickAccess = (cardId) => {
-    const params = new URLSearchParams();
-    
     if (cardId === 'alquiler') {
-      params.append('operation', 'alquiler');
-      router.push(`/propiedades?${params.toString()}`);
+      router.push('/alquiler-temporario');
     } else if (cardId === 'lotes') {
       router.push('/lotes-terrenos');
     } else if (cardId === 'complejos') {
       router.push('/complejos');
     } else {
       // Para casas y departamentos
+      const params = new URLSearchParams();
       params.append('operation', 'venta');
-      params.append('type', cardId);
+      
+      const typeMap = {
+        'casas': 'Casa',
+        'departamentos': 'Departamento'
+      };
+      
+      params.append('type', typeMap[cardId] || cardId);
       router.push(`/propiedades?${params.toString()}`);
     }
   };
@@ -190,7 +194,6 @@ const Hero = () => {
                       <option value="">Tipo de propiedad</option>
                       <option value="Casa">Casa</option>
                       <option value="Departamento">Departamento</option>
-                      <option value="PH">PH</option>
                       <option value="Terreno">Terreno</option>
                       <option value="Local">Local</option>
                       <option value="Complejo">Complejo</option>

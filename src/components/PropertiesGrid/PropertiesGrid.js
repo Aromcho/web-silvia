@@ -1,87 +1,268 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { getProperties } from '../../services/propertyService';
+import PropertyCard from '../PropertyCard/PropertyCard';
 import './PropertiesGrid.css';
+
+const PAGE_SIZE = 12;
+const CATEGORY_CACHE_KEY_PREFIX = 'silvia-category-properties-cache-v1';
+
+let cachedCategoryResults = null;
+
+const safeStorageGet = (key) => {
+  if (typeof window === 'undefined') return null;
+
+  try {
+    return window.sessionStorage.getItem(key);
+  } catch (error) {
+    console.warn('No se pudo leer el cache de categorias:', error);
+    return null;
+  }
+};
+
+const safeStorageSet = (key, value) => {
+  if (typeof window === 'undefined') return;
+
+  try {
+    window.sessionStorage.setItem(key, value);
+  } catch (error) {
+    console.warn('No se pudo guardar el cache de categorias:', error);
+  }
+};
+
+const buildCategoryCacheKey = (filters) => {
+  return `${CATEGORY_CACHE_KEY_PREFIX}:${JSON.stringify({
+    type: filters.type || '',
+    operation: filters.operation || '',
+    barrio: filters.barrio || '',
+    minPrice: filters.minPrice || '',
+    maxPrice: filters.maxPrice || '',
+    minRooms: filters.minRooms || '',
+    maxRooms: filters.maxRooms || '',
+  })}`;
+};
+
+const readCategoryCache = (cacheKey) => {
+  if (cachedCategoryResults?.[cacheKey]) {
+    return cachedCategoryResults[cacheKey];
+  }
+
+  const rawValue = safeStorageGet(cacheKey);
+  if (!rawValue) return null;
+
+  try {
+    const parsedValue = JSON.parse(rawValue);
+    cachedCategoryResults = cachedCategoryResults || {};
+    cachedCategoryResults[cacheKey] = parsedValue;
+    return parsedValue;
+  } catch (error) {
+    console.warn('No se pudo parsear el cache de categorias:', error);
+    return null;
+  }
+};
+
+const writeCategoryCache = (cacheKey, value) => {
+  cachedCategoryResults = cachedCategoryResults || {};
+  cachedCategoryResults[cacheKey] = value;
+  safeStorageSet(cacheKey, JSON.stringify(value));
+};
 
 const PropertiesGrid = ({ filters = {} }) => {
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [page, setPage] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
+  const [totalCount, setTotalCount] = useState(0);
+  const loadMoreRef = useRef(null);
+  const requestIdRef = useRef(0);
+  const cacheKeyRef = useRef(buildCategoryCacheKey(filters));
 
   useEffect(() => {
-    loadProperties();
+    const cacheKey = buildCategoryCacheKey(filters);
+    cacheKeyRef.current = cacheKey;
+
+    const cachedData = readCategoryCache(cacheKey);
+    if (cachedData) {
+      setProperties(cachedData.properties || []);
+      setPage(cachedData.page || 0);
+      setHasMore(Boolean(cachedData.hasMore));
+      setTotalCount(cachedData.totalCount || (cachedData.properties?.length || 0));
+      setLoading(false);
+      setLoadingMore(false);
+      return undefined;
+    }
+
+    setProperties([]);
+    setPage(0);
+    setHasMore(true);
+    setTotalCount(0);
+    loadProperties({ pageToLoad: 0, replace: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters]);
 
-  const loadProperties = async () => {
-    setLoading(true);
-    try {
-      // Mapear filtros del componente al formato de la API
-      const apiFilters = {
-        limit: 50,
-        offset: 0
+  const buildApiFilters = (pageToLoad = 0) => {
+    const apiFilters = {
+      limit: PAGE_SIZE,
+      offset: pageToLoad * PAGE_SIZE,
+      order: 'DESC'
+    };
+
+    // Mapear type a property_type (array)
+    if (filters.type) {
+      const typeMap = {
+        'casa': 'Casa',
+        'departamento': 'Departamento',
+        'terreno': 'Lote',
+        'lote': 'Lote',
+        'campo': 'Campo',
+        'complejo': 'Complejo',
+        'hotel': 'Hotel',
+        'hoteles': 'Hotel',
+        'emprendimiento': 'Emprendimiento',
+        'cochera': 'Cochera'
       };
+      const mappedType = typeMap[filters.type.toLowerCase()] || filters.type;
+      apiFilters.property_type = [mappedType];
+    }
 
-      // Mapear type a property_type (array)
-      if (filters.type) {
-        const typeMap = {
-          'casa': 'Casa',
-          'departamento': 'Departamento',
-          'terreno': 'Lote',
-          'lote': 'Lote',
-          'campo': 'Campo',
-          'complejo': 'Complejo',
-          'cochera': 'Cochera'
-        };
-        const mappedType = typeMap[filters.type.toLowerCase()] || filters.type;
-        apiFilters.property_type = [mappedType];
-      }
+    // Mapear operation a operation_type (array)
+    if (filters.operation) {
+      const operationMap = {
+        'venta': 'Venta',
+        'alquiler': 'Alquiler',
+        'alquiler-temporario': 'Alquiler Temporario',
+        'alquiler temporario': 'Alquiler Temporario',
+        'alquiler temporal': 'Alquiler Temporario',
+        'alquiler-anual': 'Alquiler Anual'
+      };
+      const mappedOperation = operationMap[filters.operation.toLowerCase()] || filters.operation;
+      apiFilters.operation_type = [mappedOperation];
+    }
 
-      // Mapear operation a operation_type (array)
-      if (filters.operation) {
-        const operationMap = {
-          'venta': 'Venta',
-          'alquiler': 'Alquiler',
-          'alquiler-temporario': 'Alquiler Temporario',
-          'alquiler-anual': 'Alquiler Anual'
-        };
-        const mappedOperation = operationMap[filters.operation.toLowerCase()] || filters.operation;
-        apiFilters.operation_type = [mappedOperation];
-      }
+    // Otros filtros opcionales
+    if (filters.barrio) apiFilters.barrio = filters.barrio;
+    if (filters.minPrice) apiFilters.minPrice = filters.minPrice;
+    if (filters.maxPrice) apiFilters.maxPrice = filters.maxPrice;
+    if (filters.minRooms) apiFilters.minRooms = filters.minRooms;
+    if (filters.maxRooms) apiFilters.maxRooms = filters.maxRooms;
 
-      // Otros filtros opcionales
-      if (filters.barrio) apiFilters.barrio = filters.barrio;
-      if (filters.minPrice) apiFilters.minPrice = filters.minPrice;
-      if (filters.maxPrice) apiFilters.maxPrice = filters.maxPrice;
-      if (filters.minRooms) apiFilters.minRooms = filters.minRooms;
-      if (filters.maxRooms) apiFilters.maxRooms = filters.maxRooms;
+    return apiFilters;
+  };
+
+  const loadProperties = async ({ pageToLoad = 0, replace = false } = {}) => {
+    const requestId = ++requestIdRef.current;
+
+    if (pageToLoad === 0) {
+      setLoading(true);
+    } else {
+      setLoadingMore(true);
+    }
+
+    try {
+      const apiFilters = buildApiFilters(pageToLoad);
 
       console.log('🔍 PropertiesGrid loading with filters:', apiFilters);
       const response = await getProperties(apiFilters);
+      if (requestId !== requestIdRef.current) {
+        return;
+      }
+
       console.log('📦 PropertiesGrid response:', response);
       console.log('✅ Properties loaded:', response?.objects?.length || 0);
-      setProperties(response?.objects || []);
+      const nextProperties = response?.objects || [];
+      const total = response?.meta?.total_count || 0;
+      setPage(pageToLoad);
+      setTotalCount(total);
+      setHasMore(nextProperties.length === PAGE_SIZE && (pageToLoad + 1) * PAGE_SIZE < total);
+      setProperties((previous) => {
+        const mergedProperties = replace ? nextProperties : [...previous, ...nextProperties];
+
+        writeCategoryCache(cacheKeyRef.current, {
+          properties: mergedProperties,
+          page: pageToLoad,
+          hasMore: nextProperties.length === PAGE_SIZE && (pageToLoad + 1) * PAGE_SIZE < total,
+          totalCount: total,
+        });
+
+        return mergedProperties;
+      });
     } catch (error) {
+      if (requestId !== requestIdRef.current) {
+        return;
+      }
       console.error('❌ Error loading properties:', error);
       setProperties([]);
+      setHasMore(false);
     } finally {
-      setLoading(false);
+      if (requestId === requestIdRef.current) {
+        setLoading(false);
+        setLoadingMore(false);
+      }
     }
   };
 
+  useEffect(() => {
+    if (!loadMoreRef.current || loading || loadingMore || !hasMore) {
+      return undefined;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const [entry] = entries;
+        if (entry.isIntersecting && !loading && !loadingMore && hasMore) {
+          loadProperties({ pageToLoad: page + 1, replace: false });
+        }
+      },
+      {
+        root: null,
+        rootMargin: '300px 0px',
+        threshold: 0.1,
+      }
+    );
+
+    observer.observe(loadMoreRef.current);
+
+    return () => observer.disconnect();
+  }, [hasMore, loading, loadingMore, page]);
+
   const formatPrice = (property) => {
-    if (!property || !property.price) return 'Consultar precio';
-    
-    const currency = property.currency || 'USD';
-    const price = property.price;
+    if (!property) return 'Consultar precio';
+
+    let price = null;
+    let currency = 'ARS';
+
+    if (property.operations && property.operations.length > 0) {
+      const operation = property.operations[0];
+      if (operation.prices && operation.prices.length > 0) {
+        price = operation.prices[0].price;
+        currency = operation.prices[0].currency;
+      }
+    } else {
+      price = property.price || property.total_price;
+      currency = property.currency?.name || property.currency || 'ARS';
+    }
+
+    if (!price) return 'Consultar precio';
+
+    const currencyMap = {
+      'Peso Argentino': 'ARS',
+      'Dólar Estadounidense': 'USD',
+      USD: 'USD',
+      ARS: 'ARS',
+    };
+
+    const mappedCurrency = currencyMap[currency] || currency;
     
     try {
       return new Intl.NumberFormat('es-AR', {
         style: 'currency',
-        currency: currency,
+        currency: mappedCurrency,
         minimumFractionDigits: 0,
         maximumFractionDigits: 0
       }).format(price);
     } catch (error) {
-      return `${currency} ${price.toLocaleString()}`;
+      return `${mappedCurrency} ${price.toLocaleString('es-AR')}`;
     }
   };
 
@@ -104,7 +285,7 @@ const PropertiesGrid = ({ filters = {} }) => {
         ) : (
           <>
             <div className="results-count">
-              <h3>{properties.length} propiedades encontradas</h3>
+              <h3>{properties.length} propiedades encontradas{totalCount ? ` de ${totalCount}` : ''}</h3>
             </div>
             
             <div className="properties-grid">
@@ -114,66 +295,31 @@ const PropertiesGrid = ({ filters = {} }) => {
                 </div>
               ) : (
                 properties.map((property) => (
-                  <div key={property.id} className="property-card">
-                    <div className="property-image">
-                      <img 
-                        src={property.images?.[0] || 'https://via.placeholder.com/400x300/34495e/ffffff?text=Sin+Imagen'} 
-                        alt={property.title || 'Propiedad'}
-                        onError={(e) => {
-                          e.target.src = 'https://via.placeholder.com/400x300/34495e/ffffff?text=Sin+Imagen';
-                        }}
-                      />
-                      <div className="property-badge">
-                        {property.operation === 'venta' ? 'Venta' : 'Alquiler'}
-                      </div>
-                    </div>
-                    
-                    <div className="property-content">
-                      <h4 className="property-title">
-                        {property.title || 'Propiedad'}
-                      </h4>
-                      <p className="property-price">{formatPrice(property)}</p>
-                      
-                      <div className="property-details">
-                        <span className="detail-item">
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                            <path d="M3 9L12 2L21 9V20C21 20.5304 20.7893 21.0391 20.4142 21.4142C20.0391 21.7893 19.5304 22 19 22H5C4.46957 22 3.96086 21.7893 3.58579 21.4142C3.21071 21.0391 3 20.5304 3 20V9Z" stroke="currentColor" strokeWidth="2"/>
-                          </svg>
-                          {property.surface || 0}m²
-                        </span>
-                        
-                        {property.bedrooms > 0 && (
-                          <span className="detail-item">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                              <path d="M7 7h10v10H7z" stroke="currentColor" strokeWidth="2"/>
-                            </svg>
-                            {property.bedrooms} dorm.
-                          </span>
-                        )}
-                        
-                        {property.bathrooms > 0 && (
-                          <span className="detail-item">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                              <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="2"/>
-                            </svg>
-                            {property.bathrooms} baños
-                          </span>
-                        )}
-                      </div>
-                      
-                      <p className="property-location">
-                        📍 {property.location || 'Ubicación no disponible'}
-                      </p>
-                      
-                      <div className="property-actions">
-                        <button className="btn-view">Ver Detalles</button>
-                        <button className="btn-contact">Contactar</button>
-                      </div>
-                    </div>
-                  </div>
+                  <PropertyCard
+                    key={property.id}
+                    property={property}
+                    formatPrice={formatPrice}
+                  />
                 ))
               )}
             </div>
+
+            <div ref={loadMoreRef} className="infinite-scroll-sentinel" aria-hidden="true" />
+
+            {loadingMore && (
+              <div className="loading-grid loading-more-grid">
+                {[...Array(3)].map((_, i) => (
+                  <div key={i} className="property-skeleton">
+                    <div className="skeleton-image"></div>
+                    <div className="skeleton-content">
+                      <div className="skeleton-title"></div>
+                      <div className="skeleton-price"></div>
+                      <div className="skeleton-details"></div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </>
         )}
       </div>

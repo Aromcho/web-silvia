@@ -1,4 +1,5 @@
 'use client';
+import Link from 'next/link';
 import Image from 'next/image';
 import './Footer.css';
 
@@ -49,11 +50,11 @@ const Footer = () => {
             <div className="footer-section">
               <h3 className="footer-title">Enlaces Rápidos</h3>
               <ul className="footer-links">
-                <li><a href="/">Inicio</a></li>
-                <li><a href="/about">Nosotros</a></li>
-                <li><a href="/#propiedades">Propiedades</a></li>
-                <li><a href="/#servicios">Servicios</a></li>
-                <li><a href="/#contacto">Contacto</a></li>
+                <li><Link href="/">Inicio</Link></li>
+                <li><Link href="/about">Nosotros</Link></li>
+                <li><Link href="/#propiedades">Propiedades</Link></li>
+                <li><Link href="/#servicios">Servicios</Link></li>
+                <li><Link href="/#contacto">Contacto</Link></li>
               </ul>
             </div>
 
@@ -61,11 +62,11 @@ const Footer = () => {
             <div className="footer-section">
               <h3 className="footer-title">Servicios</h3>
               <ul className="footer-links">
-                <li><a href="/#propiedades">Venta de Propiedades</a></li>
-                <li><a href="/#propiedades">Alquiler</a></li>
-                <li><a href="/#propiedades">Tasaciones</a></li>
-                <li><a href="/#servicios">Asesoramiento</a></li>
-                <li><a href="/#servicios">Inversiones</a></li>
+                <li><Link href="/#propiedades">Venta de Propiedades</Link></li>
+                <li><Link href="/#propiedades">Alquiler</Link></li>
+                <li><Link href="/#propiedades">Tasaciones</Link></li>
+                <li><Link href="/#servicios">Asesoramiento</Link></li>
+                <li><Link href="/#servicios">Inversiones</Link></li>
               </ul>
             </div>
 
@@ -119,8 +120,8 @@ const Footer = () => {
           <div className="footer-bottom-content">
             <p>&copy; {currentYear} Silvia Fernández Inmobiliaria. Todos los derechos reservados.</p>
             <div className="footer-bottom-links">
-              <a href="#privacy">Política de Privacidad</a>
-              <a href="#terms">Términos y Condiciones</a>
+              <Link href="#privacy">Política de Privacidad</Link>
+              <Link href="#terms">Términos y Condiciones</Link>
             </div>
           </div>
         </div>

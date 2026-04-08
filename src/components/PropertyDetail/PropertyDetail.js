@@ -132,7 +132,7 @@ export default function PropertyDetail({ property }) {
               
               {photos.length > 1 && (
                 <div className="thumbnails">
-                  {photos.slice(0, 6).map((photo, index) => (
+                  {photos.slice(0, 5).map((photo, index) => (
                     <img
                       key={index}
                       src={photo.thumb || photo.image}
@@ -141,9 +141,9 @@ export default function PropertyDetail({ property }) {
                       onClick={() => setCurrentImageIndex(index)}
                     />
                   ))}
-                  {photos.length > 6 && (
+                  {photos.length > 5 && (
                     <div className="more-photos" onClick={() => setShowLightbox(true)}>
-                      +{photos.length - 6} fotos
+                      +{photos.length - 5} fotos
                     </div>
                   )}
                 </div>

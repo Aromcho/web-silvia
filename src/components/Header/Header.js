@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import Link from 'next/link';
 import Image from 'next/image';
 import WhatsAppChat from '../WhatsAppChat/WhatsAppChat';
 import './Header.css';
@@ -31,25 +32,25 @@ const Header = () => {
           <nav className={`nav ${isMenuOpen ? 'nav-open' : ''}`}>
             <ul className="nav-list">
               <li className="nav-item">
-                <a href="/" className="nav-link">Inicio</a>
+                <Link href="/" className="nav-link">Inicio</Link>
               </li>
               <li className="nav-item">
-                <a href="/propiedades" className="nav-link">Propiedades</a>
+                <Link href="/propiedades" className="nav-link">Propiedades</Link>
               </li>
               <li className="nav-item">
-                <a href="/lotes-terrenos" className="nav-link">Lotes - Terrenos</a>
+                <Link href="/lotes-terrenos" className="nav-link">Lotes - Terrenos</Link>
               </li>
               <li className="nav-item">
-                <a href="/alquiler-temporario" className="nav-link">Alquiler Temporario</a>
+                <Link href="/alquiler-temporario" className="nav-link">Alquiler Temporario</Link>
               </li>
               <li className="nav-item">
-                <a href="/complejos" className="nav-link">Complejos</a>
+                <Link href="/complejos" className="nav-link">Complejos</Link>
               </li>
               <li className="nav-item">
-                <a href="/nosotros" className="nav-link">Nosotros</a>
+                <Link href="/nosotros" className="nav-link">Nosotros</Link>
               </li>
               <li className="nav-item">
-                <a href="/mapa" className="nav-link">Mapa</a>
+                <Link href="/mapa" className="nav-link">Mapa</Link>
               </li>
             </ul>
           </nav>
@@ -79,13 +80,13 @@ const Header = () => {
         {/* Mobile Menu */}
         <div className={`mobile-menu ${isMenuOpen ? 'mobile-menu-open' : ''}`}>
           <ul className="mobile-nav-list">
-            <li><a href="/" onClick={toggleMenu}>Inicio</a></li>
-            <li><a href="/propiedades" onClick={toggleMenu}>Propiedades</a></li>
-            <li><a href="/lotes-terrenos" onClick={toggleMenu}>Lotes - Terrenos</a></li>
-            <li><a href="/alquiler-temporario" onClick={toggleMenu}>Alquiler Temporario</a></li>
-            <li><a href="/complejos" onClick={toggleMenu}>Complejos</a></li>
-            <li><a href="/nosotros" onClick={toggleMenu}>Nosotros</a></li>
-            <li><a href="/mapa" onClick={toggleMenu}>Mapa</a></li>
+            <li><Link href="/" onClick={toggleMenu}>Inicio</Link></li>
+            <li><Link href="/propiedades" onClick={toggleMenu}>Propiedades</Link></li>
+            <li><Link href="/lotes-terrenos" onClick={toggleMenu}>Lotes - Terrenos</Link></li>
+            <li><Link href="/alquiler-temporario" onClick={toggleMenu}>Alquiler Temporario</Link></li>
+            <li><Link href="/complejos" onClick={toggleMenu}>Complejos</Link></li>
+            <li><Link href="/nosotros" onClick={toggleMenu}>Nosotros</Link></li>
+            <li><Link href="/mapa" onClick={toggleMenu}>Mapa</Link></li>
           </ul>
         </div>
       </div>
