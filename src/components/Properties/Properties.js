@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
-import Link from 'next/link'
+import { FaStar } from 'react-icons/fa'
 import { getProperties } from '../../services/propertyService'
 import PropertyCard from '../PropertyCard/PropertyCard'
 import './Properties.css'
@@ -202,23 +202,41 @@ export default function Properties() {
     }
   }
 
-  // Componente de sección con scroll horizontal
-  const PropertySection = ({ title, type, properties }) => {
+  const PropertySection = ({ title, type, properties, featured = false }) => {
     if (!properties || properties.length === 0) return null
 
     return (
-      <div className="property-section">
-        <div className="section-header">
-          <h2 className="section-title">{title}</h2>
-          <Link href="/propiedades" className="view-all-link">
-            Ver todas <span className="arrow">→</span>
-          </Link>
-        </div>
-        <div className="properties-scroll-container">
-          <div className="properties-grid">
-            {properties.map((property) => (
-              <PropertyCard key={property.id} property={property} formatPrice={formatPrice} />
-            ))}
+      <div className={`property-section${featured ? ' property-section--featured' : ''}`}>
+        <div className="section-surface">
+          {featured && (
+            <div className="featured-stars" aria-label="Selección destacada con cinco estrellas">
+              {[...Array(5)].map((_, index) => (
+                <FaStar key={index} />
+              ))}
+            </div>
+          )}
+
+          <div className="section-header">
+            <div className="section-heading">
+              <h2 className="section-title">{title}</h2>
+            </div>
+          </div>
+
+          <div className={`properties-scroll-container${featured ? ' featured-carousel' : ''}`}>
+            <div className={`properties-grid${featured ? ' featured-track' : ''}`}>
+              <div className="properties-group">
+                {properties.map((property) => (
+                  <PropertyCard key={property.id} property={property} formatPrice={formatPrice} />
+                ))}
+              </div>
+              {featured && (
+                <div className="properties-group" aria-hidden="true">
+                  {properties.map((property) => (
+                    <PropertyCard key={`${property.id}-clone`} property={property} formatPrice={formatPrice} />
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
@@ -267,7 +285,8 @@ export default function Properties() {
     {
       title: 'Nuestra selección',
       type: 'destacadas',
-      properties: sectionsData.destacadas
+      properties: sectionsData.destacadas,
+      featured: true
     },
     {
       title: 'Alquiler Temporario',
@@ -300,6 +319,7 @@ export default function Properties() {
             title={section.title}
             type={section.type}
             properties={section.properties}
+            featured={section.featured}
           />
         ))}
       </div>

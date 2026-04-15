@@ -1,6 +1,8 @@
 .properties-section {
   padding: 80px 0;
-  background: #f8f9fa;
+  background:
+    radial-gradient(circle at top, rgba(123, 220, 181, 0.08), transparent 35%),
+    linear-gradient(180deg, #f8f9fa 0%, #f4f7f6 100%);
 }
 
 .properties-section .container {
@@ -14,11 +16,48 @@
   margin-bottom: 60px;
 }
 
+.section-surface {
+  border-radius: 28px;
+  padding: 28px;
+}
+
+.property-section--featured .section-surface {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(250, 252, 251, 0.98)) padding-box,
+    linear-gradient(135deg, #00815c 0%, #7bdcb5 48%, #00815c 100%) border-box;
+  border: 1.5px solid transparent;
+  box-shadow: 0 18px 45px rgba(0, 129, 92, 0.08), inset 0 0 0 1px rgba(255, 255, 255, 0.55);
+  position: relative;
+  overflow: hidden;
+}
+
+.property-section--featured .section-surface::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(120deg, rgba(0, 129, 92, 0.05), transparent 40%, rgba(123, 220, 181, 0.08));
+  pointer-events: none;
+}
+
+.property-section--featured .section-header,
+.property-section--featured .properties-scroll-container {
+  position: relative;
+  z-index: 1;
+}
+
 .section-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 30px;
+  gap: 24px;
+}
+
+.section-heading {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 760px;
 }
 
 .section-title {
@@ -28,27 +67,22 @@
   margin: 0;
 }
 
-.view-all-link {
-  display: flex;
+.property-section--featured .section-title {
+  background: linear-gradient(135deg, #00815c 0%, #7bdcb5 48%, #00815c 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+
+.featured-stars {
+  display: inline-flex;
   align-items: center;
-  gap: 8px;
-  color: #3498db;
-  text-decoration: none;
-  font-weight: 500;
-  transition: all 0.3s ease;
-}
-
-.view-all-link:hover {
-  color: #2980b9;
-  transform: translateX(5px);
-}
-
-.arrow {
-  transition: transform 0.3s ease;
-}
-
-.view-all-link:hover .arrow {
-  transform: translateX(3px);
+  gap: 0.2rem;
+  width: fit-content;
+  color: #c8a34a;
+  font-size: 0.95rem;
+  filter: drop-shadow(0 4px 10px rgba(200, 163, 74, 0.16));
 }
 
 /* Contenedor de scroll horizontal */
@@ -56,6 +90,18 @@
   overflow-x: auto;
   overflow-y: hidden;
   padding-bottom: 10px;
+  scroll-behavior: smooth;
+}
+
+.featured-carousel {
+  overflow: hidden;
+  padding-bottom: 0;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.featured-carousel::-webkit-scrollbar {
+  display: none;
 }
 
 .properties-scroll-container::-webkit-scrollbar {
@@ -83,6 +129,31 @@
   min-width: max-content;
 }
 
+.featured-track {
+  display: flex;
+  width: max-content;
+  gap: 1.15rem;
+  animation: featured-marquee 34s linear infinite;
+}
+
+.featured-carousel:hover .featured-track {
+  animation-play-state: paused;
+}
+
+.properties-group {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 1.15rem;
+}
+
+.property-section--featured .properties-grid {
+  gap: 1.15rem;
+}
+
+.property-section--featured .properties-scroll-container {
+  margin-top: 8px;
+}
+
 .properties-section .modern-property-card {
   flex: 0 0 359px;
   width: 359px;
@@ -90,9 +161,21 @@
   max-width: 359px;
 }
 
+.property-section--featured .modern-property-card {
+  flex-basis: 372px;
+  width: 372px;
+  min-width: 372px;
+  max-width: 372px;
+}
+
 .properties-section .modern-property-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 15px 40px rgba(0, 129, 92, 0.15);
+}
+
+.property-section--featured .modern-property-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 22px 50px rgba(0, 129, 92, 0.16);
 }
 
 .properties-section .modern-property-card .property-image {
@@ -139,6 +222,10 @@
   z-index: 2;
 }
 
+.property-section--featured .modern-property-card .property-badge {
+  box-shadow: 0 10px 25px rgba(0, 129, 92, 0.18);
+}
+
 .properties-section .modern-property-card .property-type-badge {
   position: absolute;
   top: 1rem;
@@ -156,6 +243,10 @@
 
 .properties-section .modern-property-card .property-content {
   padding: 1.5rem;
+}
+
+.property-section--featured .modern-property-card .property-content {
+  padding: 1.6rem;
 }
 
 .properties-section .modern-property-card .property-title {
@@ -292,6 +383,15 @@
   }
 }
 
+@keyframes featured-marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
 .properties-section .error-state button {
   background: #e74c3c;
   color: white;
@@ -322,6 +422,15 @@
     gap: 15px;
     margin-bottom: 18px;
   }
+
+  .section-surface {
+    padding: 20px 16px;
+    border-radius: 22px;
+  }
+
+  .featured-stars {
+    font-size: 0.86rem;
+  }
   
   .section-title {
     font-size: 1.6rem;
@@ -336,10 +445,29 @@
     margin: 0 -15px;
   }
 
+  .featured-carousel {
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+  }
+
+  .featured-track {
+    animation-duration: 28s;
+  }
+
   .properties-section .properties-grid {
     gap: 0.75rem;
     padding: 0 15px;
     min-width: max-content;
+  }
+
+  .featured-track {
+    gap: 0.75rem;
+    padding: 0;
+  }
+
+  .properties-group {
+    gap: 0.75rem;
   }
 
   .properties-section .modern-property-card {
@@ -349,6 +477,13 @@
     max-width: min(84vw, 320px);
     scroll-snap-align: start;
     margin: 0;
+  }
+
+  .property-section--featured .modern-property-card {
+    flex: 0 0 min(86vw, 340px);
+    width: min(86vw, 340px);
+    min-width: min(86vw, 340px);
+    max-width: min(86vw, 340px);
   }
   
   .properties-section .modern-property-card .property-content {
@@ -369,6 +504,11 @@
     margin: 0 -15px;
     padding: 0 15px;
   }
+
+  .featured-carousel {
+    margin: 0 -15px;
+    padding: 0 15px;
+  }
   
   .properties-section .modern-property-card {
     flex: 0 0 86vw;
@@ -376,6 +516,13 @@
     min-width: 86vw;
     max-width: 86vw;
     margin: 0;
+  }
+
+  .property-section--featured .modern-property-card {
+    flex: 0 0 88vw;
+    width: 88vw;
+    min-width: 88vw;
+    max-width: 88vw;
   }
   
   .section-title {

@@ -101,21 +101,42 @@ export default function NosotrosPage() {
           </section>
 
           <section className="offices-section">
-            <h2>Nuestra <span className="underline">Oficina</span></h2>
+            <h2>Nuestras <span className="underline">Oficinas</span></h2>
             <div className="offices-grid">
               <div className="office-card">
-                <div className="office-image" style={{backgroundImage: 'url(/images/local.png)'}}></div>
+                <div className="office-image" style={{backgroundImage: 'url(/assets/images/oficina-central.png)'}}></div>
                 <div className="office-info">
                   <h3>Central</h3>
-                  <p className="office-location">📍 Calle 34, Mar del Plata & Mar Azul</p>
+                  <div className="office-location-row">
+                    <p className="office-location">📍 Calle 34, Mar del Plata & Mar Azul</p>
+                    <a
+                      className="office-map-btn"
+                      href="https://maps.app.goo.gl/nRSsuL4ouVaqjUVd8"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Cómo llegar
+                    </a>
+                  </div>
                   <p>En el centro Mar Azul ¡Vení a conocerla!</p>
                 </div>
               </div>
               <div className="office-card">
-                <div className="office-image" style={{backgroundImage: 'url(/images/oficina-sucursal.jpg)'}}></div>
+                <div className="office-image" style={{backgroundImage: 'url(/assets/images/oficina-sucursal.jpg)'}}></div>
                 <div className="office-info">
                   <h3>Sucursal</h3>
-                  <p className="office-location">📍 Av del Plata y Uritorco - Mar de las Pampas</p>
+                  <div className="office-location-row">
+                    <p className="office-location">📍 Av del Plata y Uritorco - Mar de las Pampas</p>
+                    <a
+                      className="office-map-btn"
+                      href="https://maps.app.goo.gl/F7tXnRHV1xBVK3qq6"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Cómo llegar
+                    </a>
+                  </div>
+                  <p>Te esperamos para asesorarte de forma personalizada.</p>
                 </div>
               </div>
             </div>

@@ -7,6 +7,8 @@ import {
   FaBath, 
   FaCar,
   FaRuler,
+  FaUniversity,
+  FaPaw,
   FaMapMarkerAlt,
   FaWhatsapp,
   FaEnvelope,
@@ -46,6 +48,140 @@ export default function PropertyDetail({ property }) {
   const price = mainOperation.prices?.[0] || {}
   const propertyTypeName = normalizePropertyTypeLabel(property.type?.name) || 'Propiedad'
   const propertyAddress = property.address?.street_name || property.real_address || property.address || 'Dirección no disponible'
+  const whatsappNumber = '5492216006474'
+  const propertyPublicUrl = `https://www.silviafernandezpropiedades.com.ar/propiedad/${property.id}`
+  const whatsappHref = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(`Hola, vi esta propiedad en su web: ${propertyPublicUrl} ¿Me pasás información por favor?`)}`
+
+  const normalizeText = (value) => {
+    if (value === null || value === undefined) return ''
+    return String(value)
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/\p{Diacritic}/gu, '')
+      .trim()
+  }
+
+  const parsePositiveNumber = (value) => {
+    if (value === null || value === undefined || value === '') return null
+
+    const parsed = Number(value)
+    if (!Number.isFinite(parsed) || parsed <= 0) return null
+
+    return parsed
+  }
+
+  const getFirstPositiveNumber = (...values) => {
+    for (const value of values) {
+      const parsed = parsePositiveNumber(value)
+      if (parsed !== null) return parsed
+    }
+    return null
+  }
+
+  const parseBooleanValue = (value) => {
+    if (typeof value === 'boolean') return value
+    if (typeof value === 'number') return value > 0
+
+    const text = normalizeText(value)
+    if (!text) return false
+
+    const truthyValues = new Set(['true', '1', 'si', 'yes', 'y', 'apto', 'acepta', 'eligible'])
+    return truthyValues.has(text)
+  }
+
+  const getBooleanFromKeys = (source, keys) => {
+    for (const key of keys) {
+      if (source?.[key] !== undefined && source?.[key] !== null) {
+        return parseBooleanValue(source[key])
+      }
+    }
+    return false
+  }
+
+  const hasKeywordInCollections = (collections, keywords) => {
+    const normalizedKeywords = keywords.map(normalizeText)
+
+    return collections
+      .filter(Array.isArray)
+      .some((items) =>
+        items.some((item) => {
+          const itemText = normalizeText(item?.name || item?.label || item?.value || item)
+          return normalizedKeywords.some((keyword) => itemText.includes(keyword))
+        })
+      )
+  }
+
+  const formatSurface = (value) =>
+    new Intl.NumberFormat('es-AR', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    }).format(value)
+
+  const surface = getFirstPositiveNumber(
+    property.surface,
+    property.total_surface,
+    property.total_surface_m2,
+    property.roofed_surface,
+    property.roofed_surface_m2
+  )
+
+  const bedrooms = getFirstPositiveNumber(property.suite_amount, property.bedrooms)
+  const bathrooms = getFirstPositiveNumber(property.bathroom_amount, property.bathrooms)
+  const parking = getFirstPositiveNumber(property.parking_lot_amount, property.garage_amount, property.garages)
+  const rooms = getFirstPositiveNumber(property.room_amount, property.rooms)
+
+  const isCreditEligible =
+    getBooleanFromKeys(property, ['apto_credito', 'apto_credit', 'aptoCredito', 'credit_approved', 'is_credit', 'credit_eligible']) ||
+    hasKeywordInCollections([property.tags, property.custom_tags, property.features, property.amenities], ['apto credito', 'apto credito hipotecario', 'credit eligible'])
+
+  const acceptsPets =
+    getBooleanFromKeys(property, ['acepta_mascotas', 'aceptaMascotas', 'pets_allowed', 'accept_pets']) ||
+    hasKeywordInCollections([property.tags, property.custom_tags, property.features, property.amenities], ['acepta mascotas', 'mascotas', 'pets allowed', 'pet friendly'])
+
+  const mainFeatures = [
+    surface && {
+      key: 'surface',
+      icon: FaRuler,
+      value: `${formatSurface(surface)}m²`,
+      label: 'Superficie total'
+    },
+    bedrooms && {
+      key: 'bedrooms',
+      icon: FaBed,
+      value: bedrooms,
+      label: 'Dormitorios'
+    },
+    bathrooms && {
+      key: 'bathrooms',
+      icon: FaBath,
+      value: bathrooms,
+      label: 'Baños'
+    },
+    parking && {
+      key: 'parking',
+      icon: FaCar,
+      value: parking,
+      label: 'Cocheras'
+    },
+    rooms && {
+      key: 'rooms',
+      icon: FaHome,
+      value: rooms,
+      label: 'Ambientes'
+    },
+    isCreditEligible && {
+      key: 'credit',
+      icon: FaUniversity,
+      value: 'Sí',
+      label: 'Apto crédito'
+    },
+    acceptsPets && {
+      key: 'pets',
+      icon: FaPaw,
+      value: 'Sí',
+      label: 'Acepta mascotas'
+    }
+  ].filter(Boolean)
 
   // Navegación de imágenes
   const nextImage = () => {
@@ -178,75 +314,44 @@ export default function PropertyDetail({ property }) {
                 <FaMapMarkerAlt />
                 <span>{propertyAddress}</span>
               </p>
-              
-              <div className="property-location-price">
+
+              <div className="property-title-layout">
                 <p className="location">
                   <FaMapMarkerAlt />
                   {property.location?.name || property.address?.city || 'Ubicación no disponible'}
                   {property.address?.state && `, ${property.address.state}`}
                 </p>
-                <div className="price">
-                  {formatPrice(price)}
-                  {price.period && <span className="period">{price.period}</span>}
+
+                <div className="price-block">
+                  <div className="price">
+                    {formatPrice(price)}
+                    {price.period && <span className="period">{price.period}</span>}
+                  </div>
                 </div>
               </div>
             </div>
 
             {/* Características principales */}
-            <div className="property-features">
-              <h2>Características principales</h2>
-              <div className="features-grid">
-                {property.surface && (
-                  <div className="feature-item">
-                    <FaRuler className="feature-icon" />
-                    <div>
-                      <span className="feature-value">{property.surface}m²</span>
-                      <span className="feature-label">Superficie total</span>
-                    </div>
-                  </div>
-                )}
-                
-                {property.suite_amount > 0 && (
-                  <div className="feature-item">
-                    <FaBed className="feature-icon" />
-                    <div>
-                      <span className="feature-value">{property.suite_amount}</span>
-                      <span className="feature-label">Dormitorios</span>
-                    </div>
-                  </div>
-                )}
-                
-                {property.bathroom_amount > 0 && (
-                  <div className="feature-item">
-                    <FaBath className="feature-icon" />
-                    <div>
-                      <span className="feature-value">{property.bathroom_amount}</span>
-                      <span className="feature-label">Baños</span>
-                    </div>
-                  </div>
-                )}
-                
-                {property.parking_lot_amount > 0 && (
-                  <div className="feature-item">
-                    <FaCar className="feature-icon" />
-                    <div>
-                      <span className="feature-value">{property.parking_lot_amount}</span>
-                      <span className="feature-label">Cocheras</span>
-                    </div>
-                  </div>
-                )}
-                
-                {property.room_amount > 0 && (
-                  <div className="feature-item">
-                    <FaHome className="feature-icon" />
-                    <div>
-                      <span className="feature-value">{property.room_amount}</span>
-                      <span className="feature-label">Ambientes</span>
-                    </div>
-                  </div>
-                )}
+            {mainFeatures.length > 0 && (
+              <div className="property-features">
+                <h2>Características principales</h2>
+                <div className="features-grid">
+                  {mainFeatures.map((feature) => {
+                    const Icon = feature.icon
+
+                    return (
+                      <div className="feature-item" key={feature.key}>
+                        <Icon className="feature-icon" />
+                        <div>
+                          <span className="feature-value">{feature.value}</span>
+                          <span className="feature-label">{feature.label}</span>
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Descripción */}
             {property.description && (
@@ -294,7 +399,7 @@ export default function PropertyDetail({ property }) {
               
               <div className="contact-buttons">
                 <a 
-                  href={`https://wa.me/5491165048694?text=Hola! Me interesa la propiedad: ${property.publication_title}`}
+                  href={whatsappHref}
                   className="contact-btn whatsapp-btn"
                   target="_blank"
                   rel="noopener noreferrer"
