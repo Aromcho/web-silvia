@@ -156,6 +156,14 @@ const PropertiesSearch = ({ defaultFilters = {} }) => {
   const formatPrice = (property) => {
     if (!property || !property.price) return 'Consultar precio';
     
+    // Verificar si es alquiler
+    if (property.operations && property.operations.length > 0) {
+      const operationType = property.operations[0].operation_type
+      if (operationType && (operationType.includes('Alquiler') || operationType === 'Rent')) {
+        return 'Consultar precio'
+      }
+    }
+    
     const currency = property.currency || 'USD';
     const price = property.price;
     

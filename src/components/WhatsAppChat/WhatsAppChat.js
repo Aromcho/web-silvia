@@ -2,10 +2,19 @@
 import { useState, useEffect } from 'react';
 import './WhatsAppChat.css';
 
-const WhatsAppChat = ({ isOpen: externalIsOpen, onClose }) => {
+const contacts = [
+  { name: 'Silvia', phone: '+549 2255 50-9408' },
+  { name: 'Fabiana', phone: '+549 2255 62-6092' },
+  { name: 'Conrado', phone: '+549 2255 62-2841' },
+  { name: 'Paul', phone: '+549 2254 60-2453' },
+  { name: 'Cecilia', phone: '+549 2216 00-6474' }
+];
+
+const WhatsAppChat = ({ isOpen: externalIsOpen, onClose, propertyTitle = '', propertyUrl = '' }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [showBubble, setShowBubble] = useState(false);
   const [message, setMessage] = useState('');
+  const [showContacts, setShowContacts] = useState(false);
 
   useEffect(() => {
     // Mostrar la burbuja después de 2 segundos solo si no hay control externo
@@ -27,34 +36,56 @@ const WhatsAppChat = ({ isOpen: externalIsOpen, onClose }) => {
       onClose();
     } else {
       setIsOpen(!isOpen);
+      setShowContacts(false);
     }
   };
 
-  const handleSendMessage = (quickMessage = '') => {
+  const formatWhatsAppNumber = (phone) => {
+    // Eliminar espacios y guiones, agregar código de país
+    const cleaned = phone.replace(/\s+|-/g, '');
+    if (cleaned.startsWith('+')) {
+      return cleaned.substring(1); // Remover el + para wa.me
+    }
+    return cleaned;
+  };
+
+  const handleSendMessage = (quickMessage = '', selectedPhone = null) => {
     const messageText = quickMessage || message;
     if (!messageText.trim()) return;
 
-    const whatsappURL = `https://wa.me/542255626092?text=${encodeURIComponent(messageText)}`;
+    const phone = selectedPhone || '5492255626092'; // Default
+    const fullMessage = propertyTitle || propertyUrl 
+      ? `${messageText}${propertyTitle ? `\n\nPropiedad: ${propertyTitle}` : ''}${propertyUrl ? `\nLink: ${propertyUrl}` : ''}`
+      : messageText;
+
+    const whatsappURL = `https://wa.me/${phone}?text=${encodeURIComponent(fullMessage)}`;
     window.open(whatsappURL, '_blank');
     if (onClose) {
       onClose();
     } else {
       setIsOpen(false);
+      setShowContacts(false);
     }
     setMessage('');
   };
 
+  const handleContactClick = (phone) => {
+    const messageText = message || 'Hola, quiero consultar por una propiedad';
+    const cleanPhone = formatWhatsAppNumber(phone);
+    handleSendMessage(messageText, cleanPhone);
+  };
+
   const handleQuickAction = (type) => {
+    let contactPhone = '5492255626092';
     if (type === 'alquileres') {
-      window.open('https://wa.me/5492255622841', '_blank');
+      contactPhone = formatWhatsAppNumber('+549 2255 62-2841');
     } else if (type === 'ventas') {
-      window.open('https://wa.me/542255626092', '_blank');
+      contactPhone = formatWhatsAppNumber('+549 2255 62-6092');
     }
-    if (onClose) {
-      onClose();
-    } else {
-      setIsOpen(false);
-    }
+    const messageText = propertyTitle || propertyUrl 
+      ? `Hola, consulto por: ${propertyTitle || 'una propiedad'}${propertyUrl ? `\n${propertyUrl}` : ''}`
+      : `Hola, consulto por ${type}`;
+    handleSendMessage(messageText, contactPhone);
   };
 
   return (
@@ -106,23 +137,50 @@ const WhatsAppChat = ({ isOpen: externalIsOpen, onClose }) => {
 
           <div className="chat-body">
             <div className="chat-message received">
-              <p>Hola! ¿En qué puedo ayudarte?</p>
+              <p>Hola! ¿Con quién te gustaría hablar?</p>
             </div>
 
-            <div className="quick-actions">
-              <button 
-                className="quick-action-btn alquileres"
-                onClick={() => handleQuickAction('alquileres')}
-              >
-                Alquileres
-              </button>
-              <button 
-                className="quick-action-btn ventas"
-                onClick={() => handleQuickAction('ventas')}
-              >
-                Ventas
-              </button>
-            </div>
+            {!showContacts ? (
+              <div className="quick-actions">
+                <button 
+                  className="quick-action-btn alquileres"
+                  onClick={() => handleQuickAction('alquileres')}
+                >
+                  Alquileres
+                </button>
+                <button 
+                  className="quick-action-btn ventas"
+                  onClick={() => handleQuickAction('ventas')}
+                >
+                  Ventas
+                </button>
+                <button 
+                  className="quick-action-btn contactos"
+                  onClick={() => setShowContacts(true)}
+                >
+                  Ver Todos
+                </button>
+              </div>
+            ) : (
+              <div className="contacts-list">
+                <button 
+                  className="back-btn"
+                  onClick={() => setShowContacts(false)}
+                >
+                  ← Volver
+                </button>
+                {contacts.map((contact) => (
+                  <button
+                    key={contact.name}
+                    className="contact-btn"
+                    onClick={() => handleContactClick(contact.phone)}
+                  >
+                    <span className="contact-name">{contact.name}</span>
+                    <span className="contact-phone">{contact.phone}</span>
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           <div className="chat-footer">

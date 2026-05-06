@@ -1,7 +1,6 @@
 import "./globals.css";
 import Header from "../components/Header/Header";
 import Footer from "../components/Footer/Footer";
-import WhatsAppChat from "../components/WhatsAppChat/WhatsAppChat";
 
 export const metadata = {
   title: "Silvia Fernández - Inmobiliaria",
@@ -9,6 +8,23 @@ export const metadata = {
   keywords: "inmobiliaria, propiedades, casas, departamentos, venta, alquiler, Silvia Fernández",
   author: "Silvia Fernández",
   viewport: "width=device-width, initial-scale=1",
+  metadataBase: new URL("https://www.silviafernandezpropiedades.com.ar"),
+  icons: {
+    icon: "/assets/images/logo.jpg",
+  },
+  openGraph: {
+    title: "Silvia Fernández - Inmobiliaria",
+    description: "Más de 15 años de experiencia en el mercado inmobiliario. Encontrá tu hogar ideal con Silvia Fernández.",
+    url: "https://www.silviafernandezpropiedades.com.ar",
+    siteName: "Silvia Fernández Inmobiliaria",
+    locale: "es_AR",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Silvia Fernández - Inmobiliaria",
+    description: "Más de 15 años de experiencia en el mercado inmobiliario. Encontrá tu hogar ideal con Silvia Fernández.",
+  },
 };
 
 export default function RootLayout({ children }) {
@@ -28,7 +44,6 @@ export default function RootLayout({ children }) {
           {children}
         </main>
         <Footer />
-        <WhatsAppChat />
       </body>
     </html>
   );

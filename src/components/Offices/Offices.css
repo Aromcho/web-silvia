@@ -24,6 +24,7 @@
 }
 
 .home-offices-section .office-card {
+  position: relative;
   background: var(--white-color);
   border-radius: 16px;
   overflow: hidden;
@@ -45,9 +46,38 @@
   background-repeat: no-repeat;
 }
 
+.home-offices-section .office-map-preview {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 250px;
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 0.35s ease, transform 0.35s ease;
+  background: #e5ddd5;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.home-offices-section .office-map-preview iframe {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.home-offices-section .office-card:hover .office-map-preview {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
 .home-offices-section .office-info {
   padding: 1.5rem;
   text-align: left;
+  position: relative;
+  z-index: 1;
 }
 
 .home-offices-section .office-info h3 {
@@ -106,5 +136,9 @@
   .home-offices-section .office-location-row {
     flex-wrap: wrap;
     justify-content: flex-start;
+  }
+
+  .home-offices-section .office-map-preview {
+    display: none;
   }
 }

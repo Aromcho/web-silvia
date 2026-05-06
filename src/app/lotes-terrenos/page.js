@@ -1,6 +1,13 @@
-'use client';
 import PropertiesGrid from '../../components/PropertiesGrid/PropertiesGrid';
 import './page.css';
+
+export const metadata = {
+  title: 'Lotes y Terrenos | Silvia Fernández Inmobiliaria',
+  description: 'Encontrá lotes y terrenos en venta en Mar de las Pampas, Mar Azul y alrededores con asesoramiento inmobiliario profesional.',
+  alternates: {
+    canonical: '/lotes-terrenos',
+  },
+};
 
 export default function LotesPage() {
   return (

@@ -23,12 +23,19 @@
 .logo {
   display: flex;
   align-items: center;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+.logo:hover {
+  transform: scale(1.05);
 }
 .logo img {
   height: auto;
   width: auto;
   max-height: 70px;
   margin-left: 14px;
+  border-radius: 12px;
 }
 
 /* Navigation */

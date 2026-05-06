@@ -3,6 +3,18 @@ import Link from 'next/link';
 import Image from 'next/image';
 import './Footer.css';
 
+const whatsappContacts = [
+  { name: 'Silvia', phone: '5492255509408' },
+  { name: 'Fabiana', phone: '5492255626092' },
+  { name: 'Conrado', phone: '5492255622841' },
+  { name: 'Paul', phone: '5492254602453' },
+  { name: 'Cecilia', phone: '5492216006474' }
+];
+
+const makeWhatsAppLink = (phone, text) => `https://wa.me/${phone}?text=${encodeURIComponent(text)}`;
+
+const formatDisplayPhone = (phone) => `+54 9 ${phone.slice(3, 7)} ${phone.slice(7, 9)}-${phone.slice(9)}`;
+
 const Footer = () => {
   const currentYear = new Date().getFullYear();
 
@@ -38,7 +50,7 @@ const Footer = () => {
                     <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" stroke="currentColor" strokeWidth="2"/>
                   </svg>
                 </a>
-                <a href="https://wa.me/5491234567890" target="_blank" rel="noopener noreferrer" className="social-link">
+                <a href={makeWhatsAppLink('5492255509408', 'Hola, quiero consultar por una propiedad')} target="_blank" rel="noopener noreferrer" className="social-link">
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                     <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                   </svg>
@@ -51,7 +63,7 @@ const Footer = () => {
               <h3 className="footer-title">Enlaces Rápidos</h3>
               <ul className="footer-links">
                 <li><Link href="/">Inicio</Link></li>
-                <li><Link href="/about">Nosotros</Link></li>
+                <li><Link href="/nosotros">Nosotros</Link></li>
                 <li><Link href="/#propiedades">Propiedades</Link></li>
                 <li><Link href="/#servicios">Servicios</Link></li>
                 <li><Link href="/#contacto">Contacto</Link></li>
@@ -86,28 +98,29 @@ const Footer = () => {
                     <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" stroke="currentColor" strokeWidth="2"/>
                     <circle cx="12" cy="10" r="3" stroke="currentColor" strokeWidth="2"/>
                   </svg>
-                  <span> Sucursal:Av del Plata y Uritorco - Mar de las Pampas</span>
+                  <span>Sucursal boutique: Av del Plata y Uritorco - Mar de las Pampas</span>
                 </div>
-                <div className="contact-item">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" stroke="currentColor" strokeWidth="2"/>
-                  </svg>
-                       <span>Ventas: +54 9 2255 62-6092</span>
-
-                </div>
-                <div className="contact-item">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" stroke="currentColor" strokeWidth="2"/>
-                  </svg>
-                      <span>Alquileres: +54 9 2255 62-2841</span>
-                </div>
-                <div className="contact-item">
+                {whatsappContacts.map((contact) => (
+                  <a
+                    key={contact.name}
+                    className="contact-item contact-link"
+                    href={makeWhatsAppLink(contact.phone, `Hola ${contact.name}, consulto por una propiedad`)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                      <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" stroke="currentColor" strokeWidth="2"/>
+                    </svg>
+                    <span>{contact.name}: {formatDisplayPhone(contact.phone)}</span>
+                  </a>
+                ))}
+                <a className="contact-item contact-link" href="mailto:braicesfernandez@gmail.com">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                     <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" stroke="currentColor" strokeWidth="2"/>
                     <polyline points="22,6 12,13 2,6" stroke="currentColor" strokeWidth="2"/>
                   </svg>
                   <span>braicesfernandez@gmail.com</span>
-                </div>
+                </a>
               </div>
             </div>
           </div>

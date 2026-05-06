@@ -1,6 +1,13 @@
-'use client';
 import PropertiesGrid from '../../components/PropertiesGrid/PropertiesGrid';
 import '../lotes-terrenos/page.css';
+
+export const metadata = {
+  title: 'Alquiler Temporario | Silvia Fernández Inmobiliaria',
+  description: 'Descubrí opciones de alquiler temporario en las mejores ubicaciones de Mar de las Pampas y Mar Azul.',
+  alternates: {
+    canonical: '/alquiler-temporario',
+  },
+};
 
 export default function AlquilerTemporarioPage() {
   return (

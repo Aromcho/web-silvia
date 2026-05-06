@@ -16,7 +16,7 @@ export default function NosotrosPage() {
           <section className="about-section">
             <div className="about-grid">
               <div className="about-image">
-                <img src="/assets/images/about-us.jpg" alt="Silvia Fernández" />
+                <img src="/assets/images/image.png" alt="Silvia Fernández" />
               </div>
               <div className="about-text">
                 <h2>Silvia Fernandez Inmobiliaria, una <span className="underline">Historia</span> de éxito</h2>
@@ -149,22 +149,23 @@ export default function NosotrosPage() {
               <div className="contact-item">
                 <span className="icon">📞</span>
                 <div>
-                  <strong>Teléfono</strong>
-                  <p>+54 2255 626092</p>
+                  <strong>WhatsApp</strong>
+                  <p><a href="https://wa.me/5492255626092?text=Hola, consulto por una propiedad" target="_blank" rel="noopener noreferrer">Fabiana: +54 9 2255 62-6092</a></p>
                 </div>
               </div>
               <div className="contact-item">
                 <span className="icon">📧</span>
                 <div>
                   <strong>Email</strong>
-                  <p>info@silviafernandez.com.ar</p>
+                  <p><a href="mailto:braicesfernandez@gmail.com">braicesfernandez@gmail.com</a></p>
                 </div>
               </div>
               <div className="contact-item">
                 <span className="icon">📍</span>
                 <div>
-                  <strong>Dirección</strong>
-                  <p>Villa Gesell, Buenos Aires</p>
+                  <strong>Direcciones</strong>
+                  <p>Central: Calle 34 y Mar del Plata - Mar Azul</p>
+                  <p>Sucursal: Av del Plata y Uritorco - Mar de las Pampas</p>
                 </div>
               </div>
             </div>

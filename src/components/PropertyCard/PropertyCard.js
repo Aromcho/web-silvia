@@ -17,6 +17,17 @@ export default function PropertyCard({ property, formatPrice }) {
       .replace(/\bhotel\b/gi, 'Complejo')
   }
 
+  const getDisplayPrice = () => {
+    // Verificar si es alquiler
+    if (property.operations && property.operations.length > 0) {
+      const operationType = property.operations[0].operation_type
+      if (operationType && (operationType.includes('Alquiler') || operationType === 'Rent')) {
+        return 'Consultar precio'
+      }
+    }
+    return formatPrice(property)
+  }
+
   const propertyTitle = normalizePropertyTypeLabel(
     property.address?.street_name || property.real_address || property.address || property.publication_title || property.title || 'Propiedad'
   )
@@ -63,7 +74,7 @@ export default function PropertyCard({ property, formatPrice }) {
         <h4 className="property-title">
           {propertyTitle}
         </h4>
-        <p className="property-price">{formatPrice(property)}</p>
+        <p className="property-price">{getDisplayPrice()}</p>
         
         <div className="property-details">
           <span className="detail-item">
@@ -101,7 +112,9 @@ export default function PropertyCard({ property, formatPrice }) {
             onClick={(e) => {
               e.preventDefault()
               e.stopPropagation()
-              window.open(`https://wa.me/5491165048694?text=Hola! Me interesa la propiedad: ${propertyTitle || 'Propiedad'}`, '_blank')
+              const propertyUrl = `https://www.silviafernandezpropiedades.com.ar/propiedad/${property.id}`
+              const messageText = `Hola, me interesa esta propiedad: ${propertyTitle}`
+              window.open(`https://wa.me/5492255626092?text=${encodeURIComponent(`${messageText}\n\n${propertyUrl}`)}`, '_blank')
             }}
           >
             <FaWhatsapp />

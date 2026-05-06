@@ -18,7 +18,7 @@ const Header = () => {
       <div className="container-hero">
         <div className="header-content">
           {/* Logo */}
-          <div className="logo">
+          <Link href="/" className="logo">
             <Image
               src="/assets/images/logo.jpg"
               alt="Silvia Fernández - Inmobiliaria"
@@ -26,14 +26,11 @@ const Header = () => {
               height={60}
               priority
             />
-          </div>
+          </Link>
 
           {/* Desktop Navigation */}
           <nav className={`nav ${isMenuOpen ? 'nav-open' : ''}`}>
             <ul className="nav-list">
-              <li className="nav-item">
-                <Link href="/" className="nav-link">Inicio</Link>
-              </li>
               <li className="nav-item">
                 <Link href="/propiedades" className="nav-link">Propiedades</Link>
               </li>
@@ -80,7 +77,6 @@ const Header = () => {
         {/* Mobile Menu */}
         <div className={`mobile-menu ${isMenuOpen ? 'mobile-menu-open' : ''}`}>
           <ul className="mobile-nav-list">
-            <li><Link href="/" onClick={toggleMenu}>Inicio</Link></li>
             <li><Link href="/propiedades" onClick={toggleMenu}>Propiedades</Link></li>
             <li><Link href="/lotes-terrenos" onClick={toggleMenu}>Lotes - Terrenos</Link></li>
             <li><Link href="/alquiler-temporario" onClick={toggleMenu}>Alquiler Temporario</Link></li>

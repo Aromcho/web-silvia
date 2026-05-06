@@ -328,6 +328,14 @@ export default function PropertiesSearchNew() {
   const formatPrice = (property) => {
     if (!property) return 'Consultar precio'
     
+    // Verificar si es alquiler
+    if (property.operations && property.operations.length > 0) {
+      const operationType = property.operations[0].operation_type
+      if (operationType && (operationType.includes('Alquiler') || operationType === 'Rent')) {
+        return 'Consultar precio'
+      }
+    }
+    
     let price = null
     let currency = 'ARS'
     
