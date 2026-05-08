@@ -1,0 +1,4 @@
+dist/home-video.mp4
+node_modules
+package-lock.json
+.env

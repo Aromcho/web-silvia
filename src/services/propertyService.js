@@ -13,7 +13,7 @@
  * - GET  /autocomplete - Autocompletado de direcciones y barrios
  */
 
-const API_BASE_URL = 'http://localhost:8080/api/property';
+const API_BASE_URL = 'https://www.silviafernandezpropiedades.com.ar/api/property';
 
 /**
  * Realiza una petición GET a la API
