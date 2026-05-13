@@ -1,0 +1,360 @@
+/* ── Mapa Page ─────────────────────────────────────── */
+.mapa-page {
+  min-height: 100vh;
+  background: #f8fafc;
+}
+
+/* Header */
+.mapa-header {
+  background: linear-gradient(135deg, #00815c 0%, #005c42 100%);
+  padding: 5rem 1rem 2rem;
+  text-align: center;
+  color: #fff;
+}
+
+@media (max-width: 480px) {
+  .mapa-header {
+    padding: 4rem 0.75rem 1.5rem;
+  }
+  .mapa-header h1 { font-size: 1.6rem; }
+  .mapa-header p  { font-size: 0.88rem; }
+  .map-popup .leaflet-popup-content { width: 190px !important; }
+  .popup-img { height: 90px; }
+}
+
+.mapa-header h1 {
+  font-size: 2.2rem;
+  font-weight: 800;
+  margin: 0 0 0.5rem;
+}
+
+.mapa-header p {
+  font-size: 1rem;
+  opacity: 0.85;
+  margin: 0 0 1.5rem;
+}
+
+/* Filter buttons */
+.mapa-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.filter-btn {
+  padding: 8px 20px;
+  border-radius: 20px;
+  border: 2px solid rgba(255,255,255,0.5);
+  background: transparent;
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.filter-btn:hover {
+  background: rgba(255,255,255,0.2);
+  border-color: #fff;
+}
+
+.filter-btn.active {
+  background: #fff;
+  color: #00815c;
+  border-color: #fff;
+}
+
+/* Body */
+.mapa-body {
+  padding: 1.5rem 1rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* Loading */
+.mapa-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 500px;
+  gap: 1rem;
+  color: #64748b;
+}
+
+.mapa-spinner {
+  width: 44px;
+  height: 44px;
+  border: 4px solid #e2e8f0;
+  border-top-color: #00815c;
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Layout sidebar + map */
+.mapa-layout {
+  display: flex;
+  gap: 1rem;
+  height: 76vh;
+  min-height: 500px;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+}
+
+/* Sidebar */
+.mapa-sidebar {
+  width: 290px;
+  flex-shrink: 0;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid #e2e8f0;
+}
+
+.sidebar-count {
+  padding: 1rem 1rem 0.5rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid #f1f5f9;
+  margin: 0;
+}
+
+.sidebar-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0.5rem;
+}
+
+.sidebar-empty {
+  padding: 1.5rem;
+  color: #94a3b8;
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+.sidebar-item {
+  display: flex;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-left: 3px solid transparent;
+  margin-bottom: 2px;
+}
+
+.sidebar-item:hover {
+  background: #f8fafc;
+}
+
+.sidebar-item.active {
+  background: #f0fdf4;
+  border-left-color: #00815c;
+}
+
+.sidebar-img {
+  width: 64px;
+  height: 64px;
+  object-fit: cover;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+.sidebar-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.sidebar-name {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sidebar-address {
+  font-size: 0.78rem;
+  color: #64748b;
+  margin: 0 0 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sidebar-link {
+  font-size: 0.78rem;
+  color: #00815c;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.sidebar-link:hover {
+  text-decoration: underline;
+}
+
+/* Map */
+.mapa-map {
+  flex: 1;
+  min-width: 0;
+  position: relative;
+}
+
+/* Popup styles */
+.map-popup .leaflet-popup-content-wrapper {
+  border-radius: 12px;
+  padding: 0;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+}
+
+.map-popup .leaflet-popup-content {
+  margin: 0;
+  width: 230px !important;
+}
+
+.map-popup .leaflet-popup-tip {
+  background: #fff;
+}
+
+.popup-inner {
+  overflow: hidden;
+}
+
+.popup-img {
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+  display: block;
+}
+
+.popup-body {
+  padding: 0.75rem 1rem;
+}
+
+.popup-name {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 3px;
+}
+
+.popup-address {
+  font-size: 0.78rem;
+  color: #64748b;
+  margin: 0 0 0.6rem;
+}
+
+.popup-btn {
+  display: inline-block;
+  padding: 5px 12px;
+  background: #00815c;
+  color: #fff;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.2s;
+}
+
+.popup-btn:hover {
+  background: #006b4d;
+  color: #fff;
+}
+
+/* Skeleton loader sidebar */
+.sidebar-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.5rem;
+}
+
+.skeleton-item {
+  height: 72px;
+  border-radius: 10px;
+  background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+}
+
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Overlay de carga de marcadores sobre el mapa */
+.map-markers-loading {
+  position: absolute;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: rgba(255,255,255,0.95);
+  padding: 8px 18px;
+  border-radius: 20px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #475569;
+  z-index: 1000;
+  pointer-events: none;
+}
+
+.map-markers-loading .mapa-spinner {
+  width: 18px;
+  height: 18px;
+  border-width: 2px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .mapa-layout {
+    flex-direction: column;
+    height: auto;
+  }
+
+  .mapa-sidebar {
+    width: 100%;
+    height: 220px;
+    border-right: none;
+    border-bottom: 1px solid #e2e8f0;
+  }
+
+  .sidebar-list {
+    display: flex;
+    gap: 0.5rem;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 0.5rem;
+  }
+
+  .sidebar-item {
+    flex-direction: column;
+    min-width: 140px;
+    flex-shrink: 0;
+    margin-bottom: 0;
+  }
+
+  .sidebar-img {
+    width: 100%;
+    height: 80px;
+  }
+
+  .mapa-map {
+    height: 450px;
+  }
+}
