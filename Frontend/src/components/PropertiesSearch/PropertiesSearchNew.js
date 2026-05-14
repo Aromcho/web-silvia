@@ -521,11 +521,6 @@ export default function PropertiesSearchNew() {
         {/* Resultados */}
         <div className="results-section">
           <div className="results-header">
-            <div className="results-count">
-              {loading && properties.length === 0
-                ? 'Buscando...'
-                : `${properties.length} de ${totalCount} propiedades encontradas`}
-            </div>
             <div className="view-toggle">
               <button 
                 className={`view-btn ${viewMode === 'grid' ? 'active' : ''}`}
