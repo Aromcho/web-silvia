@@ -19,7 +19,7 @@ export default function NosotrosPage() {
                 <img src="/assets/images/image.png" alt="Silvia Fernández" />
               </div>
               <div className="about-text">
-                <h2>Silvia Fernandez Inmobiliaria, una <span className="underline">Historia</span> de éxito</h2>
+                <h2>Silvia Fernandez Inmobiliaria, una historia de éxito</h2>
                 <p>
                   Silvia Fernandez Inmobiliaria es sinónimo de compromiso, excelencia y confianza en el mercado inmobiliario. 
                   Hemos logrado conectar a innumerables familias y empresas con la propiedad ideal, brindando un servicio 
