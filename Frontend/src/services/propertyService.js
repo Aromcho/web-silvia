@@ -1,6 +1,6 @@
 /**
  * Property Service - Cliente API para consumir endpoints de propiedades
- * API Base: https://api.silviafernandezpropiedades.com.ar/api/property/
+ * API Base: /api/property/
  * 
  * Endpoints disponibles:
  * - GET  /properties - Obtener lista de propiedades con filtros y paginación
@@ -13,7 +13,10 @@
  * - GET  /autocomplete - Autocompletado de direcciones y barrios
  */
 
-const API_BASE_URL = '/api/property';
+const API_BASE_URL =
+  typeof window === 'undefined'
+    ? process.env.PROPERTY_API_INTERNAL_URL || '/api/property'
+    : process.env.NEXT_PUBLIC_PROPERTY_API_BASE_URL || '/api/property';
 
 /**
  * Realiza una petición GET a la API
@@ -23,24 +26,26 @@ const API_BASE_URL = '/api/property';
  */
 const fetchFromAPI = async (endpoint, params = {}) => {
   try {
-    const url = new URL(`${API_BASE_URL}${endpoint}`);
-    
-    // Agregar parámetros de query
+    const qs = new URLSearchParams();
+
     Object.keys(params).forEach(key => {
       if (params[key] !== undefined && params[key] !== null) {
         if (Array.isArray(params[key])) {
-          params[key].forEach((value) => {
+          params[key].forEach(value => {
             if (value !== undefined && value !== null && value !== '') {
-              url.searchParams.append(key, value);
+              qs.append(key, value);
             }
           });
         } else {
-          url.searchParams.append(key, params[key]);
+          qs.append(key, params[key]);
         }
       }
     });
 
-    const response = await fetch(url.toString(), {
+    const queryString = qs.toString();
+    const fullUrl = `${API_BASE_URL}${endpoint}${queryString ? `?${queryString}` : ''}`;
+
+    const response = await fetch(fullUrl, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',

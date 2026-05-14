@@ -4,7 +4,7 @@
 
 Este servicio proporciona una interfaz completa para consumir la API de propiedades desde Next.js. Está ubicado en la raíz del proyecto: `propertyService.js`
 
-**API Base:** `https://api.silviafernandezpropiedades.com.ar/api/property/properties`
+**API Base:** `/api/property/properties`
 
 ---
 
