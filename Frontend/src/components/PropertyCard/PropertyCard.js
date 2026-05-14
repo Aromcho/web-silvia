@@ -79,10 +79,18 @@ export default function PropertyCard({ property, formatPrice }) {
         <p className="property-price">{getDisplayPrice()}</p>
         
         <div className="property-details">
-          <span className="detail-item">
-            <FaHome className="detail-icon" />
-            {property.surface || 0}m²
-          </span>
+          {(property.total_surface || property.surface) > 0 && (
+            <span className="detail-item">
+              <FaHome className="detail-icon" />
+              {property.total_surface || property.surface}m² tot.
+            </span>
+          )}
+          {property.roofed_surface > 0 && (
+            <span className="detail-item">
+              <FaHome className="detail-icon" />
+              {property.roofed_surface}m² cub.
+            </span>
+          )}
           
           {(property.suite_amount || property.bedrooms) > 0 && (
             <span className="detail-item">

@@ -8,6 +8,7 @@ import {
   FaCar,
   FaRuler,
   FaUniversity,
+  FaDollarSign,
   FaPaw,
   FaMapMarkerAlt,
   FaWhatsapp,
@@ -145,6 +146,10 @@ export default function PropertyDetail({ property }) {
     getBooleanFromKeys(property, ['apto_credito', 'apto_credit', 'aptoCredito', 'credit_approved', 'is_credit', 'credit_eligible']) ||
     hasKeywordInCollections([property.tags, property.custom_tags, property.features, property.amenities], ['apto credito', 'apto credito hipotecario', 'credit eligible'])
 
+  const isFinancingEligible =
+    getBooleanFromKeys(property, ['apto_financiacion', 'financiacion', 'financing', 'apto_financing', 'financing_eligible']) ||
+    hasKeywordInCollections([property.tags, property.custom_tags, property.features, property.amenities], ['apto financiacion', 'financiacion', 'financing'])
+
   const acceptsPets =
     getBooleanFromKeys(property, ['acepta_mascotas', 'aceptaMascotas', 'pets_allowed', 'accept_pets']) ||
     hasKeywordInCollections([property.tags, property.custom_tags, property.features, property.amenities], ['acepta mascotas', 'mascotas', 'pets allowed', 'pet friendly'])
@@ -186,6 +191,13 @@ export default function PropertyDetail({ property }) {
       value: isCreditEligible ? 'Sí' : 'No',
       label: 'Crédito',
       negative: !isCreditEligible
+    },
+    {
+      key: 'financing',
+      icon: FaDollarSign,
+      value: isFinancingEligible ? 'Sí' : 'No',
+      label: 'Financiación',
+      negative: !isFinancingEligible
     },
     {
       key: 'pets',

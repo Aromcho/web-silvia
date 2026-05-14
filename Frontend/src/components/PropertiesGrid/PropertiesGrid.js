@@ -292,10 +292,6 @@ const PropertiesGrid = ({ filters = {} }) => {
           </div>
         ) : (
           <>
-            <div className="results-count">
-              <h3>{properties.length} propiedades encontradas{totalCount ? ` de ${totalCount}` : ''}</h3>
-            </div>
-            
             <div className="properties-grid">
               {properties.length === 0 ? (
                 <div className="no-results">

@@ -343,12 +343,6 @@ const PropertiesSearch = ({ defaultFilters = {} }) => {
 
         {/* Resultados */}
         <div className="properties-results">
-          <div className="results-header">
-            <h3>
-              {loading ? 'Cargando...' : `${properties.length} propiedades encontradas`}
-            </h3>
-          </div>
-
           {loading ? (
             <div className="loading-grid">
               {[...Array(6)].map((_, i) => (
