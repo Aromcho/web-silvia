@@ -2,14 +2,14 @@ module.exports = {
   apps: [
     {
       name: "silvia-frontend",
-      cwd: "/root/web-silvia-next/Frontend", // ajustar al path real en el servidor
+      cwd: "/root/web-silvia/Frontend", // ajustar al path real en el servidor
       script: "npm",
       args: "start",
-      exec_mode: "cluster",
-      instances: 2,
+      exec_mode: "fork",
+      instances: 1,
       env: {
         NODE_ENV: "development",
-        PORT: 3000
+        PORT: 8080
       },
       env_production: {
         NODE_ENV: "production",
@@ -18,11 +18,11 @@ module.exports = {
     },
     {
       name: "silvia-backend",
-      cwd: "/root/SilviaFernandez/Backend", // ajustar al path real en el servidor
+      cwd: "/root/web-silvia/Backend", // ajustar al path real en el servidor
       script: "index.js",
       interpreter: "node",
-      exec_mode: "cluster",
-      instances: 2,
+      exec_mode: "fork",
+      instances: 1,
       env: {
         NODE_ENV: "development",
         PORT: 3001
