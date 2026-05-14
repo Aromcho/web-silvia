@@ -9,7 +9,7 @@ export const metadata = {
 async function getLocations() {
   try {
     const res = await fetch(
-      'https://www.silviafernandezpropiedades.com.ar/api/locations',
+      'http://localhost:3001/api/locations',
       { next: { revalidate: 300 } } // cache 5 minutos en el servidor
     )
     if (!res.ok) return []

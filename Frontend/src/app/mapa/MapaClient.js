@@ -7,7 +7,7 @@ import './mapa.css'
 
 const MapView = dynamic(() => import('./MapView'), { ssr: false })
 
-const API_BASE = 'https://www.silviafernandezpropiedades.com.ar/api'
+const API_BASE = '/api'
 
 const FILTERS = [
   { value: 'all',          label: 'Todas' },

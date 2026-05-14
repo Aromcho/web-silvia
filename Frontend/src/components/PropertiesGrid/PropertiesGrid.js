@@ -5,7 +5,7 @@ import PropertyCard from '../PropertyCard/PropertyCard';
 import './PropertiesGrid.css';
 
 const PAGE_SIZE = 12;
-const CATEGORY_CACHE_KEY_PREFIX = 'silvia-category-properties-cache-v1';
+const CATEGORY_CACHE_KEY_PREFIX = 'silvia-category-properties-cache-v2';
 
 let cachedCategoryResults = null;
 
@@ -108,36 +108,36 @@ const PropertiesGrid = ({ filters = {} }) => {
       order: 'DESC'
     };
 
-    // Mapear type a property_type (array)
+    // Mapear type a property_type (array con todos los sinónimos posibles)
     if (filters.type) {
       const typeMap = {
-        'casa': 'Casa',
-        'departamento': 'Departamento',
-        'terreno': 'Lote',
-        'lote': 'Lote',
-        'campo': 'Campo',
-        'complejo': 'Complejo',
-        'hotel': 'Hotel',
-        'hoteles': 'Hotel',
-        'emprendimiento': 'Emprendimiento',
-        'cochera': 'Cochera'
+        'casa':          ['Casa', 'Casas'],
+        'departamento':  ['Departamento', 'Departamentos', 'Apartment'],
+        'terreno':       ['Terreno', 'Terrenos', 'Lote', 'Lotes'],
+        'lote':          ['Lote', 'Lotes', 'Terreno', 'Terrenos'],
+        'campo':         ['Campo'],
+        'complejo':      ['Complejo', 'Complejos', 'Hotel', 'Hoteles', 'Apart Hotel', 'Emprendimiento'],
+        'hotel':         ['Hotel', 'Hoteles', 'Complejo', 'Complejos'],
+        'emprendimiento':['Emprendimiento'],
+        'cochera':       ['Cochera'],
+        'local':         ['Local', 'Locales', 'Local Comercial'],
       };
-      const mappedType = typeMap[filters.type.toLowerCase()] || filters.type;
-      apiFilters.property_type = [mappedType];
+      const key = filters.type.toLowerCase();
+      apiFilters.property_type = typeMap[key] || [filters.type];
     }
 
-    // Mapear operation a operation_type (array)
+    // Mapear operation a operation_type (array con todos los sinónimos posibles)
     if (filters.operation) {
       const operationMap = {
-        'venta': 'Venta',
-        'alquiler': 'Alquiler',
-        'alquiler-temporario': 'Alquiler Temporario',
-        'alquiler temporario': 'Alquiler Temporario',
-        'alquiler temporal': 'Alquiler Temporario',
-        'alquiler-anual': 'Alquiler Anual'
+        'venta':               ['Venta', 'Sale'],
+        'alquiler':            ['Alquiler', 'Rent'],
+        'alquiler-temporario': ['Alquiler temporal', 'Alquiler Temporario', 'Alquiler temporario'],
+        'alquiler temporario': ['Alquiler temporal', 'Alquiler Temporario', 'Alquiler temporario'],
+        'alquiler temporal':   ['Alquiler temporal', 'Alquiler Temporario', 'Alquiler temporario'],
+        'alquiler-anual':      ['Alquiler anual', 'Alquiler Anual'],
       };
-      const mappedOperation = operationMap[filters.operation.toLowerCase()] || filters.operation;
-      apiFilters.operation_type = [mappedOperation];
+      const key = filters.operation.toLowerCase();
+      apiFilters.operation_type = operationMap[key] || [filters.operation];
     }
 
     // Otros filtros opcionales

@@ -225,8 +225,8 @@
   display: grid;
   grid-template-columns: 1fr 380px;
   gap: 2rem;
-
   align-items: start;
+  position: relative;
 }
 
 .property-detail-page .left-column {
@@ -616,18 +616,31 @@
   overflow: hidden;
 }
 
-/* Sidebar de contacto */
+/* Sidebar de contacto — 3 estados */
 .property-detail-page .sidebar-column {
-  position: relative;
   align-self: start;
 }
 
-.property-detail-page .sidebar-column.is-fixed {
+/* Estado 1: flujo normal */
+.property-detail-page .sidebar-relative {
+  position: relative;
+}
+
+/* Estado 2: sigue el scroll */
+.property-detail-page .sidebar-fixed {
   position: fixed;
   top: 6.5rem;
   right: max(1rem, calc((100vw - 1400px) / 2 + 2rem));
   width: 380px;
   z-index: 20;
+}
+
+/* Estado 3: anclado al fondo del contenedor, justo antes del footer */
+.property-detail-page .sidebar-bottom {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 380px;
 }
 
 .property-detail-page .sidebar-column .contact-card {
@@ -766,6 +779,17 @@
 .property-detail-page .share-btn:hover {
   border-color: var(--primary-color);
   background: rgba(123, 220, 181, 0.1);
+}
+
+.property-detail-page .print-btn {
+  border-color: #e2e8f0;
+  color: #475569;
+}
+
+.property-detail-page .print-btn:hover {
+  border-color: #94a3b8;
+  background: #f8fafc;
+  color: #1e293b;
 }
 
 /* Lightbox */
@@ -967,14 +991,16 @@
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 
-  /* Sidebar deja de estar fija */
+  /* Sidebar deja de estar fija en tablet */
   .property-detail-page .sidebar-column,
-  .property-detail-page .sidebar-column.is-fixed {
-    position: relative;
-    top: auto;
-    right: auto;
-    width: auto;
-    z-index: auto;
+  .property-detail-page .sidebar-fixed,
+  .property-detail-page .sidebar-bottom {
+    position: relative !important;
+    top: auto !important;
+    right: auto !important;
+    width: auto !important;
+    z-index: auto !important;
+    bottom: auto !important;
   }
 
   .property-detail-page .property-title-section {

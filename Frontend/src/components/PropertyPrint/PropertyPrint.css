@@ -1,0 +1,191 @@
+/* ── Pantalla: completamente invisible y sin espacio ── */
+.pp-print-wrapper {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ── Impresión ── */
+@media print {
+  /* 1. Ocultar TODO el contenido de la página */
+  body * {
+    visibility: hidden;
+  }
+
+  /* 2. Mostrar solo el wrapper y su contenido */
+  .pp-print-wrapper,
+  .pp-print-wrapper * {
+    visibility: visible;
+  }
+
+  /* 3. Posicionar el wrapper en el origen de la página */
+  .pp-print-wrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    opacity: 1;
+    z-index: 99999;
+    background: white;
+  }
+
+  .pp-root {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    background: white;
+  }
+
+  @page {
+    size: A4 landscape;
+    margin: 0;
+  }
+}
+
+/* ── Estilos del documento imprimible ── */
+.pp-root {
+  font-family: 'Inter', 'Montserrat', sans-serif;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: white;
+}
+
+/* Header */
+.pp-header {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 14px 24px;
+  background: white;
+  border-bottom: 3px solid #00815c;
+  flex-shrink: 0;
+}
+
+.pp-logo {
+  width: 90px;
+  height: auto;
+  object-fit: contain;
+}
+
+.pp-header-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.pp-header-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.pp-header-address {
+  font-size: 0.8rem;
+  color: #64748b;
+}
+
+/* Imagen principal */
+.pp-image-wrap {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  min-height: 0;
+}
+
+.pp-main-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Overlay verde */
+.pp-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 52%;
+  background: rgba(0, 129, 92, 0.88);
+  padding: 16px 20px;
+  border-radius: 0 16px 0 0;
+  color: white;
+}
+
+.pp-overlay-price {
+  font-size: 1.5rem;
+  font-weight: 800;
+  margin-bottom: 10px;
+  letter-spacing: -0.5px;
+}
+
+.pp-overlay-stats {
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+
+.pp-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.pp-stat svg { font-size: 1rem; }
+.pp-stat-val { font-weight: 700; font-size: 0.85rem; }
+.pp-stat-lbl { font-size: 0.65rem; opacity: 0.85; }
+
+/* QR */
+.pp-qr {
+  position: absolute;
+  bottom: 10px;
+  right: 14px;
+  background: white;
+  padding: 8px;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+}
+
+.pp-qr-label {
+  font-size: 0.6rem;
+  color: #64748b;
+  font-weight: 600;
+}
+
+/* Footer */
+.pp-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 8px 24px;
+  background: #1e293b;
+  color: white;
+  gap: 1rem;
+  flex-wrap: wrap;
+  flex-shrink: 0;
+}
+
+.pp-contact-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.pp-url {
+  font-size: 0.65rem;
+  color: #94a3b8;
+}
