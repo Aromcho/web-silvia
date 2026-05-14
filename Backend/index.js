@@ -19,7 +19,7 @@ import cookieParser from 'cookie-parser';
 
 dotenv.config();
 
-const PORT = 8080;
+const PORT = process.env.PORT || 3001;
 const app = express();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -28,19 +28,25 @@ const numCPUs = cpus().length;
 connectDB();
 
 if (isPrimary) {
-  cron.schedule('*/1 * * * *', () => {
-    console.log('Ejecutando sincronización con Tokko cada 5 minutos');
+  // Sincronización con Tokko cada 5 minutos
+  cron.schedule('*/5 * * * *', () => {
+    console.log('Ejecutando sincronización con Tokko');
     syncWithTokko();
   });
-  // cron.schedule('*/1 * * * *', () => {
-  //   console.log('Running cron job to sync with Tokko');
-  //   syncDevelopmentsWithTokko();
-  // });
-  
-  for (let i = 1; i <=numCPUs; i++){
+
+  // Regenerar direcciones_y_barrios.json todos los días a las 3:00 AM
+  cron.schedule('0 3 * * *', () => {
+    console.log('Regenerando direcciones y barrios...');
+    generateJSON();
+  });
+
+  // Generar el JSON al iniciar el servidor por primera vez
+  generateJSON();
+
+  for (let i = 1; i <= numCPUs; i++) {
     cluster.fork();
   }
-  console.log('proseso primario');
+  console.log('proceso primario');
 } else {
   console.log('proseso worker');
   app.listen(PORT, () => {
@@ -74,17 +80,6 @@ app.get('/propiedad/:id', renderPropertySEO);
 app.get('/noticia/:id', renderArticuleSEO);
 
 
-// Configurar los cron jobs para sincronización Development
-//cron.schedule('0 * * * *', () => {
-//  console.log('Running cron job to sync with Tokko');
-//  syncDevelopmentsWithTokko();
-//});
-
-//ejecutar el jsonGenerator.js
-//cron.schedule('*/1 * * * *', () => {
-//  console.log('Running cron job to generate JSON');
-//  generateJSON();
-//});
 
 
 // Ruta catch-all para servir index.html
