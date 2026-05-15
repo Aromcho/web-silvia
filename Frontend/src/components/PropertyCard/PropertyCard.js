@@ -111,6 +111,7 @@ export default function PropertyCard({ property, formatPrice }) {
           <FaMapMarkerAlt className="location-icon" />
           {property.address?.city || property.location?.name || property.location || 'Ubicación no disponible'}, {property.address?.state || ''}
         </p>
+        <p className="property-id">ID #{property.id}</p>
         
         <div className="property-actions">
           <button className="btn-view">

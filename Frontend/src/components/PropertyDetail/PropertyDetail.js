@@ -30,6 +30,7 @@ export default function PropertyDetail({ property }) {
   const [sidebarMode, setSidebarMode] = useState('relative') // 'relative' | 'fixed' | 'bottom'
   const [contactForm, setContactForm] = useState({ name: '', email: '', phone: '', message: '' })
   const [contactStatus, setContactStatus] = useState('idle')
+  const [idCopied, setIdCopied] = useState(false)
   const sidebarRef = useRef(null)
   const sidebarTopRef = useRef(0)
 
@@ -629,6 +630,18 @@ export default function PropertyDetail({ property }) {
             <button className="share-btn print-btn" onClick={handlePrint}>
               <FaPrint />
               Imprimir / PDF
+            </button>
+
+            <button
+              className={`property-id-btn${idCopied ? ' copied' : ''}`}
+              onClick={() => {
+                navigator.clipboard.writeText(String(property.id))
+                setIdCopied(true)
+                setTimeout(() => setIdCopied(false), 1500)
+              }}
+              title="Copiar ID"
+            >
+              {idCopied ? '¡ID copiado!' : `ID #${property.id}`}
             </button>
           </div>
 

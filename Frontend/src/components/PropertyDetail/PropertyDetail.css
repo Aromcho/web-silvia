@@ -1373,3 +1373,32 @@
     font-size: 0.72rem;
   }
 }
+
+/* ID de propiedad en sidebar */
+.property-id-btn {
+  display: block;
+  width: 100%;
+  margin-top: 0.6rem;
+  padding: 0.45rem 0.75rem;
+  background: transparent;
+  border: 1px dashed #cbd5e1;
+  border-radius: 8px;
+  color: #94a3b8;
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  text-align: center;
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s, background 0.2s;
+}
+
+.property-id-btn:hover {
+  color: var(--primary-color, #008060);
+  border-color: var(--primary-color, #008060);
+  background: rgba(0, 128, 96, 0.04);
+}
+
+.property-id-btn.copied {
+  color: var(--primary-color, #008060);
+  border-color: var(--primary-color, #008060);
+  background: rgba(0, 128, 96, 0.08);
+}

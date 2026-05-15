@@ -368,3 +368,12 @@
 .modern-property-card:nth-child(4) { animation-delay: 0.4s; }
 .modern-property-card:nth-child(5) { animation-delay: 0.5s; }
 .modern-property-card:nth-child(6) { animation-delay: 0.6s; }
+
+/* ID de propiedad en card */
+.property-id {
+  margin-top: 0.35rem;
+  font-size: 0.68rem;
+  color: #b0bec5;
+  letter-spacing: 0.03em;
+  text-align: right;
+}
