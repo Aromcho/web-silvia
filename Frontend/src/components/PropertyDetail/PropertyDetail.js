@@ -436,6 +436,9 @@ export default function PropertyDetail({ property }) {
         {property.is_starred_on_web && (
           <span className="badge-featured">Destacada</span>
         )}
+        <button className="print-icon-btn" onClick={handlePrint} title="Imprimir / PDF">
+          <FaPrint />
+        </button>
       </div>
       {property.status && property.status !== 'disponible' && (
         <div className={`detail-status-ribbon ${property.status}`}>
@@ -583,6 +586,14 @@ export default function PropertyDetail({ property }) {
                   className="description-text"
                   dangerouslySetInnerHTML={{ __html: property.description }}
                 />
+                <a
+                  href={`https://www.tokkobroker.com/property/${property.id}/`}
+                  className="tokko-link-btn"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Ver en Tokko
+                </a>
               </div>
             )}
           </div>
@@ -625,11 +636,6 @@ export default function PropertyDetail({ property }) {
             <button className="share-btn" onClick={handleShare}>
               <FaShare />
               Compartir propiedad
-            </button>
-
-            <button className="share-btn print-btn" onClick={handlePrint}>
-              <FaPrint />
-              Imprimir / PDF
             </button>
 
             <button

@@ -1374,6 +1374,51 @@
   }
 }
 
+/* Botón "Ver en Tokko" al pie de la descripción */
+.tokko-link-btn {
+  display: inline-block;
+  margin-top: 1.25rem;
+  padding: 0.5rem 1.1rem;
+  background: transparent;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  color: #64748b;
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  text-decoration: none;
+  transition: color 0.2s, border-color 0.2s, background 0.2s;
+}
+
+.tokko-link-btn:hover {
+  color: var(--primary-color, #008060);
+  border-color: var(--primary-color, #008060);
+  background: rgba(0, 128, 96, 0.05);
+}
+
+/* Botón imprimir en fila de precio */
+.print-icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  background: transparent;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  color: #94a3b8;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s, background 0.2s;
+}
+
+.print-icon-btn:hover {
+  color: var(--primary-color, #008060);
+  border-color: var(--primary-color, #008060);
+  background: rgba(0, 128, 96, 0.06);
+}
+
 /* ID de propiedad en sidebar */
 .property-id-btn {
   display: block;
