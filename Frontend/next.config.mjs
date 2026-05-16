@@ -4,6 +4,16 @@ const nextConfig = {
     ignoreDuringBuilds: true,
   },
 
+  async redirects() {
+    return [
+      {
+        source: '/propertyDetail/:id',
+        destination: '/propiedad/:id',
+        permanent: true,
+      },
+    ]
+  },
+
   async rewrites() {
     // afterFiles: primero se verifican las rutas de Next.js (/api/contact, etc.)
     // y si no hay match, se proxea al backend Express en el puerto 3001.
