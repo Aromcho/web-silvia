@@ -21,16 +21,16 @@ const About = () => {
             <div className="about-text">
               <div className="about-description">
                 <p>
-                  Silvia Fernandez Inmobiliaria es sinónimo de compromiso, excelencia y confianza en el mercado inmobiliario. Hemos logrado conectar a innumerables familias y empresas con la propiedad ideal, brindando un servicio transparente y personalizado.
+                  Silvia Fernández Inmobiliaria es sinónimo de compromiso, excelencia y confianza en el mercado inmobiliario. Hemos logrado conectar a innumerables familias y empresas con la propiedad ideal, brindando un servicio transparente y personalizado.
                 </p>
                 <p>
                   Nuestra pasión por el sector nos impulsa a innovar constantemente, ofreciendo un asesoramiento integral basado en un profundo conocimiento del mercado. Cada operación es gestionada con profesionalismo y dedicación, asegurando que cada cliente reciba la atención que merece.
                 </p>
                 <p>
-                  En Silvia Fernandez Inmobiliaria, no solo vendemos propiedades, creamos hogares, oportunidades y futuros. Nuestra reputación se construye sobre valores sólidos: integridad, compromiso y una atención cercana que marca la diferencia en cada transacción.
+                  En Silvia Fernández Inmobiliaria, no solo vendemos propiedades, creamos hogares, oportunidades y futuros. Nuestra reputación se construye sobre valores sólidos: integridad, compromiso y una atención cercana que marca la diferencia en cada transacción.
                 </p>
                 <p>
-                  Si buscas un equipo confiable, apasionado y altamente capacitado para guiarte en tu próxima inversión inmobiliaria, Silvia Fernandez Inmobiliaria es tu mejor elección. Descubre la experiencia de trabajar con expertos que ponen tu bienestar en el centro de todo.
+                  Si buscas un equipo confiable, apasionado y altamente capacitado para guiarte en tu próxima inversión inmobiliaria, Silvia Fernández Inmobiliaria es tu mejor elección. Descubre la experiencia de trabajar con expertos que ponen tu bienestar en el centro de todo.
                 </p>
               </div>
 

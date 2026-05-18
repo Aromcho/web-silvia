@@ -23,7 +23,7 @@ const buildPropertyMetadata = (property) => {
 
 export async function generateMetadata({ params }) {
   try {
-    const property = await getPropertyById(params.id)
+    const property = await getPropertyById(params.id, { cache: 'no-store' })
 
     if (!property) {
       return {
@@ -43,7 +43,7 @@ export async function generateMetadata({ params }) {
 
 export default async function PropertyPage({ params }) {
   try {
-    const property = await getPropertyById(params.id)
+    const property = await getPropertyById(params.id, { cache: 'no-store' })
 
     if (!property) {
       return (

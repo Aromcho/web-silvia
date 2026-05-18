@@ -22,9 +22,10 @@ const API_BASE_URL =
  * Realiza una petición GET a la API
  * @param {string} endpoint - Endpoint de la API (ej: /properties)
  * @param {object} params - Parámetros de query
+ * @param {object} fetchOptions - Opciones adicionales de fetch (ej: { cache: 'no-store' })
  * @returns {Promise<object>} Respuesta de la API
  */
-const fetchFromAPI = async (endpoint, params = {}) => {
+const fetchFromAPI = async (endpoint, params = {}, fetchOptions = {}) => {
   try {
     const qs = new URLSearchParams();
 
@@ -50,6 +51,7 @@ const fetchFromAPI = async (endpoint, params = {}) => {
       headers: {
         'Content-Type': 'application/json',
       },
+      ...fetchOptions,
     });
 
     if (!response.ok) {
@@ -117,16 +119,19 @@ export const getProperties = async (filters = {}) => {
 /**
  * Obtener detalles completos de una propiedad por ID
  * @param {number|string} id - ID de la propiedad
+ * @param {object} fetchOptions - Opciones de fetch (ej: { cache: 'no-store' })
  * @returns {Promise<object>} Objeto propiedad completo
  * 
  * @example
  * const property = await getPropertyById(12345);
+ * // Para deshabilitar caché (PropertyDetail):
+ * const property = await getPropertyById(12345, { cache: 'no-store' });
  */
-export const getPropertyById = async (id) => {
+export const getPropertyById = async (id, fetchOptions = {}) => {
   if (!id) {
     throw new Error('Property ID is required');
   }
-  return fetchFromAPI(`/${id}`);
+  return fetchFromAPI(`/${id}`, {}, fetchOptions);
 };
 
 /**

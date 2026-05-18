@@ -371,9 +371,7 @@
 
 /* ID de propiedad en card */
 .property-id {
-  margin-top: 0.35rem;
   font-size: 0.68rem;
   color: #b0bec5;
-  letter-spacing: 0.03em;
   text-align: right;
 }
