@@ -16,7 +16,8 @@ import './PropertiesSearchNew.css'
 
 const PAGE_SIZE = 12
 const FILTER_DEBOUNCE_MS = 250
-const SEARCH_CACHE_KEY_PREFIX = 'silvia-search-properties-cache-v1'
+const SEARCH_CACHE_KEY_PREFIX = 'silvia-search-properties-cache-v2'
+const CACHE_TTL_MS = 60 * 1000 // 1 minuto
 
 let cachedSearchResults = null
 
@@ -96,9 +97,15 @@ const buildSearchCacheKey = (filtersSnapshot) => {
   })}`
 }
 
+const isCacheExpired = (entry) => {
+  if (!entry?.timestamp) return true
+  return Date.now() - entry.timestamp > CACHE_TTL_MS
+}
+
 const readSearchCache = (cacheKey) => {
-  if (cachedSearchResults?.[cacheKey]) {
-    return cachedSearchResults[cacheKey]
+  const memEntry = cachedSearchResults?.[cacheKey]
+  if (memEntry && !isCacheExpired(memEntry)) {
+    return memEntry
   }
 
   const rawValue = safeStorageGet(cacheKey)
@@ -106,6 +113,7 @@ const readSearchCache = (cacheKey) => {
 
   try {
     const parsedValue = JSON.parse(rawValue)
+    if (isCacheExpired(parsedValue)) return null
     cachedSearchResults = cachedSearchResults || {}
     cachedSearchResults[cacheKey] = parsedValue
     return parsedValue
@@ -116,9 +124,10 @@ const readSearchCache = (cacheKey) => {
 }
 
 const writeSearchCache = (cacheKey, value) => {
+  const entry = { ...value, timestamp: Date.now() }
   cachedSearchResults = cachedSearchResults || {}
-  cachedSearchResults[cacheKey] = value
-  safeStorageSet(cacheKey, JSON.stringify(value))
+  cachedSearchResults[cacheKey] = entry
+  safeStorageSet(cacheKey, JSON.stringify(entry))
 }
 
 export default function PropertiesSearchNew() {

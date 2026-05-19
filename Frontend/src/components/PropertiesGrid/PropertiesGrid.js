@@ -5,7 +5,8 @@ import PropertyCard from '../PropertyCard/PropertyCard';
 import './PropertiesGrid.css';
 
 const PAGE_SIZE = 12;
-const CATEGORY_CACHE_KEY_PREFIX = 'silvia-category-properties-cache-v2';
+const CATEGORY_CACHE_KEY_PREFIX = 'silvia-category-properties-cache-v3';
+const CACHE_TTL_MS = 60 * 1000; // 1 minuto
 
 let cachedCategoryResults = null;
 
@@ -42,9 +43,15 @@ const buildCategoryCacheKey = (filters) => {
   })}`;
 };
 
+const isCacheExpired = (entry) => {
+  if (!entry?.timestamp) return true;
+  return Date.now() - entry.timestamp > CACHE_TTL_MS;
+};
+
 const readCategoryCache = (cacheKey) => {
-  if (cachedCategoryResults?.[cacheKey]) {
-    return cachedCategoryResults[cacheKey];
+  const memEntry = cachedCategoryResults?.[cacheKey];
+  if (memEntry && !isCacheExpired(memEntry)) {
+    return memEntry;
   }
 
   const rawValue = safeStorageGet(cacheKey);
@@ -52,6 +59,7 @@ const readCategoryCache = (cacheKey) => {
 
   try {
     const parsedValue = JSON.parse(rawValue);
+    if (isCacheExpired(parsedValue)) return null;
     cachedCategoryResults = cachedCategoryResults || {};
     cachedCategoryResults[cacheKey] = parsedValue;
     return parsedValue;
@@ -62,9 +70,10 @@ const readCategoryCache = (cacheKey) => {
 };
 
 const writeCategoryCache = (cacheKey, value) => {
+  const entry = { ...value, timestamp: Date.now() };
   cachedCategoryResults = cachedCategoryResults || {};
-  cachedCategoryResults[cacheKey] = value;
-  safeStorageSet(cacheKey, JSON.stringify(value));
+  cachedCategoryResults[cacheKey] = entry;
+  safeStorageSet(cacheKey, JSON.stringify(entry));
 };
 
 const PropertiesGrid = ({ filters = {} }) => {

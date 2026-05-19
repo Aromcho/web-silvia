@@ -6,11 +6,17 @@ import { getProperties } from '../../services/propertyService'
 import PropertyCard from '../PropertyCard/PropertyCard'
 import './Properties.css'
 
-const HOME_PROPERTIES_CACHE_KEY = 'silvia-home-properties-cache-v1'
+const HOME_PROPERTIES_CACHE_KEY = 'silvia-home-properties-cache-v2'
+const CACHE_TTL_MS = 60 * 1000 // 1 minuto
 let cachedSectionsData = null
 
+const isCacheExpired = (entry) => {
+  if (!entry?.timestamp) return true
+  return Date.now() - entry.timestamp > CACHE_TTL_MS
+}
+
 const readCachedSectionsData = () => {
-  if (cachedSectionsData) {
+  if (cachedSectionsData && !isCacheExpired(cachedSectionsData)) {
     return cachedSectionsData
   }
 
@@ -24,7 +30,9 @@ const readCachedSectionsData = () => {
       return null
     }
 
-    cachedSectionsData = JSON.parse(rawValue)
+    const parsed = JSON.parse(rawValue)
+    if (isCacheExpired(parsed)) return null
+    cachedSectionsData = parsed
     return cachedSectionsData
   } catch (error) {
     console.warn('No se pudo leer el cache de propiedades del home:', error)
@@ -33,14 +41,15 @@ const readCachedSectionsData = () => {
 }
 
 const writeCachedSectionsData = (sectionsData) => {
-  cachedSectionsData = sectionsData
+  const entry = { ...sectionsData, timestamp: Date.now() }
+  cachedSectionsData = entry
 
   if (typeof window === 'undefined') {
     return
   }
 
   try {
-    window.sessionStorage.setItem(HOME_PROPERTIES_CACHE_KEY, JSON.stringify(sectionsData))
+    window.sessionStorage.setItem(HOME_PROPERTIES_CACHE_KEY, JSON.stringify(entry))
   } catch (error) {
     console.warn('No se pudo guardar el cache de propiedades del home:', error)
   }
