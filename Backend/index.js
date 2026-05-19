@@ -28,8 +28,8 @@ const numCPUs = cpus().length;
 connectDB();
 
 if (isPrimary) {
-  // Sincronización con Tokko cada 5 minutos
-  cron.schedule('*/5 * * * *', () => {
+  // Sincronización con Tokko cada minuto
+  cron.schedule('* * * * *', () => {
     console.log('Ejecutando sincronización con Tokko');
     syncWithTokko();
   });
