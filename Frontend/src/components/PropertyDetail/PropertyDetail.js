@@ -131,9 +131,9 @@ export default function PropertyDetail({ property }) {
     }).format(value)
 
   const surface = getFirstPositiveNumber(
+    property.surface,
     property.total_surface,
-    property.total_surface_m2,
-    property.surface
+    property.total_surface_m2
   )
 
   const roofedSurface = getFirstPositiveNumber(
