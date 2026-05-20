@@ -152,7 +152,8 @@ export default function PropertyDetail({ property }) {
 
   const isFinancingEligible =
     getBooleanFromKeys(property, ['apto_financiacion', 'financiacion', 'financing', 'apto_financing', 'financing_eligible']) ||
-    hasKeywordInCollections([property.tags, property.custom_tags, property.features, property.amenities], ['apto financiacion', 'financiacion', 'financing'])
+    hasKeywordInCollections([property.tags, property.custom_tags, property.features, property.amenities], ['apto financiacion', 'financiacion', 'financing']) ||
+    property.extra_attributes?.some(attr => attr.name?.toLowerCase() === 'financiacion' && attr.value === 'true')
 
   const acceptsPets =
     getBooleanFromKeys(property, ['acepta_mascotas', 'aceptaMascotas', 'pets_allowed', 'accept_pets']) ||
@@ -195,26 +196,23 @@ export default function PropertyDetail({ property }) {
       value: rooms,
       label: 'Ambientes'
     },
-    {
+    isCreditEligible && {
       key: 'credit',
       icon: FaUniversity,
-      value: isCreditEligible ? 'Sí' : 'No',
+      value: 'Sí',
       label: 'Crédito',
-      negative: !isCreditEligible
     },
-    {
+    isFinancingEligible && {
       key: 'financing',
       icon: FaDollarSign,
-      value: isFinancingEligible ? 'Sí' : 'No',
+      value: 'Sí',
       label: 'Financiación',
-      negative: !isFinancingEligible
     },
-    {
+    acceptsPets && {
       key: 'pets',
       icon: FaPaw,
-      value: acceptsPets ? 'Sí' : 'No',
+      value: 'Sí',
       label: 'Mascotas',
-      negative: !acceptsPets
     }
   ].filter(Boolean)
 
