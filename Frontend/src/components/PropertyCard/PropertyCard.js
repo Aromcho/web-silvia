@@ -79,7 +79,7 @@ export default function PropertyCard({ property, formatPrice }) {
         <p className="property-price">{getDisplayPrice()}</p>
         
         <div className="property-details">
-          {(property.total_surface || property.surface) > 0 && (
+          {(property.total_surface > 0 || (property.surface > 0 && !property.roofed_surface)) && (
             <span className="detail-item">
               <FaHome className="detail-icon" />
               {property.total_surface || property.surface}m² tot.

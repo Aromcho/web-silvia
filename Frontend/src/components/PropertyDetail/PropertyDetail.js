@@ -131,9 +131,12 @@ export default function PropertyDetail({ property }) {
     }).format(value)
 
   const surface = getFirstPositiveNumber(
-    property.surface,
     property.total_surface,
     property.total_surface_m2,
+    property.surface
+  )
+
+  const roofedSurface = getFirstPositiveNumber(
     property.roofed_surface,
     property.roofed_surface_m2
   )
@@ -161,6 +164,12 @@ export default function PropertyDetail({ property }) {
       icon: FaRuler,
       value: `${formatSurface(surface)}m²`,
       label: 'Sup. total'
+    },
+    roofedSurface && {
+      key: 'roofed_surface',
+      icon: FaRuler,
+      value: `${formatSurface(roofedSurface)}m²`,
+      label: 'Sup. cubierta'
     },
     bedrooms && {
       key: 'bedrooms',
