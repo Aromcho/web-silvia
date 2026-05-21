@@ -1,0 +1,218 @@
+/* Oculto en pantalla */
+.pp-print-wrapper {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+@media print {
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  body * { visibility: hidden; }
+
+  .pp-print-wrapper,
+  .pp-print-wrapper * { visibility: visible; }
+
+  .pp-print-wrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 297mm;
+    height: 210mm;
+    overflow: hidden;
+    opacity: 1;
+    z-index: 99999;
+    background: white;
+  }
+
+  @page {
+    size: A4 landscape;
+    margin: 0;
+  }
+
+  /* ── Raíz: página completa ── */
+  .print-root {
+    font-family: 'Montserrat', Arial, sans-serif;
+    width: 297mm;
+    height: 210mm;
+    display: flex;
+    flex-direction: column;
+    background: white;
+    overflow: hidden;
+  }
+
+  /* ── Header ── */
+  .print-header {
+    display: flex;
+    align-items: stretch;
+    height: 17mm;
+    flex-shrink: 0;
+  }
+
+  .print-logo-box {
+    width: 38mm;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3mm 4mm;
+    border-right: 1mm solid #00815c;
+    flex-shrink: 0;
+  }
+
+  .print-logo {
+    width: 28mm;
+    height: auto;
+    object-fit: contain;
+  }
+
+  .print-contact-bar {
+    flex: 1;
+    background: #00815c;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10mm;
+    padding: 0 8mm;
+  }
+
+  .print-contact-item {
+    display: flex;
+    align-items: center;
+    gap: 2mm;
+    font-size: 9pt;
+    font-weight: 600;
+    color: white;
+  }
+
+  .print-contact-icon {
+    font-size: 10pt;
+    color: white;
+  }
+
+  /* ── Foto principal ── */
+  .print-image-wrap {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+    min-height: 0;
+  }
+
+  .print-main-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  /* ── Overlay verde inferior ── */
+  .print-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0, 129, 92, 0.93);
+    padding: 4mm 6mm 5mm 7mm;
+    border-radius: 6mm 6mm 0 0;
+    display: flex;
+    align-items: center;
+    gap: 5mm;
+    color: white;
+  }
+
+  .print-overlay-left {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .print-overlay-title {
+    font-size: 20pt;
+    font-weight: 800;
+    line-height: 1.1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 1mm;
+  }
+
+  .print-overlay-subtitle {
+    font-size: 10pt;
+    font-weight: 400;
+    opacity: 0.9;
+    margin-bottom: 3mm;
+  }
+
+  /* ── Fila de stats ── */
+  .print-stats-row {
+    display: flex;
+    align-items: center;
+    gap: 4mm;
+    flex-wrap: nowrap;
+  }
+
+  .print-price {
+    font-size: 16pt;
+    font-weight: 800;
+    white-space: nowrap;
+  }
+
+  .print-stat-divider {
+    font-size: 14pt;
+    opacity: 0.5;
+    align-self: center;
+    line-height: 1;
+  }
+
+  /* Cada stat: label → valor → icono (apilados) */
+  .print-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5mm;
+  }
+
+  .print-stat-lbl {
+    font-size: 7pt;
+    font-weight: 700;
+    opacity: 0.9;
+    text-transform: uppercase;
+    letter-spacing: 0.3pt;
+    line-height: 1;
+  }
+
+  .print-stat-val {
+    font-size: 14pt;
+    font-weight: 800;
+    line-height: 1;
+  }
+
+  .print-stat-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+  }
+
+  .print-stat-icon svg {
+    width: 4mm;
+    height: 4mm;
+    opacity: 0.9;
+  }
+
+  /* ── QR ── */
+  .print-qr-wrap {
+    background: white;
+    padding: 2mm;
+    border-radius: 3mm;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}

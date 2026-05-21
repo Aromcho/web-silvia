@@ -21,6 +21,7 @@ import {
   FaShare,
   FaPrint
 } from 'react-icons/fa'
+import Print from '../Print/Print'
 import './PropertyDetail.css'
 
 export default function PropertyDetail({ property }) {
@@ -309,96 +310,7 @@ export default function PropertyDetail({ property }) {
     setContactForm((prev) => ({ ...prev, [name]: value }))
   }
 
-  const handlePrint = () => {
-    const ops    = property?.operations?.[0] || {}
-    const price  = ops?.prices?.[0] || {}
-    const photos = (property?.photos || []).filter(p => !p.is_blueprint)
-    const mainPhoto = photos[0]?.image || photos[0]?.thumb || ''
-    const priceStr  = price.price
-      ? `${price.currency || 'USD'} ${Number(price.price).toLocaleString('es-AR')}`
-      : ops.operation_type || ''
-    const propUrl = `https://www.silviafernandezpropiedades.com.ar/propiedad/${property?.id}`
-    const logoUrl = window.location.origin + '/assets/images/logo.jpg'
-
-    const stats = [
-      property?.surface         > 0 && `<div class="st"><span class="stv">${Math.round(property.surface)} m²</span><span class="stl">Sup. Total</span></div>`,
-      property?.roofed_surface  > 0 && `<div class="st"><span class="stv">${Math.round(property.roofed_surface)} m²</span><span class="stl">Sup. Cub.</span></div>`,
-      property?.suite_amount    > 0 && `<div class="st"><span class="stv">${property.suite_amount}</span><span class="stl">Dorm.</span></div>`,
-      property?.bathroom_amount > 0 && `<div class="st"><span class="stv">${property.bathroom_amount}</span><span class="stl">Baños</span></div>`,
-      property?.parking_lot_amount > 0 && `<div class="st"><span class="stv">${property.parking_lot_amount}</span><span class="stl">Cochera</span></div>`,
-    ].filter(Boolean).join('')
-
-    const html = `<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="utf-8"/>
-  <title>${property?.publication_title || 'Propiedad'}</title>
-  <style>
-    * { margin:0; padding:0; box-sizing:border-box; }
-    @page { size: A4 landscape; margin: 0; }
-    body { font-family: Inter, Arial, sans-serif; width:100%; height:100vh; display:flex; flex-direction:column; background:#fff; }
-
-    .hdr { display:flex; align-items:center; gap:1.2rem; padding:12px 24px; border-bottom:3px solid #00815c; flex-shrink:0; }
-    .hdr img { width:80px; height:auto; }
-    .hdr-title { font-size:.95rem; font-weight:700; color:#1e293b; }
-    .hdr-addr  { font-size:.75rem; color:#64748b; margin-top:2px; }
-
-    .img-wrap { flex:1; position:relative; overflow:hidden; min-height:0; }
-    .img-wrap img { width:100%; height:100%; object-fit:cover; display:block; }
-
-    .overlay { position:absolute; bottom:0; left:0; width:52%; background:rgba(0,129,92,.88); padding:14px 20px; border-radius:0 14px 0 0; color:#fff; }
-    .ov-price { font-size:1.5rem; font-weight:800; margin-bottom:8px; }
-    .ov-stats { display:flex; gap:16px; flex-wrap:wrap; }
-    .st  { display:flex; flex-direction:column; align-items:center; }
-    .stv { font-weight:700; font-size:.82rem; }
-    .stl { font-size:.62rem; opacity:.85; }
-
-    .qr-box { position:absolute; bottom:10px; right:14px; background:#fff; padding:8px; border-radius:10px; display:flex; flex-direction:column; align-items:center; gap:3px; box-shadow:0 2px 10px rgba(0,0,0,.2); }
-    .qr-box img { width:110px; height:110px; }
-    .qr-lbl { font-size:.6rem; color:#64748b; font-weight:600; }
-
-    .ftr { display:flex; align-items:center; justify-content:space-around; padding:8px 24px; background:#1e293b; color:#fff; gap:.75rem; flex-wrap:wrap; flex-shrink:0; }
-    .fc  { font-size:.72rem; }
-    .fu  { font-size:.62rem; color:#94a3b8; }
-  </style>
-</head>
-<body>
-  <div class="hdr">
-    <img src="${logoUrl}" alt="Silvia Fernández"/>
-    <div>
-      <div class="hdr-title">${property?.publication_title || ''}</div>
-      <div class="hdr-addr">${property?.address || ''}</div>
-    </div>
-  </div>
-
-  <div class="img-wrap">
-    ${mainPhoto ? `<img src="${mainPhoto}" alt="Propiedad"/>` : '<div style="background:#e2e8f0;width:100%;height:100%"></div>'}
-    <div class="overlay">
-      <div class="ov-price">${priceStr}</div>
-      <div class="ov-stats">${stats}</div>
-    </div>
-    <div class="qr-box">
-      <img src="https://api.qrserver.com/v1/create-qr-code/?size=110x110&data=${encodeURIComponent(propUrl)}" alt="QR"/>
-      <span class="qr-lbl">Ver online</span>
-    </div>
-  </div>
-
-  <div class="ftr">
-    <span class="fc">📞 2255 46-3051</span>
-    <span class="fc">💬 +54 9 2255 509408</span>
-    <span class="fc">✉ braicesfernandez@gmail.com</span>
-    <span class="fu">${propUrl}</span>
-  </div>
-</body>
-</html>`
-
-    const pw = window.open('', '_blank', 'width=1200,height=800')
-    if (!pw) return
-    pw.document.write(html)
-    pw.document.close()
-    pw.focus()
-    setTimeout(() => { pw.print(); pw.close() }, 600)
-  }
+  const handlePrint = () => window.print()
 
   const handleContactSubmit = async (e) => {
     e.preventDefault()
@@ -793,6 +705,12 @@ export default function PropertyDetail({ property }) {
           </div>
         </div>
       )}
+
+      {/* Componente de impresión — oculto en pantalla, visible al imprimir */}
+      <div className="pp-print-wrapper">
+        <Print property={property} />
+      </div>
+
     </div>
   );
 }
