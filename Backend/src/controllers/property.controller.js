@@ -299,13 +299,14 @@ const getProperties = async (req, res) => {
 
     const filterObj = andConditions.length > 0 ? { $and: andConditions } : {};
 
-    // Orden compuesto (multi-sort):
-    // 1) created_at DESC para que salgan primero las más nuevas
-    // 2) Luego, se ordena por precio asc o desc según "order"
-    const sortObj = {
-      created_at: -1,
-      'operations.prices.price': order.toLowerCase() === 'desc' ? -1 : 1,
-    };
+    let sortObj;
+    if (order === 'price_asc') {
+      sortObj = { 'operations.prices.price': 1 };
+    } else if (order === 'price_desc') {
+      sortObj = { 'operations.prices.price': -1 };
+    } else {
+      sortObj = { created_at: -1 };
+    }
 
 
     const properties = await PropertyManager.paginate({

@@ -62,9 +62,9 @@ const getPropertyTypeQueryValues = (type) => {
 }
 
 const normalizeSortOrder = (sort) => {
-  if (sort === 'price_asc') return 'ASC'
-  if (sort === 'price_desc') return 'DESC'
-  return 'DESC'
+  if (sort === 'price_asc') return 'price_asc'
+  if (sort === 'price_desc') return 'price_desc'
+  return 'recent'
 }
 
 const safeStorageGet = (key) => {

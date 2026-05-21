@@ -19,7 +19,8 @@ import {
   FaTimes,
   FaExpand,
   FaShare,
-  FaPrint
+  FaPrint,
+  FaCopy
 } from 'react-icons/fa'
 import Print from '../Print/Print'
 import './PropertyDetail.css'
@@ -171,7 +172,7 @@ export default function PropertyDetail({ property }) {
       key: 'roofed_surface',
       icon: FaRuler,
       value: `${formatSurface(roofedSurface)}m²`,
-      label: 'Sup. cubierta'
+      label: 'Sup. cub'
     },
     bedrooms && {
       key: 'bedrooms',
@@ -498,6 +499,18 @@ export default function PropertyDetail({ property }) {
                 </div>
               )}
             </div>
+            <button
+              className={`mobile-id-copy-btn${idCopied ? ' copied' : ''}`}
+              onClick={() => {
+                navigator.clipboard.writeText(String(property.id))
+                setIdCopied(true)
+                setTimeout(() => setIdCopied(false), 1500)
+              }}
+            >
+              <FaCopy />
+              {idCopied ? '¡ID copiado!' : `ID #${property.id}`}
+            </button>
+
             {property.description && (
               <div className="property-description">
                 <h2>Descripción</h2>

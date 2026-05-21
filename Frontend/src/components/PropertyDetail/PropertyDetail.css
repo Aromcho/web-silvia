@@ -1312,6 +1312,22 @@
     color: var(--gray30-color);
     border: 1.5px solid #e2e8f0 !important;
   }
+
+  .id-bar-btn {
+    background: #f8fafc;
+    color: var(--gray30-color);
+    border: 1.5px solid #e2e8f0 !important;
+  }
+
+  .id-bar-btn.copied {
+    background: #f0fdf7;
+    color: var(--primary-color);
+    border-color: var(--primary-color) !important;
+  }
+
+  .print-icon-btn {
+    display: none !important;
+  }
 }
 
 /* Móvil pequeño */
@@ -1394,6 +1410,34 @@
   color: var(--primary-color, #008060);
   border-color: var(--primary-color, #008060);
   background: rgba(0, 128, 96, 0.05);
+}
+
+/* Botón copiar ID — solo mobile */
+.mobile-id-copy-btn {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .mobile-id-copy-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.45rem 0.9rem;
+    background: transparent;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    color: #64748b;
+    font-size: 0.78rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: color 0.2s, border-color 0.2s;
+    margin-bottom: 1rem;
+  }
+
+  .mobile-id-copy-btn.copied {
+    color: var(--primary-color, #008060);
+    border-color: var(--primary-color, #008060);
+  }
 }
 
 /* Botón imprimir en fila de precio */
