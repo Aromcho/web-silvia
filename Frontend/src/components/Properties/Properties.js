@@ -213,8 +213,8 @@ export default function Properties() {
       currency = property.currency?.name || property.currency || 'ARS'
     }
     
-    if (!price) return 'Consultar precio'
-    
+    if (!price || price === 1) return 'Consultar precio'
+
     try {
       // Mapear códigos de moneda de Tokko
       const currencyMap = {

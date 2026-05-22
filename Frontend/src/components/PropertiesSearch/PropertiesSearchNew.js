@@ -356,8 +356,8 @@ export default function PropertiesSearchNew() {
       }
     }
     
-    if (!price) return 'Consultar precio'
-    
+    if (!price || price === 1) return 'Consultar precio'
+
     try {
       const formattedPrice = new Intl.NumberFormat('es-AR', {
         style: 'currency',

@@ -231,7 +231,7 @@ export default function PropertyDetail({ property }) {
   const formatPrice = (priceObj) => {
     if (isRentalOperation) return 'Consultar precio'
 
-    if (!priceObj.price) return 'Consultar precio'
+    if (!priceObj.price || priceObj.price === 1) return 'Consultar precio'
     
     try {
       return new Intl.NumberFormat('es-AR', {

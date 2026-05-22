@@ -13,9 +13,9 @@ const Print = React.forwardRef(function Print({ property }, ref) {
 
   const ops = property?.operations?.[0] || {}
   const price = ops?.prices?.[0] || {}
-  const priceStr = price.price
-    ? `${price.currency || 'USD'} ${formatToMoney(price.price)}`
-    : ops.operation_type || ''
+  const priceStr = (!price.price || price.price === 1)
+    ? 'Consultar precio'
+    : `${price.currency || 'USD'} ${formatToMoney(price.price)}`
 
   const propertyUrl = `https://www.silviafernandezpropiedades.com.ar/propiedad/${property?.id}`
 
