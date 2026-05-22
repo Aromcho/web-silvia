@@ -8,7 +8,8 @@ const whatsappContacts = [
   { name: 'Fabiana', phone: '5492255626092' },
   { name: 'Conrado', phone: '5492255622841' },
   { name: 'Paul', phone: '5492254602453' },
-  { name: 'Cecilia', phone: '5492216006474' }
+  { name: 'Cecilia', phone: '5492216006474' },
+  { name: 'Pablo', phone: '5492255609992' }
 ];
 
 const makeWhatsAppLink = (phone, text) => `https://wa.me/${phone}?text=${encodeURIComponent(text)}`;

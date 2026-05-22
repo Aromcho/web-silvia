@@ -7,7 +7,8 @@ const contacts = [
   { name: 'Fabiana', phone: '+549 2255 62-6092' },
   { name: 'Conrado', phone: '+549 2255 62-2841' },
   { name: 'Paul', phone: '+549 2254 60-2453' },
-  { name: 'Cecilia', phone: '+549 2216 00-6474' }
+  { name: 'Cecilia', phone: '+549 2216 00-6474' },
+  { name: 'Pablo', phone: '+549 2255 60-9992' }
 ];
 
 const WhatsAppChat = ({ isOpen: externalIsOpen, onClose, propertyTitle = '', propertyUrl = '' }) => {

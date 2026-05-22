@@ -245,6 +245,7 @@ export const formatPrice = (price, currency = 'ARS') => {
   const formatter = new Intl.NumberFormat('es-AR', {
     style: 'currency',
     currency: currency,
+    currencyDisplay: 'code',
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
   });

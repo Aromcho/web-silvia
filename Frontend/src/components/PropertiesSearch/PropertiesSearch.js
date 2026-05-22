@@ -171,6 +171,7 @@ const PropertiesSearch = ({ defaultFilters = {} }) => {
       return new Intl.NumberFormat('es-AR', {
         style: 'currency',
         currency: currency,
+        currencyDisplay: 'code',
         minimumFractionDigits: 0,
         maximumFractionDigits: 0
       }).format(price);

@@ -237,6 +237,7 @@ export default function PropertyDetail({ property }) {
       return new Intl.NumberFormat('es-AR', {
         style: 'currency',
         currency: priceObj.currency || 'ARS',
+        currencyDisplay: 'code',
         minimumFractionDigits: 0,
         maximumFractionDigits: 0
       }).format(priceObj.price)
