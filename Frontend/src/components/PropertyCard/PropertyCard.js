@@ -1,9 +1,10 @@
 import React from 'react'
 import Link from 'next/link'
-import { 
-  FaHome, 
-  FaBed, 
-  FaBath, 
+import {
+  FaHome,
+  FaBed,
+  FaBath,
+  FaCar,
   FaMapMarkerAlt,
   FaWhatsapp
 } from 'react-icons/fa'
@@ -103,6 +104,13 @@ export default function PropertyCard({ property, formatPrice }) {
             <span className="detail-item">
               <FaBath className="detail-icon" />
               {property.bathroom_amount || property.bathrooms} baños
+            </span>
+          )}
+
+          {property.parking_lot_amount > 0 && (
+            <span className="detail-item">
+              <FaCar className="detail-icon" />
+              {property.parking_lot_amount} {property.parking_lot_amount === 1 ? 'cochera' : 'cocheras'}
             </span>
           )}
         </div>

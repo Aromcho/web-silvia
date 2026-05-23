@@ -405,6 +405,12 @@ const PropertiesSearch = ({ defaultFilters = {} }) => {
                           {property.bathrooms} baños
                         </span>
                       )}
+
+                      {property.parking_lot_amount > 0 && (
+                        <span className="detail-item">
+                          🚗 {property.parking_lot_amount} {property.parking_lot_amount === 1 ? 'cochera' : 'cocheras'}
+                        </span>
+                      )}
                     </div>
                     
                     <p className="property-location">
