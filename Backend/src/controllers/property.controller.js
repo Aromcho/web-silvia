@@ -316,7 +316,7 @@ const getProperties = async (req, res) => {
         limit: parseInt(limit, 10),
         offset: parseInt(offset, 10),
       },
-      projection: 'id address suite_amount operations.prices location.name created_at',
+      projection: 'id address suite_amount operations.prices location.name created_at credit_eligible custom_tags tags photos roofed_surface surface bathroom_amount parking_lot_amount status',
       lean: true,
     });
 

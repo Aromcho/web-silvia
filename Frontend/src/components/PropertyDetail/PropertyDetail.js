@@ -100,8 +100,8 @@ export default function PropertyDetail({ property }) {
     const text = normalizeText(value)
     if (!text) return false
 
-    const truthyValues = new Set(['true', '1', 'si', 'yes', 'y', 'apto', 'acepta', 'eligible'])
-    return truthyValues.has(text)
+    const truthyValues = new Set(['true', '1', 'si', 'yes', 'y', 'apto', 'acepta', 'eligible', 'apto credito', 'apto credito hipotecario'])
+    return truthyValues.has(text) || text.startsWith('apto')
   }
 
   const getBooleanFromKeys = (source, keys) => {

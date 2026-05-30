@@ -10,6 +10,24 @@ import {
 } from 'react-icons/fa'
 import './PropertyCard.css'
 
+const isCreditEligible = (property) => {
+  const normalize = (value) => {
+    if (value === null || value === undefined) return ''
+    return String(value).toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '').trim()
+  }
+  const text = normalize(property.credit_eligible)
+  if (!text) return false
+  const truthyValues = new Set(['true', '1', 'si', 'yes', 'y', 'apto', 'acepta', 'eligible', 'apto credito', 'apto credito hipotecario'])
+  if (truthyValues.has(text) || text.startsWith('apto')) return true
+  const collections = [property.tags, property.custom_tags].filter(Array.isArray)
+  return collections.some((items) =>
+    items.some((item) => {
+      const t = normalize(item?.name || item?.label || item?.value || item)
+      return t.includes('apto credito') || t.includes('credit eligible')
+    })
+  )
+}
+
 export default function PropertyCard({ property, formatPrice }) {
   const normalizePropertyTypeLabel = (text) => {
     if (!text || typeof text !== 'string') return text
@@ -66,6 +84,9 @@ export default function PropertyCard({ property, formatPrice }) {
             return 'Consultar'
           })()}
         </div>
+        {isCreditEligible(property) && (
+          <div className="credit-badge">Apto crédito</div>
+        )}
         {property.status && property.status !== 'disponible' && (
           <div className={`status-ribbon ${property.status}`}>
             {property.status === 'vendida' ? 'VENDIDO' : 'RESERVADO'}
