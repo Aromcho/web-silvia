@@ -130,17 +130,18 @@ export default function Properties() {
   const getPropertiesByType = async (type) => {
     try {
       console.log(`🔍 Fetching properties for type: ${type}`)
+
+      if (type === 'destacadas') {
+        return await fetchAllStarred()
+      }
+
       let apiFilters = {
         limit: 6,
         offset: 0,
         order: 'DESC'
       }
-      
+
       switch (type) {
-        case 'destacadas':
-          apiFilters.is_starred = true
-          apiFilters.limit = 8
-          break;
         case 'alquiler-temporario':
           apiFilters.operation_type = ['Alquiler']
           break;
@@ -156,17 +157,36 @@ export default function Properties() {
         default:
           break;
       }
-      
+
       console.log(`📡 API filters for ${type}:`, apiFilters)
       const response = await getProperties(apiFilters)
       const result = response.objects || []
-      
+
       console.log(`${type} properties fetched:`, result.length)
       return result
     } catch (error) {
       console.error(`Error fetching properties for type ${type}:`, error);
       return []
     }
+  }
+
+  const fetchAllStarred = async () => {
+    const PAGE_SIZE = 100
+    const first = await getProperties({ is_starred: true, limit: PAGE_SIZE, offset: 0, order: 'DESC' })
+    const all = first.objects || []
+    const total = first.meta?.total_count || all.length
+
+    let offset = PAGE_SIZE
+    while (all.length < total) {
+      const batch = await getProperties({ is_starred: true, limit: PAGE_SIZE, offset, order: 'DESC' })
+      const items = batch.objects || []
+      if (items.length === 0) break
+      all.push(...items)
+      offset += PAGE_SIZE
+    }
+
+    console.log(`destacadas total fetched: ${all.length} / ${total}`)
+    return all
   }
 
   const scrollSectionToNext = (type) => {
