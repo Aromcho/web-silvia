@@ -7,6 +7,8 @@ import {
   FaBath,
   FaCar,
   FaRuler,
+  FaArrowsAltH,
+  FaArrowsAltV,
   FaUniversity,
   FaDollarSign,
   FaPaw,
@@ -147,6 +149,8 @@ export default function PropertyDetail({ property }) {
   const bathrooms = getFirstPositiveNumber(property.bathroom_amount, property.bathrooms)
   const parking = getFirstPositiveNumber(property.parking_lot_amount, property.garage_amount, property.garages)
   const rooms = getFirstPositiveNumber(property.room_amount, property.rooms)
+  const frontMeasure = getFirstPositiveNumber(property.front_measure, property.front, property.lot_frontage)
+  const depthMeasure = getFirstPositiveNumber(property.depth_measure, property.depth, property.lot_depth)
 
   const isCreditEligible =
     getBooleanFromKeys(property, ['apto_credito', 'apto_credit', 'aptoCredito', 'credit_approved', 'is_credit', 'credit_eligible']) ||
@@ -197,6 +201,18 @@ export default function PropertyDetail({ property }) {
       icon: FaHome,
       value: rooms,
       label: 'Ambientes'
+    },
+    frontMeasure && {
+      key: 'front_measure',
+      icon: FaArrowsAltH,
+      value: `${formatSurface(frontMeasure)}m`,
+      label: 'Frente'
+    },
+    depthMeasure && {
+      key: 'depth_measure',
+      icon: FaArrowsAltV,
+      value: `${formatSurface(depthMeasure)}m`,
+      label: 'Fondo'
     },
     isCreditEligible && {
       key: 'credit',

@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useEffect, useRef, useState } from 'react'
-import { FaChevronRight, FaStar } from 'react-icons/fa'
+import { FaChevronLeft, FaChevronRight, FaStar } from 'react-icons/fa'
 import { getProperties } from '../../services/propertyService'
 import PropertyCard from '../PropertyCard/PropertyCard'
 import './Properties.css'
@@ -189,7 +189,7 @@ export default function Properties() {
     return all
   }
 
-  const scrollSectionToNext = (type) => {
+  const scrollSection = (type, direction = 'next') => {
     const container = sectionScrollerRefs.current[type]
 
     if (!container) {
@@ -200,8 +200,11 @@ export default function Properties() {
     const cardWidth = firstCard ? firstCard.getBoundingClientRect().width : 359
     const computedGap = 16
 
+    const scrollAmount = cardWidth + computedGap
+    const offset = direction === 'prev' ? -scrollAmount : scrollAmount
+
     container.scrollBy({
-      left: cardWidth + computedGap,
+      left: offset,
       behavior: 'smooth'
     })
   }
@@ -276,37 +279,49 @@ export default function Properties() {
             <div className="section-heading">
               <h2 className="section-title">{title}</h2>
             </div>
-
-            {!featured && (
-              <button
-                type="button"
-                className="section-nav-button"
-                onClick={() => scrollSectionToNext(type)}
-                aria-label={`Ver siguientes propiedades de ${title}`}
-              >
-                <FaChevronRight />
-              </button>
-            )}
           </div>
 
-          <div className={`properties-scroll-container${featured ? ' featured-carousel' : ''}`} ref={(node) => {
-            if (node) {
-              sectionScrollerRefs.current[type] = node
-            }
-          }}>
-            <div className={`properties-grid${featured ? ' featured-track' : ''}`}>
-              <div className="properties-group">
-                {properties.map((property) => (
-                  <PropertyCard key={property.id} property={property} formatPrice={formatPrice} />
-                ))}
-              </div>
-              {featured && (
-                <div className="properties-group" aria-hidden="true">
+          <div className={`carousel-shell${featured ? ' carousel-shell--featured' : ''}`}>
+            {!featured && (
+              <>
+                <button
+                  type="button"
+                  className="carousel-arrow carousel-arrow--left"
+                  onClick={() => scrollSection(type, 'prev')}
+                  aria-label={`Ver propiedades anteriores de ${title}`}
+                >
+                  <FaChevronLeft />
+                </button>
+                <button
+                  type="button"
+                  className="carousel-arrow carousel-arrow--right"
+                  onClick={() => scrollSection(type, 'next')}
+                  aria-label={`Ver siguientes propiedades de ${title}`}
+                >
+                  <FaChevronRight />
+                </button>
+              </>
+            )}
+
+            <div className={`properties-scroll-container${featured ? ' featured-carousel' : ''}`} ref={(node) => {
+              if (node) {
+                sectionScrollerRefs.current[type] = node
+              }
+            }}>
+              <div className={`properties-grid${featured ? ' featured-track' : ''}`}>
+                <div className="properties-group">
                   {properties.map((property) => (
-                    <PropertyCard key={`${property.id}-clone`} property={property} formatPrice={formatPrice} />
+                    <PropertyCard key={property.id} property={property} formatPrice={formatPrice} />
                   ))}
                 </div>
-              )}
+                {featured && (
+                  <div className="properties-group" aria-hidden="true">
+                    {properties.map((property) => (
+                      <PropertyCard key={`${property.id}-clone`} property={property} formatPrice={formatPrice} />
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>

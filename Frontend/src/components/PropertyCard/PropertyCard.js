@@ -28,7 +28,59 @@ const isCreditEligible = (property) => {
   )
 }
 
+const isFinancingEligible = (property) => {
+  const normalize = (value) => {
+    if (value === null || value === undefined) return ''
+    return String(value).toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '').trim()
+  }
+
+  const parseBoolean = (value) => {
+    if (typeof value === 'boolean') return value
+    if (typeof value === 'number') return value > 0
+
+    const text = normalize(value)
+    if (!text) return false
+
+    const truthyValues = new Set(['true', '1', 'si', 'yes', 'y', 'apto', 'acepta', 'eligible'])
+    return truthyValues.has(text) || text.startsWith('apto')
+  }
+
+  const keys = ['apto_financiacion', 'financiacion', 'financing', 'apto_financing', 'financing_eligible']
+  const hasTruthyKey = keys.some((key) => parseBoolean(property?.[key]))
+  if (hasTruthyKey) return true
+
+  const collections = [property.tags, property.custom_tags, property.features, property.amenities].filter(Array.isArray)
+  const hasFinancingKeyword = collections.some((items) =>
+    items.some((item) => {
+      const t = normalize(item?.name || item?.label || item?.value || item)
+      return t.includes('apto financiacion') || t.includes('financiacion') || t.includes('financing')
+    })
+  )
+  if (hasFinancingKeyword) return true
+
+  return Array.isArray(property.extra_attributes)
+    ? property.extra_attributes.some((attr) => normalize(attr?.name) === 'financiacion' && parseBoolean(attr?.value))
+    : false
+}
+
 export default function PropertyCard({ property, formatPrice }) {
+  const parsePositiveNumber = (value) => {
+    if (value === null || value === undefined || value === '') return null
+
+    const parsed = Number(value)
+    if (!Number.isFinite(parsed) || parsed <= 0) return null
+
+    return parsed
+  }
+
+  const getFirstPositiveNumber = (...values) => {
+    for (const value of values) {
+      const parsed = parsePositiveNumber(value)
+      if (parsed !== null) return parsed
+    }
+    return null
+  }
+
   const normalizePropertyTypeLabel = (text) => {
     if (!text || typeof text !== 'string') return text
     return text
@@ -50,6 +102,10 @@ export default function PropertyCard({ property, formatPrice }) {
   const propertyTitle = normalizePropertyTypeLabel(
     property.address?.street_name || property.real_address || property.address || property.publication_title || property.title || 'Propiedad'
   )
+  const creditEligible = isCreditEligible(property)
+  const financingEligible = isFinancingEligible(property)
+  const frontMeasure = getFirstPositiveNumber(property.front_measure, property.front, property.lot_frontage)
+  const depthMeasure = getFirstPositiveNumber(property.depth_measure, property.depth, property.lot_depth)
 
   return (
     <Link href={`/propiedad/${property.id}`} className="modern-property-card">
@@ -84,8 +140,15 @@ export default function PropertyCard({ property, formatPrice }) {
             return 'Consultar'
           })()}
         </div>
-        {isCreditEligible(property) && (
-          <div className="credit-badge">Apto crédito</div>
+        {(creditEligible || financingEligible) && (
+          <div className="property-eligibility-badges">
+            {creditEligible && (
+              <div className="credit-badge">Apto crédito</div>
+            )}
+            {financingEligible && (
+              <div className="financing-badge">Apto financiación</div>
+            )}
+          </div>
         )}
         {property.status && property.status !== 'disponible' && (
           <div className={`status-ribbon ${property.status}`}>
@@ -132,6 +195,20 @@ export default function PropertyCard({ property, formatPrice }) {
             <span className="detail-item">
               <FaCar className="detail-icon" />
               {property.parking_lot_amount} {property.parking_lot_amount === 1 ? 'cochera' : 'cocheras'}
+            </span>
+          )}
+
+          {frontMeasure && (
+            <span className="detail-item">
+              <FaHome className="detail-icon" />
+              {frontMeasure}m frente
+            </span>
+          )}
+
+          {depthMeasure && (
+            <span className="detail-item">
+              <FaHome className="detail-icon" />
+              {depthMeasure}m fondo
             </span>
           )}
         </div>

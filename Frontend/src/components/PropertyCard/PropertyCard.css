@@ -74,9 +74,6 @@
 }
 
 .credit-badge {
-  position: absolute;
-  bottom: 12px;
-  left: 12px;
   background: rgba(34, 139, 34, 0.92);
   color: #fff;
   padding: 4px 10px;
@@ -87,6 +84,28 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
   z-index: 2;
   pointer-events: none;
+}
+
+.property-eligibility-badges {
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.financing-badge {
+  background: rgba(234, 119, 10, 0.95);
+  color: #fff;
+  padding: 4px 10px;
+  border-radius: 14px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
 }
 
 /* Etiqueta diagonal de estado (vendido / reservado) */

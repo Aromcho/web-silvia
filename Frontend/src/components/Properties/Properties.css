@@ -124,6 +124,51 @@
   scroll-behavior: smooth;
 }
 
+.carousel-shell {
+  position: relative;
+}
+
+.carousel-arrow {
+  position: absolute;
+  top: 46%;
+  transform: translateY(-50%);
+  width: 42px;
+  height: 42px;
+  border: 1px solid rgba(0, 129, 92, 0.22);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.95);
+  color: #00815c;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 12px 28px rgba(0, 129, 92, 0.16);
+  cursor: pointer;
+  z-index: 3;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.carousel-arrow--left {
+  left: 10px;
+}
+
+.carousel-arrow--right {
+  right: 10px;
+}
+
+.carousel-arrow:hover {
+  background: #ffffff;
+  box-shadow: 0 16px 32px rgba(0, 129, 92, 0.2);
+}
+
+.carousel-arrow:active {
+  transform: translateY(-50%) scale(0.97);
+}
+
+.carousel-arrow:focus-visible {
+  outline: 2px solid #00815c;
+  outline-offset: 3px;
+}
+
 .featured-carousel {
   overflow: hidden;
   padding-bottom: 0;
@@ -191,6 +236,7 @@
   min-width: 359px;
   max-width: 359px;
 }
+
 
 .property-section--featured .modern-property-card {
   flex-basis: 372px;
@@ -489,6 +535,10 @@
     -webkit-overflow-scrolling: touch;
     padding-bottom: 8px;
     margin: 0 -15px;
+  }
+
+  .carousel-arrow {
+    display: none;
   }
 
   .featured-carousel {
