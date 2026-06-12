@@ -7,7 +7,7 @@ import './Contact.css'
 const contacts = [
   { name: 'Silvia', phone: '5492255509408' },
   { name: 'Fabiana', phone: '5492255626092' },
-  { name: 'Conrado', phone: '5492255622841' },
+  { name: 'Sucursal Mar Azul', phone: '5492255622841' },
   { name: 'Paul', phone: '5492254602453' },
   { name: 'Cecilia', phone: '5492216006474' },
   { name: 'Pablo', phone: '5492255609992' }

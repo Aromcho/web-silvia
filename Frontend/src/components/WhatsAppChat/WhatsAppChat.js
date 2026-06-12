@@ -5,7 +5,7 @@ import './WhatsAppChat.css';
 const contacts = [
   { name: 'Silvia', phone: '+549 2255 50-9408' },
   { name: 'Fabiana', phone: '+549 2255 62-6092' },
-  { name: 'Conrado', phone: '+549 2255 62-2841' },
+  { name: 'Sucursal Mar Azul', phone: '+549 2255 62-2841' },
   { name: 'Paul', phone: '+549 2254 60-2453' },
   { name: 'Cecilia', phone: '+549 2216 00-6474' },
   { name: 'Pablo', phone: '+549 2255 60-9992' }
