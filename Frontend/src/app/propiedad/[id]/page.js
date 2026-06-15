@@ -1,22 +1,42 @@
 import { getPropertyById } from '../../../services/propertyService'
 import PropertyDetail from '../../../components/PropertyDetail/PropertyDetail'
 
+const getPropertyCoverImage = (property) => {
+  const photos = (property?.photos || []).filter(
+    (photo) => (photo?.description || '').trim().toLowerCase() !== 'pf'
+  )
+
+  if (!photos.length) return null
+
+  const frontCover = photos.find((photo) => photo.is_front_cover)
+  return (frontCover || photos[0]).image || (frontCover || photos[0]).thumb || null
+}
+
 const buildPropertyMetadata = (property) => {
   const title = property?.publication_title || property?.type?.name || 'Propiedad'
   const location = property?.location?.name || property?.address?.city || property?.address?.street_name || 'Mar de las Pampas'
   const operation = property?.operations?.[0]?.operation_type || 'venta o alquiler'
+  const description = `Detalle de ${title} en ${location}. Consultá esta propiedad para ${operation} con Silvia Fernández Inmobiliaria.`
+  const coverImage = getPropertyCoverImage(property)
 
   return {
     title: `${title} | Silvia Fernández Inmobiliaria`,
-    description: `Detalle de ${title} en ${location}. Consultá esta propiedad para ${operation} con Silvia Fernández Inmobiliaria.`,
+    description,
     alternates: {
       canonical: `/propiedad/${property?.id || ''}`,
     },
     openGraph: {
       title: `${title} | Silvia Fernández Inmobiliaria`,
-      description: `Detalle de ${title} en ${location}. Consultá esta propiedad para ${operation} con Silvia Fernández Inmobiliaria.`,
+      description,
       url: `/propiedad/${property?.id || ''}`,
       type: 'article',
+      ...(coverImage && { images: [{ url: coverImage, alt: title }] }),
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: `${title} | Silvia Fernández Inmobiliaria`,
+      description,
+      ...(coverImage && { images: [coverImage] }),
     },
   }
 }
