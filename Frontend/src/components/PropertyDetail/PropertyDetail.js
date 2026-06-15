@@ -22,14 +22,19 @@ import {
   FaExpand,
   FaShare,
   FaPrint,
-  FaCopy
+  FaCopy,
+  FaPlay
 } from 'react-icons/fa'
+import { FaWandMagicSparkles } from 'react-icons/fa6'
 import Print from '../Print/Print'
 import './PropertyDetail.css'
 
 export default function PropertyDetail({ property }) {
-  const [currentImageIndex, setCurrentImageIndex] = useState(0)
+  const [currentMediaIndex, setCurrentMediaIndex] = useState(0)
+  const [lightboxIndex, setLightboxIndex] = useState(0)
   const [showLightbox, setShowLightbox] = useState(false)
+  const [showAIModal, setShowAIModal] = useState(false)
+  const [aiLightboxIndex, setAiLightboxIndex] = useState(null)
   const [showContactForm, setShowContactForm] = useState(false)
   const [sidebarMode, setSidebarMode] = useState('relative') // 'relative' | 'fixed' | 'bottom'
   const [contactForm, setContactForm] = useState({ name: '', email: '', phone: '', message: '' })
@@ -73,6 +78,33 @@ export default function PropertyDetail({ property }) {
       .replace(/\p{Diacritic}/gu, '')
       .trim()
   }
+
+  // Fotos "PF" (Proyección a Futuro): remodelaciones con IA, no van en la galería normal
+  const isAIRemodelPhoto = (photo) => normalizeText(photo?.description) === 'pf'
+  const galleryPhotos = photos.filter((photo) => !isAIRemodelPhoto(photo))
+  const aiRemodelPhotos = photos.filter(isAIRemodelPhoto)
+
+  // Video de YouTube de la propiedad (si tiene)
+  const getYoutubeVideoId = (video) => {
+    if (!video) return null
+    if (video.video_id) return video.video_id
+
+    const url = video.url || video.player_url || ''
+    const match = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{6,})/)
+    return match ? match[1] : null
+  }
+
+  const youtubeVideoId = getYoutubeVideoId(property.videos?.[0])
+  const hasVideo = Boolean(youtubeVideoId)
+
+  // Secuencia de medios del carrusel principal: el video (si hay) ocupa la 2da posición
+  const mediaItems = galleryPhotos.map((photo, index) => ({ type: 'photo', photo, index }))
+  if (hasVideo) {
+    mediaItems.splice(1, 0, { type: 'video' })
+  }
+  const currentMediaItem = mediaItems[currentMediaIndex] || mediaItems[0]
+  const thumbnailItems = mediaItems.slice(0, 5)
+  const remainingMediaCount = mediaItems.length - thumbnailItems.length
 
   const operationType = normalizeText(mainOperation.operation_type)
   const isRentalOperation =
@@ -234,13 +266,31 @@ export default function PropertyDetail({ property }) {
     }
   ].filter(Boolean)
 
-  // Navegación de imágenes
-  const nextImage = () => {
-    setCurrentImageIndex((prev) => (prev + 1) % photos.length)
+  // Navegación del carrusel principal (fotos + video)
+  const nextMedia = () => {
+    setCurrentMediaIndex((prev) => (prev + 1) % mediaItems.length)
   }
 
-  const prevImage = () => {
-    setCurrentImageIndex((prev) => (prev - 1 + photos.length) % photos.length)
+  const prevMedia = () => {
+    setCurrentMediaIndex((prev) => (prev - 1 + mediaItems.length) % mediaItems.length)
+  }
+
+  // Navegación de imágenes en el lightbox de pantalla completa
+  const nextLightboxImage = () => {
+    setLightboxIndex((prev) => (prev + 1) % galleryPhotos.length)
+  }
+
+  const prevLightboxImage = () => {
+    setLightboxIndex((prev) => (prev - 1 + galleryPhotos.length) % galleryPhotos.length)
+  }
+
+  // Navegación de imágenes en el modal "Remodelar con IA"
+  const nextAIImage = () => {
+    setAiLightboxIndex((prev) => (prev + 1) % aiRemodelPhotos.length)
+  }
+
+  const prevAIImage = () => {
+    setAiLightboxIndex((prev) => (prev - 1 + aiRemodelPhotos.length) % aiRemodelPhotos.length)
   }
 
   // Formatear precio
@@ -418,55 +468,101 @@ export default function PropertyDetail({ property }) {
         <div className="left-column">
           {/* Galería */}
           <div className="property-gallery">
-            {photos.length > 0 ? (
+            {mediaItems.length > 0 ? (
               <>
                 <div className="main-image">
-                  <img
-                    src={
-                      photos[currentImageIndex]?.image ||
-                      photos[currentImageIndex]?.thumb
-                    }
-                    alt={property.publication_title}
-                    onClick={() => setShowLightbox(true)}
-                  />
-                  <button
-                    className="expand-btn"
-                    onClick={() => setShowLightbox(true)}
-                  >
-                    <FaExpand />
-                  </button>
-                  {photos.length > 1 && (
+                  {currentMediaItem.type === 'video' ? (
+                    <iframe
+                      className="main-video-frame"
+                      src={`https://www.youtube.com/embed/${youtubeVideoId}?autoplay=1&mute=1`}
+                      title={property.publication_title || 'Video de la propiedad'}
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                      allowFullScreen
+                    />
+                  ) : (
+                    <img
+                      src={
+                        galleryPhotos[currentMediaItem.index]?.image ||
+                        galleryPhotos[currentMediaItem.index]?.thumb
+                      }
+                      alt={property.publication_title}
+                      onClick={() => {
+                        setLightboxIndex(currentMediaItem.index)
+                        setShowLightbox(true)
+                      }}
+                    />
+                  )}
+                  {currentMediaItem.type === 'photo' && (
+                    <button
+                      className="expand-btn"
+                      onClick={() => {
+                        setLightboxIndex(currentMediaItem.index)
+                        setShowLightbox(true)
+                      }}
+                    >
+                      <FaExpand />
+                    </button>
+                  )}
+                  {mediaItems.length > 1 && (
                     <>
-                      <button className="nav-btn prev-btn" onClick={prevImage}>
+                      <button className="nav-btn prev-btn" onClick={prevMedia}>
                         <FaChevronLeft />
                       </button>
-                      <button className="nav-btn next-btn" onClick={nextImage}>
+                      <button className="nav-btn next-btn" onClick={nextMedia}>
                         <FaChevronRight />
                       </button>
                     </>
                   )}
                   <div className="image-counter">
-                    {currentImageIndex + 1} / {photos.length}
+                    {currentMediaIndex + 1} / {mediaItems.length}
                   </div>
+                  {aiRemodelPhotos.length > 0 && (
+                    <button
+                      className="ai-remodel-btn"
+                      onClick={() => setShowAIModal(true)}
+                    >
+                      <span>Remodelar con IA</span>
+                      <FaWandMagicSparkles />
+                    </button>
+                  )}
                 </div>
 
-                {photos.length > 1 && (
+                {mediaItems.length > 1 && (
                   <div className="thumbnails">
-                    {photos.slice(0, 5).map((photo, index) => (
-                      <img
-                        key={index}
-                        src={photo.thumb || photo.image}
-                        alt={`Imagen ${index + 1}`}
-                        className={currentImageIndex === index ? "active" : ""}
-                        onClick={() => setCurrentImageIndex(index)}
-                      />
-                    ))}
-                    {photos.length > 5 && (
+                    {thumbnailItems.map((item, index) =>
+                      item.type === 'video' ? (
+                        <div
+                          key="video-thumb"
+                          className={`video-thumb${currentMediaIndex === index ? " active" : ""}`}
+                          onClick={() => setCurrentMediaIndex(index)}
+                        >
+                          <img
+                            src={`https://img.youtube.com/vi/${youtubeVideoId}/hqdefault.jpg`}
+                            alt="Video de la propiedad"
+                          />
+                          <span className="play-icon">
+                            <FaPlay />
+                          </span>
+                        </div>
+                      ) : (
+                        <img
+                          key={item.index}
+                          src={item.photo.thumb || item.photo.image}
+                          alt={`Imagen ${item.index + 1}`}
+                          className={currentMediaIndex === index ? "active" : ""}
+                          onClick={() => setCurrentMediaIndex(index)}
+                        />
+                      )
+                    )}
+                    {remainingMediaCount > 0 && (
                       <div
                         className="more-photos"
-                        onClick={() => setShowLightbox(true)}
+                        onClick={() => {
+                          setLightboxIndex(currentMediaItem.type === 'photo' ? currentMediaItem.index : 0)
+                          setShowLightbox(true)
+                        }}
                       >
-                        +{photos.length - 5} fotos
+                        +{remainingMediaCount} fotos
                       </div>
                     )}
                   </div>
@@ -476,6 +572,15 @@ export default function PropertyDetail({ property }) {
               <div className="no-image">
                 <FaHome />
                 <p>Sin imágenes disponibles</p>
+                {aiRemodelPhotos.length > 0 && (
+                  <button
+                    className="ai-remodel-btn"
+                    onClick={() => setShowAIModal(true)}
+                  >
+                    <span>Remodelar con IA</span>
+                    <FaWandMagicSparkles />
+                  </button>
+                )}
               </div>
             )}
           </div>
@@ -647,7 +752,7 @@ export default function PropertyDetail({ property }) {
             className="lightbox-nav prev"
             onClick={(e) => {
               e.stopPropagation();
-              prevImage();
+              prevLightboxImage();
             }}
           >
             <FaChevronLeft />
@@ -656,18 +761,18 @@ export default function PropertyDetail({ property }) {
             className="lightbox-nav next"
             onClick={(e) => {
               e.stopPropagation();
-              nextImage();
+              nextLightboxImage();
             }}
           >
             <FaChevronRight />
           </button>
           <img
-            src={photos[currentImageIndex]?.image}
+            src={galleryPhotos[lightboxIndex]?.image}
             alt={property.publication_title}
             onClick={(e) => e.stopPropagation()}
           />
           <div className="lightbox-counter">
-            {currentImageIndex + 1} / {photos.length}
+            {lightboxIndex + 1} / {galleryPhotos.length}
           </div>
         </div>
       )}
@@ -732,6 +837,82 @@ export default function PropertyDetail({ property }) {
                 </p>
               )}
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal "Remodelar con IA" — proyección a futuro */}
+      {showAIModal && (
+        <div
+          className="ai-modal-overlay"
+          onClick={() => setShowAIModal(false)}
+        >
+          <div className="ai-modal-content" onClick={(e) => e.stopPropagation()}>
+            <button
+              className="modal-close"
+              onClick={() => setShowAIModal(false)}
+            >
+              <FaTimes />
+            </button>
+            <h3>
+              <FaWandMagicSparkles className="ai-modal-icon" />
+              Remodelación con IA
+            </h3>
+            <p className="ai-modal-subtitle">
+              Así se vería esta propiedad remodelada: una proyección a futuro generada con inteligencia artificial.
+            </p>
+            <div className="ai-modal-grid">
+              {aiRemodelPhotos.map((photo, index) => (
+                <img
+                  key={index}
+                  src={photo.image || photo.thumb}
+                  alt={`Proyección a futuro ${index + 1}`}
+                  onClick={() => setAiLightboxIndex(index)}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Lightbox para las imágenes de "Remodelar con IA" */}
+      {aiLightboxIndex !== null && (
+        <div className="lightbox" onClick={() => setAiLightboxIndex(null)}>
+          <button
+            className="lightbox-close"
+            onClick={() => setAiLightboxIndex(null)}
+          >
+            <FaTimes />
+          </button>
+          {aiRemodelPhotos.length > 1 && (
+            <>
+              <button
+                className="lightbox-nav prev"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  prevAIImage();
+                }}
+              >
+                <FaChevronLeft />
+              </button>
+              <button
+                className="lightbox-nav next"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  nextAIImage();
+                }}
+              >
+                <FaChevronRight />
+              </button>
+            </>
+          )}
+          <img
+            src={aiRemodelPhotos[aiLightboxIndex]?.image}
+            alt="Proyección a futuro"
+            onClick={(e) => e.stopPropagation()}
+          />
+          <div className="lightbox-counter">
+            {aiLightboxIndex + 1} / {aiRemodelPhotos.length}
           </div>
         </div>
       )}
