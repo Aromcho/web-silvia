@@ -200,6 +200,13 @@ const getProperties = async (req, res) => {
       if (operationRegexes.length > 0) {
         andConditions.push({ 'operations.operation_type': { $in: operationRegexes } });
       }
+
+      // Si se pide únicamente alquiler (sin venta), ocultar reservadas/vendidas.
+      // En venta sí queremos que sigan apareciendo.
+      const isSaleRequested = operationRegexes.some((regex) => /venta|sale/i.test(regex.source));
+      if (!isSaleRequested) {
+        andConditions.push({ status: { $not: /^(reservad|vendid)/i } });
+      }
     }
 
     // Filtro por tipo de propiedad

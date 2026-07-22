@@ -6,7 +6,7 @@ import morgan from 'morgan';
 import cron from 'node-cron';
 import cors from 'cors'; 
 import connectDB from './src/utils/db.js';
-import { syncWithTokko } from './src/utils/syncWithTokko.js';
+import { syncWithTokko, reconcileDeletedProperties } from './src/utils/syncWithTokko.js';
 import router from './src/routes/index.router.js';
 import pathHandler from './src/middelwares/pathHandler.mid.js';
 import path from 'path';
@@ -38,6 +38,15 @@ if (isPrimary) {
   cron.schedule('0 3 * * *', () => {
     console.log('Regenerando direcciones y barrios...');
     generateJSON();
+  });
+
+  // Reconciliación diaria de borrados: el sync de cada minuto solo trae altas/updates
+  // (delta por updatedSince), así que las bajas se detectan aparte una vez por día
+  // comparando contra los IDs activos que reporta el CRM.
+  cron.schedule('30 3 * * *', () => {
+    if ((process.env.PROPERTY_SOURCE || 'tokko') !== 'crm') return; // el modo tokko ya borra en su propio sync
+    console.log('Reconciliando propiedades eliminadas...');
+    reconcileDeletedProperties().catch(err => console.error('Error reconciliando borrados:', err));
   });
 
   // Generar el JSON al iniciar el servidor por primera vez
