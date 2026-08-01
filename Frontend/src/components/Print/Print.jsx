@@ -26,23 +26,28 @@ const Print = React.forwardRef(function Print({ property }, ref) {
   const stats = [
     property?.surface > 0 && {
       icon: <FaRulerCombined />,
-      text: `${Math.round(property.surface)} m² Sup. Total`,
+      value: `${Math.round(property.surface)} m²`,
+      label: 'Sup. Total',
     },
     property?.roofed_surface > 0 && {
       icon: <FaRulerCombined />,
-      text: `${Math.round(property.roofed_surface)} m² Cubiertos`,
+      value: `${Math.round(property.roofed_surface)} m²`,
+      label: 'Cubiertos',
     },
     property?.parking_lot_amount > 0 && {
       icon: <FaCar />,
-      text: `${property.parking_lot_amount} Cochera${property.parking_lot_amount === 1 ? '' : 's'}`,
+      value: `${property.parking_lot_amount}`,
+      label: `Cochera${property.parking_lot_amount === 1 ? '' : 's'}`,
     },
     property?.suite_amount > 0 && {
       icon: <FaBed />,
-      text: `${property.suite_amount} Dormitorio${property.suite_amount === 1 ? '' : 's'}`,
+      value: `${property.suite_amount}`,
+      label: `Dormitorio${property.suite_amount === 1 ? '' : 's'}`,
     },
     property?.bathroom_amount > 0 && {
       icon: <FaBath />,
-      text: `${property.bathroom_amount} Baño${property.bathroom_amount === 1 ? '' : 's'}`,
+      value: `${property.bathroom_amount}`,
+      label: `Baño${property.bathroom_amount === 1 ? '' : 's'}`,
     },
   ].filter(Boolean)
 
@@ -97,7 +102,8 @@ const Print = React.forwardRef(function Print({ property }, ref) {
               {stats.map((s, i) => (
                 <div className="print-stat" key={i}>
                   <span className="print-stat-icon">{s.icon}</span>
-                  <span className="print-stat-label">{s.text}</span>
+                  <span className="print-stat-value">{s.value}</span>
+                  <span className="print-stat-label">{s.label}</span>
                 </div>
               ))}
             </div>
