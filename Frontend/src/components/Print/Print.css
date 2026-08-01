@@ -38,55 +38,71 @@
 
   /* ── Raíz: página completa ── */
   .print-root {
-    font-family: 'Montserrat', Arial, sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
     width: 297mm;
     height: 210mm;
+    padding: 7mm;
+    box-sizing: border-box;
     display: flex;
     flex-direction: column;
     background: white;
     overflow: hidden;
   }
 
-  /* ── Header ── */
+  /* ── Header: sobrepuesto a la imagen, separado del borde superior ── */
   .print-header {
-    display: flex;
-    align-items: stretch;
-    height: 17mm;
-    flex-shrink: 0;
+    position: absolute;
+    top: 2mm;
+    left: 0;
+    right: 0;
+    height: 20mm;
+    z-index: 4;
   }
 
   .print-logo-box {
-    width: 38mm;
+    width: 34mm;
     background: white;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 3mm 4mm;
-    border-right: 1mm solid #00815c;
-    flex-shrink: 0;
+    padding: 2mm 3mm;
+    position: absolute;
+    top: -4mm;
+    left: 6mm;
+    height: 22mm;
+    box-sizing: border-box;
+    z-index: 2;
+    border-radius: 0 0 3mm 3mm;
   }
 
   .print-logo {
-    width: 28mm;
+    width: 26mm;
     height: auto;
     object-fit: contain;
   }
 
   .print-contact-bar {
-    flex: 1;
-    background: #00815c;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 16mm;
+    background: rgba(0, 129, 92, 0.6);
     display: flex;
     align-items: center;
-    justify-content: flex-end;
-    gap: 10mm;
-    padding: 0 8mm;
+    justify-content: space-evenly;
+    gap: 6mm;
+    padding: 0 8mm 0 46mm;
+    border-radius: 9mm;
+    box-sizing: border-box;
+    z-index: 1;
   }
 
   .print-contact-item {
     display: flex;
     align-items: center;
     gap: 2mm;
-    font-size: 9pt;
+    font-size: 10pt;
     font-weight: 600;
     color: white;
   }
@@ -111,85 +127,80 @@
     display: block;
   }
 
-  /* ── Overlay verde inferior ── */
-  .print-overlay {
+  /* ── Overlay verde inferior (forma ondulada) ── */
+  .print-overlay-shape {
     position: absolute;
     bottom: 0;
     left: 0;
-    right: 0;
-    background: rgba(0, 129, 92, 0.93);
-    padding: 4mm 6mm 5mm 7mm;
-    border-radius: 6mm 6mm 0 0;
-    display: flex;
-    align-items: center;
-    gap: 5mm;
-    color: white;
+    width: 100%;
+    height: 62mm;
+    z-index: 1;
+    pointer-events: none;
   }
 
-  .print-overlay-left {
+  .print-overlay-content {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 62%;
+    height: 62mm;
+    padding: 6mm 6mm 9mm 9mm;
+    color: white;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+  }
+
+  .print-overlay-title {
+    font-size: 22pt;
+    font-weight: 700;
+    line-height: 1.15;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 1.5mm;
+  }
+
+  .print-overlay-subtitle {
+    font-size: 11pt;
+    font-weight: 400;
+    opacity: 0.9;
+    margin-bottom: 4mm;
+  }
+
+  /* ── Precio + stats en la misma línea ── */
+  .print-info-row {
+    display: flex;
+    align-items: center;
+    gap: 6mm;
+  }
+
+  .print-price {
+    font-size: 17pt;
+    font-weight: 700;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  /* ── Fila de stats: icono arriba, texto abajo ── */
+  .print-stats-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 3mm;
     flex: 1;
     min-width: 0;
   }
 
-  .print-overlay-title {
-    font-size: 20pt;
-    font-weight: 800;
-    line-height: 1.1;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    margin-bottom: 1mm;
-  }
-
-  .print-overlay-subtitle {
-    font-size: 10pt;
-    font-weight: 400;
-    opacity: 0.9;
-    margin-bottom: 3mm;
-  }
-
-  /* ── Fila de stats ── */
-  .print-stats-row {
-    display: flex;
-    align-items: center;
-    gap: 4mm;
-    flex-wrap: nowrap;
-  }
-
-  .print-price {
-    font-size: 16pt;
-    font-weight: 800;
-    white-space: nowrap;
-  }
-
-  .print-stat-divider {
-    font-size: 14pt;
-    opacity: 0.5;
-    align-self: center;
-    line-height: 1;
-  }
-
-  /* Cada stat: label → valor → icono (apilados) */
   .print-stat {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.5mm;
-  }
-
-  .print-stat-lbl {
-    font-size: 7pt;
-    font-weight: 700;
-    opacity: 0.9;
-    text-transform: uppercase;
-    letter-spacing: 0.3pt;
-    line-height: 1;
-  }
-
-  .print-stat-val {
-    font-size: 14pt;
-    font-weight: 800;
-    line-height: 1;
+    gap: 1.5mm;
+    flex: 1;
+    min-width: 0;
+    text-align: center;
   }
 
   .print-stat-icon {
@@ -200,17 +211,27 @@
   }
 
   .print-stat-icon svg {
-    width: 4mm;
-    height: 4mm;
-    opacity: 0.9;
+    width: 7mm;
+    height: 7mm;
   }
 
-  /* ── QR ── */
-  .print-qr-wrap {
+  .print-stat-label {
+    font-size: 8.5pt;
+    font-weight: 600;
+    line-height: 1.1;
+    white-space: nowrap;
+  }
+
+  /* ── QR flotante ── */
+  .print-qr-card {
+    position: absolute;
+    right: 9mm;
+    bottom: 9mm;
     background: white;
-    padding: 2mm;
-    border-radius: 3mm;
-    flex-shrink: 0;
+    padding: 3mm;
+    border-radius: 4mm;
+    box-shadow: 0 2mm 5mm rgba(0, 0, 0, 0.28);
+    z-index: 3;
     display: flex;
     align-items: center;
     justify-content: center;

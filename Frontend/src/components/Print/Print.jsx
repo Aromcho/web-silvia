@@ -26,82 +26,86 @@ const Print = React.forwardRef(function Print({ property }, ref) {
   const stats = [
     property?.surface > 0 && {
       icon: <FaRulerCombined />,
-      label: 'Sup. Total',
-      value: Math.round(property.surface),
+      text: `${Math.round(property.surface)} m² Sup. Total`,
     },
     property?.roofed_surface > 0 && {
       icon: <FaRulerCombined />,
-      label: 'Sup. Cub',
-      value: Math.round(property.roofed_surface),
-    },
-    property?.suite_amount > 0 && {
-      icon: <FaBed />,
-      label: null,
-      value: property.suite_amount,
-    },
-    property?.bathroom_amount > 0 && {
-      icon: <FaBath />,
-      label: null,
-      value: property.bathroom_amount,
+      text: `${Math.round(property.roofed_surface)} m² Cubiertos`,
     },
     property?.parking_lot_amount > 0 && {
       icon: <FaCar />,
-      label: null,
-      value: property.parking_lot_amount,
+      text: `${property.parking_lot_amount} Cochera${property.parking_lot_amount === 1 ? '' : 's'}`,
+    },
+    property?.suite_amount > 0 && {
+      icon: <FaBed />,
+      text: `${property.suite_amount} Dormitorio${property.suite_amount === 1 ? '' : 's'}`,
+    },
+    property?.bathroom_amount > 0 && {
+      icon: <FaBath />,
+      text: `${property.bathroom_amount} Baño${property.bathroom_amount === 1 ? '' : 's'}`,
     },
   ].filter(Boolean)
 
   return (
     <div className="print-root" ref={ref}>
 
-      {/* Header: caja blanca con logo + barra verde con contacto */}
-      <div className="print-header">
-        <div className="print-logo-box">
-          <img src="/assets/images/logo.jpg" alt="Silvia Fernández" className="print-logo" />
-        </div>
-        <div className="print-contact-bar">
-          <span className="print-contact-item">
-            <FaPhone className="print-contact-icon" /> 2255 46-3051
-          </span>
-          <span className="print-contact-item">
-            <IoLogoWhatsapp className="print-contact-icon" /> +54 9 2255 509408
-          </span>
-          <span className="print-contact-item">
-            <FaEnvelope className="print-contact-icon" /> braicesfernandez@gmail.com
-          </span>
-        </div>
-      </div>
-
       {/* Foto principal */}
       <div className="print-image-wrap">
         {mainPhoto && <img src={mainPhoto} alt="Propiedad" className="print-main-img" />}
 
-        {/* Overlay verde inferior ancho completo */}
-        <div className="print-overlay">
-          <div className="print-overlay-left">
-            <div className="print-overlay-title">
-              {property?.publication_title || property?.address}
-            </div>
-            {subtitle && (
-              <div className="print-overlay-subtitle">{subtitle}</div>
-            )}
+        {/* Header: caja blanca con logo + barra verde transparente, sobrepuesto a la imagen */}
+        <div className="print-header">
+          <div className="print-logo-box">
+            <img src="/assets/images/logo.jpg" alt="Silvia Fernández" className="print-logo" />
+          </div>
+          <div className="print-contact-bar">
+            <span className="print-contact-item">
+              <FaPhone className="print-contact-icon" /> 2255 46-3051
+            </span>
+            <span className="print-contact-item">
+              <IoLogoWhatsapp className="print-contact-icon" /> +54 9 2255 509408
+            </span>
+            <span className="print-contact-item">
+              <FaEnvelope className="print-contact-icon" /> braicesfernandez@gmail.com
+            </span>
+          </div>
+        </div>
+
+        {/* Forma verde ondulada inferior */}
+        <svg
+          className="print-overlay-shape"
+          viewBox="0 0 1000 300"
+          preserveAspectRatio="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M0,300 L0,95 C160,50 300,45 430,70 C560,95 580,140 680,175 C760,200 820,190 870,165 C910,145 950,150 1000,160 L1000,300 Z"
+            fill="rgba(0,129,92,0.6)"
+          />
+        </svg>
+
+        <div className="print-overlay-content">
+          <div className="print-overlay-title">
+            {property?.publication_title || property?.address}
+          </div>
+          {subtitle && (
+            <div className="print-overlay-subtitle">{subtitle}</div>
+          )}
+          <div className="print-info-row">
+            {priceStr && <div className="print-price">{priceStr}</div>}
             <div className="print-stats-row">
-              {priceStr && <span className="print-price">{priceStr}</span>}
               {stats.map((s, i) => (
-                <React.Fragment key={i}>
-                  <span className="print-stat-divider">|</span>
-                  <div className="print-stat">
-                    {s.label && <span className="print-stat-lbl">{s.label}</span>}
-                    <span className="print-stat-val">{s.value}</span>
-                    <span className="print-stat-icon">{s.icon}</span>
-                  </div>
-                </React.Fragment>
+                <div className="print-stat" key={i}>
+                  <span className="print-stat-icon">{s.icon}</span>
+                  <span className="print-stat-label">{s.text}</span>
+                </div>
               ))}
             </div>
           </div>
-          <div className="print-qr-wrap">
-            <QRCode value={propertyUrl} size={130} bgColor="#ffffff" fgColor="#000000" />
-          </div>
+        </div>
+
+        <div className="print-qr-card">
+          <QRCode value={propertyUrl} size={110} bgColor="#ffffff" fgColor="#000000" />
         </div>
       </div>
 
