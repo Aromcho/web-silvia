@@ -19,7 +19,8 @@ const Print = React.forwardRef(function Print({ property }, ref) {
 
   const propertyUrl = `https://www.silviafernandezpropiedades.com.ar/propiedad/${property?.id}`
 
-  const propertyType = property?.type?.name || ''
+  const rawPropertyType = property?.type?.name || ''
+  const propertyType = rawPropertyType.toLowerCase() === 'hotel' ? 'Complejo' : rawPropertyType
   const location = property?.location?.name || ''
   const subtitle = [propertyType, location].filter(Boolean).join(' en ')
 
@@ -91,7 +92,7 @@ const Print = React.forwardRef(function Print({ property }, ref) {
 
         <div className="print-overlay-content">
           <div className="print-overlay-title">
-            {property?.publication_title || property?.address}
+            {property.address}
           </div>
           {subtitle && (
             <div className="print-overlay-subtitle">{subtitle}</div>
