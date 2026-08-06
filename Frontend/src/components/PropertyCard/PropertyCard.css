@@ -61,12 +61,14 @@
   position: absolute;
   top: 15px;
   left: 15px;
+  max-width: calc(100% - 30px);
   background: var(--primary-color);
   color: var(--white-color);
   padding: 6px 12px;
   border-radius: 20px;
   font-size: 0.85rem;
   font-weight: 600;
+  line-height: 1.25;
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.2);
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
@@ -406,7 +408,8 @@
 
 /* ID de propiedad en card */
 .property-id {
-  font-size: 0.68rem;
-  color: #b0bec5;
+  font-size: 0.85rem;
+  color: #1a1a1a;
+  font-weight: 600;
   text-align: right;
 }

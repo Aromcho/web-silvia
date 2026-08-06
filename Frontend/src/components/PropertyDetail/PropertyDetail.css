@@ -375,6 +375,14 @@
   background: rgba(220, 38, 38, 0.92);
 }
 
+.property-price-group {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+}
+
 .property-detail-page .price {
   display: flex;
   flex-direction: column;
@@ -396,9 +404,6 @@
   line-height: 1.1;
 }
 
-.property-detail-page .price.price-consult .price-value {
-  font-size: 1.4rem;
-}
 
 .property-detail-page .period {
   font-size: 0.8rem;

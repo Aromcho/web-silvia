@@ -12,6 +12,8 @@ import {
   FaUniversity,
   FaDollarSign,
   FaPaw,
+  FaWater,
+  FaCalendarAlt,
   FaMapMarkerAlt,
   FaWhatsapp,
   FaEnvelope,
@@ -27,6 +29,7 @@ import {
 } from 'react-icons/fa'
 import { FaWandMagicSparkles } from 'react-icons/fa6'
 import Print from '../Print/Print'
+import TemporaryRentalCalendarCard from './TemporaryRentalCalendarCard'
 import './PropertyDetail.css'
 
 export default function PropertyDetail({ property }) {
@@ -62,7 +65,6 @@ export default function PropertyDetail({ property }) {
   const photos = property.photos || []
   const operations = property.operations || []
   const mainOperation = operations[0] || {}
-  const price = mainOperation.prices?.[0] || {}
   const propertyTypeName = normalizePropertyTypeLabel(property.type?.name) || 'Propiedad'
   const propertyAddress = property.address?.street_name || property.real_address || property.address || 'Dirección no disponible'
   const propertyPublicUrl = `https://www.silviafernandezpropiedades.com.ar/propiedad/${property.id}`
@@ -106,9 +108,30 @@ export default function PropertyDetail({ property }) {
   const thumbnailItems = mediaItems.slice(0, 5)
   const remainingMediaCount = mediaItems.length - thumbnailItems.length
 
-  const operationType = normalizeText(mainOperation.operation_type)
-  const isRentalOperation =
-    operationType.includes('alquiler') || operationType === 'rent' || mainOperation.operation_id === 2
+  const isSaleOperationType = (op) => {
+    const t = normalizeText(op?.operation_type)
+    return t.includes('venta') || t === 'sale' || op?.operation_id === 1
+  }
+  const isRentalOperationType = (op) => {
+    const t = normalizeText(op?.operation_type)
+    return t.includes('alquiler') || t === 'rent' || op?.operation_id === 2
+  }
+
+  const isTemporaryRentalOperationType = (op) => {
+    const t = normalizeText(op?.operation_type)
+    return t.includes('temporari') || t.includes('temporal')
+  }
+
+  const saleOperation = operations.find(isSaleOperationType)
+  const rentalOperation = operations.find((op) => op !== saleOperation && isRentalOperationType(op))
+  // Propiedades en venta y alquiler (o alquiler temporario) a la vez: mostramos ambos precios
+  // en vez de uno solo (antes solo se mostraba mainOperation, la primera operación de Tokko)
+  const operationsToShow = saleOperation && rentalOperation ? [saleOperation, rentalOperation] : [mainOperation]
+
+  const temporaryRentalOperation = operations.find(isTemporaryRentalOperationType)
+  // Solo mostramos el calendario de reservas cuando Tokko marca la propiedad como alquiler
+  // temporario de forma explícita (flag o tipo de operación); si no, es una propiedad normal.
+  const isTemporaryRentalProperty = Boolean(property.has_temporary_rent) || Boolean(temporaryRentalOperation)
 
   const parsePositiveNumber = (value) => {
     if (value === null || value === undefined || value === '') return null
@@ -184,6 +207,18 @@ export default function PropertyDetail({ property }) {
   const frontMeasure = getFirstPositiveNumber(property.front_measure, property.front, property.lot_frontage)
   const depthMeasure = getFirstPositiveNumber(property.depth_measure, property.depth, property.lot_depth)
 
+  const getExtraAttributeValue = (names) => {
+    const attributes = Array.isArray(property.extra_attributes) ? property.extra_attributes : []
+    const normalizedNames = names.map(normalizeText)
+    const match = attributes.find((attr) => normalizedNames.includes(normalizeText(attr?.name)))
+    return match?.value ?? null
+  }
+
+  const age = getFirstPositiveNumber(property.age)
+  const distanceToSea = getFirstPositiveNumber(
+    getExtraAttributeValue(['distancia', 'distancia al mar', 'distancia mar'])
+  )
+
   const isCreditEligible =
     getBooleanFromKeys(property, ['apto_credito', 'apto_credit', 'aptoCredito', 'credit_approved', 'is_credit', 'credit_eligible']) ||
     hasKeywordInCollections([property.tags, property.custom_tags, property.features, property.amenities], ['apto credito', 'apto credito hipotecario', 'credit eligible'])
@@ -246,6 +281,18 @@ export default function PropertyDetail({ property }) {
       value: `${formatSurface(depthMeasure)}m`,
       label: 'Fondo'
     },
+    distanceToSea && {
+      key: 'distance_to_sea',
+      icon: FaWater,
+      value: `${formatSurface(distanceToSea)}m`,
+      label: 'Del mar'
+    },
+    age && {
+      key: 'age',
+      icon: FaCalendarAlt,
+      value: age,
+      label: 'Antigüedad (años)'
+    },
     isCreditEligible && {
       key: 'credit',
       icon: FaUniversity,
@@ -293,12 +340,13 @@ export default function PropertyDetail({ property }) {
     setAiLightboxIndex((prev) => (prev - 1 + aiRemodelPhotos.length) % aiRemodelPhotos.length)
   }
 
-  // Formatear precio
-  const formatPrice = (priceObj) => {
-    if (isRentalOperation) return 'Consultar precio'
+  // Formatear precio de una operación puntual (Venta, Alquiler o Alquiler temporario)
+  const formatOperationPrice = (op) => {
+    if (isRentalOperationType(op)) return 'Consultar precio'
 
+    const priceObj = op?.prices?.[0] || {}
     if (!priceObj.price || priceObj.price === 1) return 'Consultar precio'
-    
+
     try {
       return new Intl.NumberFormat('es-AR', {
         style: 'currency',
@@ -380,6 +428,12 @@ export default function PropertyDetail({ property }) {
 
   const handlePrint = () => window.print()
 
+  const handleCopyId = () => {
+    navigator.clipboard.writeText(String(property.id))
+    setIdCopied(true)
+    setTimeout(() => setIdCopied(false), 1500)
+  }
+
   const handleContactSubmit = async (e) => {
     e.preventDefault()
     setContactStatus('loading')
@@ -413,12 +467,20 @@ export default function PropertyDetail({ property }) {
         </span>
       </p>
       <div className="property-price-row">
-        <div className={`price ${isRentalOperation ? "price-consult" : ""}`}>
-          <span className="operation-label">{mainOperation.operation_type || "Consultar"}</span>
-          <span className="price-value">{formatPrice(price)}</span>
-          {!isRentalOperation && price.period && (
-            <span className="period">{price.period}</span>
-          )}
+        <div className="property-price-group">
+          {operationsToShow.map((op, index) => {
+            const opIsRental = isRentalOperationType(op)
+            const opPrice = op?.prices?.[0] || {}
+            return (
+              <div className={`price ${opIsRental ? "price-consult" : ""}`} key={op?.operation_type || index}>
+                <span className="operation-label">{op?.operation_type || "Consultar"}</span>
+                <span className="price-value">{formatOperationPrice(op)}</span>
+                {!opIsRental && opPrice.period && (
+                  <span className="period">{opPrice.period}</span>
+                )}
+              </div>
+            )
+          })}
         </div>
         {property.is_starred_on_web && (
           <span className="badge-featured">Destacada</span>
@@ -623,11 +685,7 @@ export default function PropertyDetail({ property }) {
             </div>
             <button
               className={`mobile-id-copy-btn${idCopied ? ' copied' : ''}`}
-              onClick={() => {
-                navigator.clipboard.writeText(String(property.id))
-                setIdCopied(true)
-                setTimeout(() => setIdCopied(false), 1500)
-              }}
+              onClick={handleCopyId}
             >
               <FaCopy />
               {idCopied ? '¡ID copiado!' : `ID #${property.id}`}
@@ -658,52 +716,60 @@ export default function PropertyDetail({ property }) {
           ref={sidebarRef}
           className={`sidebar-column sidebar-${sidebarMode}`}
         >
-          <div className="contact-card">
-            <h3>¿Te interesa esta propiedad?</h3>
-            <p className="contact-subtitle">Contactanos para más información</p>
+          {isTemporaryRentalProperty ? (
+            <TemporaryRentalCalendarCard
+              property={property}
+              whatsappHref={whatsappHref}
+              whatsappNumber={whatsappNumber}
+              onEmailClick={() => setShowContactForm(true)}
+              onShare={handleShare}
+              idCopied={idCopied}
+              onCopyId={handleCopyId}
+            />
+          ) : (
+            <div className="contact-card">
+              <h3>¿Te interesa esta propiedad?</h3>
+              <p className="contact-subtitle">Contactanos para más información</p>
 
-            <div className="contact-buttons">
-              <a
-                href={whatsappHref}
-                className="contact-btn whatsapp-btn"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <FaWhatsapp />
-                <span>WhatsApp</span>
-              </a>
+              <div className="contact-buttons">
+                <a
+                  href={whatsappHref}
+                  className="contact-btn whatsapp-btn"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <FaWhatsapp />
+                  <span>WhatsApp</span>
+                </a>
 
-              <button
-                className="contact-btn email-btn"
-                onClick={() => setShowContactForm(true)}
-              >
-                <FaEnvelope />
-                <span>Email</span>
+                <button
+                  className="contact-btn email-btn"
+                  onClick={() => setShowContactForm(true)}
+                >
+                  <FaEnvelope />
+                  <span>Email</span>
+                </button>
+
+                <a href="tel:+5492216006474" className="contact-btn phone-btn">
+                  <FaPhone />
+                  <span>Llamar</span>
+                </a>
+              </div>
+
+              <button className="share-btn" onClick={handleShare}>
+                <FaShare />
+                Compartir propiedad
               </button>
 
-              <a href="tel:+5492216006474" className="contact-btn phone-btn">
-                <FaPhone />
-                <span>Llamar</span>
-              </a>
+              <button
+                className={`property-id-btn${idCopied ? ' copied' : ''}`}
+                onClick={handleCopyId}
+                title="Copiar ID"
+              >
+                {idCopied ? '¡ID copiado!' : `ID #${property.id}`}
+              </button>
             </div>
-
-            <button className="share-btn" onClick={handleShare}>
-              <FaShare />
-              Compartir propiedad
-            </button>
-
-            <button
-              className={`property-id-btn${idCopied ? ' copied' : ''}`}
-              onClick={() => {
-                navigator.clipboard.writeText(String(property.id))
-                setIdCopied(true)
-                setTimeout(() => setIdCopied(false), 1500)
-              }}
-              title="Copiar ID"
-            >
-              {idCopied ? '¡ID copiado!' : `ID #${property.id}`}
-            </button>
-          </div>
+          )}
 
 
           {/* ── DESKTOP ONLY: características en sidebar ── */}

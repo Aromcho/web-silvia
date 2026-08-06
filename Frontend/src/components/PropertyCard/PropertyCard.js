@@ -88,10 +88,30 @@ export default function PropertyCard({ property, formatPrice }) {
       .replace(/\bhotel\b/gi, 'Complejo')
   }
 
+  const isSaleOperation = (op) =>
+    Boolean(op?.operation_type && (op.operation_type.includes('Venta') || op.operation_type === 'Sale' || op.operation_id === 1))
+  const isTemporaryRentalOperation = (op) => {
+    const t = (op?.operation_type || '').toLowerCase()
+    return t.includes('temporari') || t.includes('temporal')
+  }
+  const isRegularRentalOperation = (op) =>
+    Boolean(op?.operation_type && (op.operation_type.includes('Alquiler') || op.operation_type === 'Rent' || op.operation_id === 2) && !isTemporaryRentalOperation(op))
+
+  const operations = property.operations || []
+  // Propiedades con venta + alquiler (+ alquiler temporario): priorizamos mostrar el precio
+  // de venta en la card en vez de "Consultar precio" (eso queda reservado para alquiler/temporario).
+  const saleOperation = operations.find(isSaleOperation)
+  const temporaryRentalOperation = operations.find(isTemporaryRentalOperation)
+  const regularRentalOperation = operations.find(isRegularRentalOperation)
+
   const getDisplayPrice = () => {
+    if (saleOperation && saleOperation !== operations[0]) {
+      return formatPrice({ ...property, operations: [saleOperation] })
+    }
+
     // Verificar si es alquiler
-    if (property.operations && property.operations.length > 0) {
-      const operationType = property.operations[0].operation_type
+    if (operations.length > 0) {
+      const operationType = operations[0].operation_type
       if (operationType && (operationType.includes('Alquiler') || operationType === 'Rent')) {
         return 'Consultar precio'
       }
@@ -124,14 +144,14 @@ export default function PropertyCard({ property, formatPrice }) {
         />
         <div className="property-badge">
           {(() => {
-            if (property.operations && property.operations.length > 0) {
-              const operationType = property.operations[0].operation_type
+            if (saleOperation && temporaryRentalOperation) return 'Venta y Alquiler temp.'
+            if (saleOperation && regularRentalOperation) return 'Venta y Alquiler'
+            if (saleOperation) return 'Venta'
 
-              if (operationType && (operationType.includes('Venta') || operationType === 'Sale' || property.operations[0].operation_id === 1)) {
-                return 'Venta'
-              }
+            if (operations.length > 0) {
+              const operationType = operations[0].operation_type
 
-              if (operationType && (operationType.includes('Alquiler') || operationType === 'Rent' || property.operations[0].operation_id === 2)) {
+              if (operationType && (operationType.includes('Alquiler') || operationType === 'Rent' || operations[0].operation_id === 2)) {
                 return 'Alquiler'
               }
 
