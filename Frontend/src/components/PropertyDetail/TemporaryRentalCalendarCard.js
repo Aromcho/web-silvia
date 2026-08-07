@@ -189,24 +189,15 @@ export default function TemporaryRentalCalendarCard({
         </div>
       </div>
 
-      <div className="temp-rental-range-boxes">
-        <div className="range-box">
-          <span className="range-box-label">Desde</span>
-          <span className="range-box-value">{formatShortDate(rangeStart) || '—'}</span>
-        </div>
-        <div className="range-box">
-          <span className="range-box-label">Hasta</span>
-          <span className="range-box-value">{formatShortDate(rangeEnd) || '—'}</span>
-        </div>
-      </div>
-
       <button
         type="button"
         className="temp-rental-check-btn"
         disabled={!rangeStart || !rangeEnd}
         onClick={handleCheckAvailability}
       >
-        Consultar disponibilidad
+        {rangeStart && rangeEnd
+          ? `Consultar: ${formatShortDate(rangeStart)} → ${formatShortDate(rangeEnd)}`
+          : 'Consultar disponibilidad'}
       </button>
 
       <div className="temp-rental-contact-row">
