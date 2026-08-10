@@ -356,7 +356,8 @@ export default function PropertiesSearchNew() {
       }
     }
     
-    if (!price || price === 1) return 'Consultar precio'
+    const isUsd = currency === 'USD' || currency === 'Dólar Estadounidense'
+    if (!price || price === 1 || (price === 100 && isUsd)) return 'Consultar precio'
 
     try {
       const formattedPrice = new Intl.NumberFormat('es-AR', {

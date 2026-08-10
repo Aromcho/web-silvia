@@ -236,7 +236,8 @@ export default function Properties() {
       currency = property.currency?.name || property.currency || 'ARS'
     }
     
-    if (!price || price === 1) return 'Consultar precio'
+    const isUsd = currency === 'USD' || currency === 'Dólar Estadounidense'
+    if (!price || price === 1 || (price === 100 && isUsd)) return 'Consultar precio'
 
     try {
       // Mapear códigos de moneda de Tokko

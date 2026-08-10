@@ -260,7 +260,8 @@ const PropertiesGrid = ({ filters = {} }) => {
       currency = property.currency?.name || property.currency || 'ARS';
     }
 
-    if (!price || price === 1) return 'Consultar precio';
+    const isUsd = currency === 'USD' || currency === 'Dólar Estadounidense';
+    if (!price || price === 1 || (price === 100 && isUsd)) return 'Consultar precio';
 
     const currencyMap = {
       'Peso Argentino': 'ARS',

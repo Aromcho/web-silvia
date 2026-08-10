@@ -13,7 +13,8 @@ const Print = React.forwardRef(function Print({ property }, ref) {
 
   const ops = property?.operations?.[0] || {}
   const price = ops?.prices?.[0] || {}
-  const priceStr = (!price.price || price.price === 1)
+  const isUsd = price.currency === 'USD' || price.currency === 'Dólar Estadounidense' || !price.currency
+  const priceStr = (!price.price || price.price === 1 || (price.price === 100 && isUsd))
     ? 'Consultar precio'
     : `${price.currency || 'USD'} ${formatToMoney(price.price)}`
 

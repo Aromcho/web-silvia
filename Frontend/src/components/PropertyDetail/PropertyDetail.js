@@ -345,7 +345,8 @@ export default function PropertyDetail({ property }) {
     if (isRentalOperationType(op)) return 'Consultar precio'
 
     const priceObj = op?.prices?.[0] || {}
-    if (!priceObj.price || priceObj.price === 1) return 'Consultar precio'
+    const isUsd = priceObj.currency === 'USD' || priceObj.currency === 'Dólar Estadounidense'
+    if (!priceObj.price || priceObj.price === 1 || (priceObj.price === 100 && isUsd)) return 'Consultar precio'
 
     try {
       return new Intl.NumberFormat('es-AR', {
