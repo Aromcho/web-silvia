@@ -14,7 +14,9 @@ const chunkArray = (array, size) => {
 // PROPERTY_SOURCE=crm: la fuente de propiedades es la API del CRM, que a su vez es la única
 // que le habla a Tokko. Default 'tokko' (comportamiento actual) para que desplegar este código
 // no cambie nada hasta setear CRM_API_URL/CRM_API_KEY y flipear la env var a propósito.
-const PROPERTY_SOURCE = process.env.PROPERTY_SOURCE || 'tokko';
+// Se lee en cada llamada (no una const de módulo): los imports de ES modules se evalúan
+// antes que dotenv.config() en index.js, así que capturarla al importar siempre daba 'tokko'.
+const getPropertySource = () => process.env.PROPERTY_SOURCE || 'tokko';
 
 // Timestamp del último sync exitoso contra el CRM, en memoria (solo corre en el proceso
 // primario del cluster). null en el primer run del proceso => trae todo, no solo el delta.
@@ -34,6 +36,11 @@ function mapBranch(branch) {
 // El status que devuelve la API pública del CRM ya viene traducido a disponible/reservada/vendida
 // (en_tasacion nunca se expone). Se pasa tal cual, no hay que re-derivarlo de un código numérico.
 function mapCrmProperty(property) {
+  // La API pública del CRM expone su propio _id de Mongo, que no tiene relación con el _id
+  // del documento local: hay que descartarlo o el $set del bulkWrite falla con
+  // "Performing an update on the path '_id' would modify the immutable field '_id'".
+  const { _id, ...propertyWithoutId } = property;
+
   const photos = Array.isArray(property.photos)
     ? property.photos.map(img => ({
         image: img.local_image || img.image_url || '',
@@ -58,7 +65,7 @@ function mapCrmProperty(property) {
     : [];
 
   return {
-    ...property,
+    ...propertyWithoutId,
     photos,
     operations,
     branch: mapBranch(property.branch),
@@ -269,7 +276,7 @@ async function syncFromTokkoDirect() {
 
 export const syncWithTokko = async () => {
   try {
-    if (PROPERTY_SOURCE === 'crm') {
+    if (getPropertySource() === 'crm') {
       await syncFromCRM();
     } else {
       await syncFromTokkoDirect();
