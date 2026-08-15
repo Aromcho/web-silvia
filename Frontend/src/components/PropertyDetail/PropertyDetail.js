@@ -215,7 +215,10 @@ export default function PropertyDetail({ property }) {
   }
 
   const age = getFirstPositiveNumber(property.age)
-  const distanceToSea = getFirstPositiveNumber(
+  // distanciaMar es texto libre cargado a mano en el CRM (ej: "500m", "5 cuadras"), por eso
+  // se muestra tal cual en vez de pasarlo por formatSurface como el resto de las medidas.
+  const manualDistanceToSea = typeof property.distanciaMar === 'string' ? property.distanciaMar.trim() : ''
+  const distanceToSea = manualDistanceToSea || getFirstPositiveNumber(
     getExtraAttributeValue(['distancia', 'distancia al mar', 'distancia mar'])
   )
 
@@ -229,6 +232,7 @@ export default function PropertyDetail({ property }) {
     property.extra_attributes?.some(attr => attr.name?.toLowerCase() === 'financiacion' && attr.value === 'true')
 
   const acceptsPets =
+    property.aptoMascotas === true ||
     getBooleanFromKeys(property, ['acepta_mascotas', 'aceptaMascotas', 'pets_allowed', 'accept_pets']) ||
     hasKeywordInCollections([property.tags, property.custom_tags, property.features, property.amenities], ['acepta mascotas', 'mascotas', 'pets allowed', 'pet friendly'])
 
@@ -284,7 +288,7 @@ export default function PropertyDetail({ property }) {
     distanceToSea && {
       key: 'distance_to_sea',
       icon: FaWater,
-      value: `${formatSurface(distanceToSea)}m`,
+      value: manualDistanceToSea ? manualDistanceToSea : `${formatSurface(distanceToSea)}m`,
       label: 'Del mar'
     },
     age && {
