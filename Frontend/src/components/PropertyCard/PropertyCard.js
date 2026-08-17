@@ -120,7 +120,7 @@ export default function PropertyCard({ property, formatPrice }) {
   }
 
   const propertyTitle = normalizePropertyTypeLabel(
-    property.address?.street_name || property.real_address || property.address || property.publication_title || property.title || 'Propiedad'
+    property.address?.street_name || property.address || property.real_address || property.publication_title || property.title || 'Propiedad'
   )
   const creditEligible = isCreditEligible(property)
   const financingEligible = isFinancingEligible(property)
