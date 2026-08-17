@@ -66,7 +66,7 @@ export default function PropertyDetail({ property }) {
   const operations = property.operations || []
   const mainOperation = operations[0] || {}
   const propertyTypeName = normalizePropertyTypeLabel(property.type?.name) || 'Propiedad'
-  const propertyAddress = property.address?.street_name || property.real_address || property.address || 'Dirección no disponible'
+  const propertyAddress = property.address?.street_name || property.address || property.real_address || 'Dirección no disponible'
   const propertyPublicUrl = `https://www.silviafernandezpropiedades.com.ar/propiedad/${property.id}`
   const whatsappNumber = '5492216006474'
   const whatsappMessage = `Hola, consulto por esta propiedad: ${property.publication_title || propertyTypeName}\n\n${propertyPublicUrl}`
