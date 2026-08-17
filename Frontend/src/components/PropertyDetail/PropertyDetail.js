@@ -107,6 +107,9 @@ export default function PropertyDetail({ property }) {
   const currentMediaItem = mediaItems[currentMediaIndex] || mediaItems[0]
   const thumbnailItems = mediaItems.slice(0, 5)
   const remainingMediaCount = mediaItems.length - thumbnailItems.length
+  // Título/descripción cargado en el CRM para la foto actual (las "PF" ya quedaron afuera de galleryPhotos)
+  const currentPhotoCaption =
+    currentMediaItem?.type === 'photo' ? galleryPhotos[currentMediaItem.index]?.description : null
 
   const isSaleOperationType = (op) => {
     const t = normalizeText(op?.operation_type)
@@ -552,12 +555,15 @@ export default function PropertyDetail({ property }) {
                         galleryPhotos[currentMediaItem.index]?.image ||
                         galleryPhotos[currentMediaItem.index]?.thumb
                       }
-                      alt={property.publication_title}
+                      alt={currentPhotoCaption || property.publication_title}
                       onClick={() => {
                         setLightboxIndex(currentMediaItem.index)
                         setShowLightbox(true)
                       }}
                     />
+                  )}
+                  {currentPhotoCaption && (
+                    <div className="photo-caption">{currentPhotoCaption}</div>
                   )}
                   {currentMediaItem.type === 'photo' && (
                     <button
@@ -839,9 +845,12 @@ export default function PropertyDetail({ property }) {
           </button>
           <img
             src={galleryPhotos[lightboxIndex]?.image}
-            alt={property.publication_title}
+            alt={galleryPhotos[lightboxIndex]?.description || property.publication_title}
             onClick={(e) => e.stopPropagation()}
           />
+          {galleryPhotos[lightboxIndex]?.description && (
+            <div className="lightbox-caption">{galleryPhotos[lightboxIndex].description}</div>
+          )}
           <div className="lightbox-counter">
             {lightboxIndex + 1} / {galleryPhotos.length}
           </div>
