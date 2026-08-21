@@ -172,7 +172,7 @@ export default function PropertyCard({ property, formatPrice }) {
         )}
         {property.status && property.status !== 'disponible' && (
           <div className={`status-ribbon ${property.status}`}>
-            {property.status === 'vendida' ? 'VENDIDO' : 'RESERVADO'}
+            {property.status === 'vendida' ? 'VENDIDO' : property.status === 'alquilado' ? 'ALQUILADO' : 'RESERVADO'}
           </div>
         )}
       </div>
