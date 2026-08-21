@@ -139,6 +139,10 @@
   background: rgba(220, 38, 38, 0.92);
 }
 
+.status-ribbon.alquilado {
+  background: rgba(47, 111, 237, 0.92);
+}
+
 .property-content {
   padding: 1.5rem;
   flex: 1;

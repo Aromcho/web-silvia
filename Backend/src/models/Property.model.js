@@ -134,7 +134,7 @@ const propertySchema = new Schema({
   room_amount: { type: Number, index: true }, // Cantidad de habitaciones indexada
   semiroofed_surface: String,
   situation: String,
-  status:{ type: String, enum: ["disponible", "reservada", "vendida"], index: true },
+  status:{ type: String, enum: ["disponible", "reservada", "vendida", "alquilado"], index: true },
   suite_amount: { type: Number, index: true }, // Cantidad de suites indexada
   surface: String,
   surface_measurement: String,

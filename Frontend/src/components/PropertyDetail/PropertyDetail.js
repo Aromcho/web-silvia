@@ -499,7 +499,7 @@ export default function PropertyDetail({ property }) {
       </div>
       {property.status && property.status !== 'disponible' && (
         <div className={`detail-status-ribbon ${property.status}`}>
-          {property.status === 'vendida' ? 'VENDIDO' : 'RESERVADO'}
+          {property.status === 'vendida' ? 'VENDIDO' : property.status === 'alquilado' ? 'ALQUILADO' : 'RESERVADO'}
         </div>
       )}
     </div>
