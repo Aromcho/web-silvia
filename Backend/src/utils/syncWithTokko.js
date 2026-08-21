@@ -41,15 +41,18 @@ function mapCrmProperty(property) {
   // "Performing an update on the path '_id' would modify the immutable field '_id'".
   const { _id, ...propertyWithoutId } = property;
 
+  // Solo copias propias (mirroreadas por el CRM en su propio servidor). Nunca caer a
+  // image_url/original_url/thumb_url de Tokko: si el CRM todavía no bajó la foto, mostramos
+  // el placeholder de PropertyCard hasta el próximo sync en vez de depender de que Tokko esté online.
   const photos = Array.isArray(property.photos)
     ? property.photos.map(img => ({
-        image: img.local_image || img.image_url || '',
+        image: img.local_image || '',
         description: img.description || '',
         is_blueprint: img.is_blueprint || false,
         is_front_cover: img.is_front_cover || false,
         order: img.order || 0,
-        original: img.local_original || img.original_url || '',
-        thumb: img.local_thumb || img.thumb_url || '',
+        original: img.local_original || '',
+        thumb: img.local_thumb || '',
       }))
     : [];
 
