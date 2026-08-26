@@ -50,6 +50,9 @@ const propertySchema = new Schema({
   id: { type: Number, required: true, unique: true, index: true }, // ID indexado
   address: { type: String, text: true }, // Dirección con índice de texto
   age: { type: Number, index: true }, // Índice en edad
+  aptoMascotas: Boolean,
+  aptoCredito: Boolean,
+  aptoFinanciacion: Boolean,
   bathroom_amount: { type: Number, index: true }, // Índice en cantidad de baños
   branch: {
     address: String,

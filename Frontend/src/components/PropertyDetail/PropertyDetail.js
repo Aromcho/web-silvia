@@ -226,11 +226,13 @@ export default function PropertyDetail({ property }) {
   )
 
   const isCreditEligible =
+    property.aptoCredito === true ||
     getBooleanFromKeys(property, ['apto_credito', 'apto_credit', 'aptoCredito', 'credit_approved', 'is_credit', 'credit_eligible']) ||
     hasKeywordInCollections([property.tags, property.custom_tags, property.features, property.amenities], ['apto credito', 'apto credito hipotecario', 'credit eligible'])
 
   const isFinancingEligible =
-    getBooleanFromKeys(property, ['apto_financiacion', 'financiacion', 'financing', 'apto_financing', 'financing_eligible']) ||
+    property.aptoFinanciacion === true ||
+    getBooleanFromKeys(property, ['apto_financiacion', 'aptoFinanciacion', 'financiacion', 'financing', 'apto_financing', 'financing_eligible']) ||
     hasKeywordInCollections([property.tags, property.custom_tags, property.features, property.amenities], ['apto financiacion', 'financiacion', 'financing']) ||
     property.extra_attributes?.some(attr => attr.name?.toLowerCase() === 'financiacion' && attr.value === 'true')
 

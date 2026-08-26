@@ -11,6 +11,7 @@ import {
 import './PropertyCard.css'
 
 const isCreditEligible = (property) => {
+  if (property.aptoCredito === true) return true
   const normalize = (value) => {
     if (value === null || value === undefined) return ''
     return String(value).toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '').trim()
@@ -29,6 +30,7 @@ const isCreditEligible = (property) => {
 }
 
 const isFinancingEligible = (property) => {
+  if (property.aptoFinanciacion === true) return true
   const normalize = (value) => {
     if (value === null || value === undefined) return ''
     return String(value).toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '').trim()
