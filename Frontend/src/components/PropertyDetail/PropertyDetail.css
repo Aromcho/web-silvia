@@ -645,6 +645,27 @@
 .property-detail-page .description-text {
   line-height: 1.8;
   color: #475569;
+  white-space: pre-wrap;
+}
+
+.property-detail-page .description-text p {
+  margin: 0 0 1em;
+}
+
+.property-detail-page .description-text p:last-child {
+  margin-bottom: 0;
+}
+
+.property-detail-page .description-text strong,
+.property-detail-page .description-text b {
+  font-weight: 700;
+  color: inherit;
+}
+
+.property-detail-page .description-text ul,
+.property-detail-page .description-text ol {
+  margin: 0 0 1em 1.25em;
+  padding: 0;
 }
 
 /* Ubicación */
