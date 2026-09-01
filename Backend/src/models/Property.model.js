@@ -90,6 +90,7 @@ const propertySchema = new Schema({
   development: Object,
   development_excel_extra_data: String,
   disposition: String,
+  distanciaMar: String,
   expenses: Number,
   extra_attributes: Array,
   fake_address: String,
