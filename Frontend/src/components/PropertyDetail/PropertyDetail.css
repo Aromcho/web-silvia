@@ -1504,8 +1504,8 @@
   }
 }
 
-/* Botón "Ver en Tokko" al pie de la descripción */
-.tokko-link-btn {
+/* Botón "Ver en MercadoLibre" al pie de la descripción */
+.ml-link-btn {
   display: inline-block;
   margin-top: 1.25rem;
   padding: 0.5rem 1.1rem;
@@ -1520,7 +1520,7 @@
   transition: color 0.2s, border-color 0.2s, background 0.2s;
 }
 
-.tokko-link-btn:hover {
+.ml-link-btn:hover {
   color: var(--primary-color, #008060);
   border-color: var(--primary-color, #008060);
   background: rgba(0, 128, 96, 0.05);

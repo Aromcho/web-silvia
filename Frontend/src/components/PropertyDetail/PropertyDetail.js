@@ -711,14 +711,16 @@ export default function PropertyDetail({ property }) {
                   className="description-text"
                   dangerouslySetInnerHTML={{ __html: property.description }}
                 />
-                <a
-                  href={`https://www.tokkobroker.com/property/${property.id}/`}
-                  className="tokko-link-btn"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Ver en Tokko
-                </a>
+                {property.mercadolibre_url && (
+                  <a
+                    href={property.mercadolibre_url}
+                    className="ml-link-btn"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Ver en MercadoLibre
+                  </a>
+                )}
               </div>
             )}
           </div>

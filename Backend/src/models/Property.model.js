@@ -128,6 +128,7 @@ const propertySchema = new Schema({
     picture: String,
     position: String,
   },
+  mercadolibre_url: String,
   property_condition: { type: String, text: true }, // Condición de la propiedad con índice de texto
   public_url: String,
   publication_title: { type: String, text: true }, // Título de la publicación con índice de texto
