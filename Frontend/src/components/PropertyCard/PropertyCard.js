@@ -300,7 +300,7 @@ export default function PropertyCard({ property, formatPrice }) {
         
         <p className="property-location">
           <FaMapMarkerAlt className="location-icon" />
-          {property.address?.city || property.location?.name || property.location || 'Ubicación no disponible'}, {property.address?.state || ''}
+          {property.address?.city || property.location?.name || (typeof property.location === 'string' ? property.location : '') || 'Ubicación no disponible'}, {property.address?.state || ''}
         </p>
         <p className="property-id">ID #{property.id}</p>
         
