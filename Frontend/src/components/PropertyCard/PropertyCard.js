@@ -6,9 +6,54 @@ import {
   FaBath,
   FaCar,
   FaMapMarkerAlt,
-  FaWhatsapp
+  FaWhatsapp,
+  FaWater,
+  FaPaw
 } from 'react-icons/fa'
 import './PropertyCard.css'
+
+const normalizeText = (value) => {
+  if (value === null || value === undefined) return ''
+  return String(value).toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '').trim()
+}
+
+const getBooleanFromKeys = (source, keys) => {
+  const truthyValues = new Set(['true', '1', 'si', 'yes', 'y', 'apto', 'acepta', 'eligible'])
+  return keys.some((key) => {
+    const value = source?.[key]
+    if (typeof value === 'boolean') return value
+    if (typeof value === 'number') return value > 0
+    const text = normalizeText(value)
+    return text ? truthyValues.has(text) || text.startsWith('apto') : false
+  })
+}
+
+const hasKeywordInCollections = (collections, keywords) => {
+  const normalizedKeywords = keywords.map(normalizeText)
+  return collections.filter(Array.isArray).some((items) =>
+    items.some((item) => {
+      const itemText = normalizeText(item?.name || item?.label || item?.value || item)
+      return normalizedKeywords.some((kw) => itemText.includes(kw))
+    })
+  )
+}
+
+// Misma lógica que PropertyDetail.js: distanciaMar es texto libre cargado a mano en el CRM
+// (ej: "500m", "5 cuadras"), por eso se muestra tal cual en vez de formatearlo como medida.
+const getDistanceToSea = (property, getFirstPositiveNumber) => {
+  const manual = typeof property.distanciaMar === 'string' ? property.distanciaMar.trim() : ''
+  if (manual) return manual
+  const attributes = Array.isArray(property.extra_attributes) ? property.extra_attributes : []
+  const normalizedNames = ['distancia', 'distancia al mar', 'distancia mar'].map(normalizeText)
+  const match = attributes.find((attr) => normalizedNames.includes(normalizeText(attr?.name)))
+  const numeric = getFirstPositiveNumber(match?.value)
+  return numeric ? `${numeric}m` : null
+}
+
+const acceptsPets = (property) =>
+  property.aptoMascotas === true ||
+  getBooleanFromKeys(property, ['acepta_mascotas', 'aceptaMascotas', 'pets_allowed', 'accept_pets']) ||
+  hasKeywordInCollections([property.tags, property.custom_tags, property.features, property.amenities], ['acepta mascotas', 'mascotas', 'pets allowed', 'pet friendly'])
 
 const isCreditEligible = (property) => {
   if (property.aptoCredito === true) return true
@@ -129,6 +174,12 @@ export default function PropertyCard({ property, formatPrice }) {
   const frontMeasure = getFirstPositiveNumber(property.front_measure, property.front, property.lot_frontage)
   const depthMeasure = getFirstPositiveNumber(property.depth_measure, property.depth, property.lot_depth)
 
+  // Alquiler (con o sin alquiler temporario) sin venta -> en vez de las superficies, mostramos
+  // distancia al mar y apto mascota. En venta (o venta + alquiler) sigue igual.
+  const isRentalCard = !saleOperation && operations.length > 0
+  const distanceToSea = isRentalCard ? getDistanceToSea(property, getFirstPositiveNumber) : null
+  const petsFriendly = isRentalCard ? acceptsPets(property) : false
+
   return (
     <Link href={`/propiedad/${property.id}`} className="modern-property-card">
       <div className="property-image">
@@ -186,19 +237,31 @@ export default function PropertyCard({ property, formatPrice }) {
         <p className="property-price">{getDisplayPrice()}</p>
         
         <div className="property-details">
-          {property.surface > 0 && (
+          {!isRentalCard && property.surface > 0 && (
             <span className="detail-item">
               <FaHome className="detail-icon" />
               {property.surface}m² tot.
             </span>
           )}
-          {property.roofed_surface > 0 && (
+          {!isRentalCard && property.roofed_surface > 0 && (
             <span className="detail-item">
               <FaHome className="detail-icon" />
               {property.roofed_surface}m² cub.
             </span>
           )}
-          
+          {isRentalCard && distanceToSea && (
+            <span className="detail-item">
+              <FaWater className="detail-icon" />
+              {distanceToSea} del mar
+            </span>
+          )}
+          {isRentalCard && petsFriendly && (
+            <span className="detail-item">
+              <FaPaw className="detail-icon" />
+              Apto mascota
+            </span>
+          )}
+
           {(property.suite_amount || property.bedrooms) > 0 && (
             <span className="detail-item">
               <FaBed className="detail-icon" />
