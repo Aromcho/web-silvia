@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { FaEnvelope, FaMapMarkerAlt, FaPhone, FaWhatsapp, FaFacebookF, FaInstagram, FaLinkedin } from 'react-icons/fa'
+import { logWhatsAppClick } from '../../services/whatsappService'
 import './Contact.css'
 
 const contacts = [
@@ -130,6 +131,12 @@ export default function Contact() {
                         target="_blank"
                         rel="noopener noreferrer"
                         className="contact-whatsapp-link"
+                        onClick={() => logWhatsAppClick({
+                          name: contact.name,
+                          phone: contact.phone,
+                          source: 'contact-page',
+                          assigned: false,
+                        })}
                       >
                         {contact.name}: {formatDisplayPhone(contact.phone)}
                       </a>

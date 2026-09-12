@@ -30,7 +30,19 @@ import {
 import { FaWandMagicSparkles } from 'react-icons/fa6'
 import Print from '../Print/Print'
 import TemporaryRentalCalendarCard from './TemporaryRentalCalendarCard'
+import { getNextWhatsAppAgent, logWhatsAppClick } from '../../services/whatsappService'
 import './PropertyDetail.css'
+
+// Espejo del seed de WhatsAppContact en el backend, solo para el fallback cuando
+// /api/whatsapp/next-agent no responde (no debería repartirse siempre a la misma persona).
+const FALLBACK_CONTACTS = [
+  { name: 'Silvia', phone: '5492255509408' },
+  { name: 'Fabiana', phone: '5492255626092' },
+  { name: 'Sucursal Mar Azul', phone: '5492255622841' },
+  { name: 'Paul', phone: '5492254602453' },
+  { name: 'Cecilia', phone: '5492216006474' },
+  { name: 'Pablo', phone: '5492255609992' },
+]
 
 export default function PropertyDetail({ property }) {
   const [currentMediaIndex, setCurrentMediaIndex] = useState(0)
@@ -43,8 +55,19 @@ export default function PropertyDetail({ property }) {
   const [contactForm, setContactForm] = useState({ name: '', email: '', phone: '', message: '' })
   const [contactStatus, setContactStatus] = useState('idle')
   const [idCopied, setIdCopied] = useState(false)
+  const [assignedAgent, setAssignedAgent] = useState(null)
   const sidebarRef = useRef(null)
   const sidebarTopRef = useRef(0)
+
+  // Cada vista de ficha de propiedad recibe un agente distinto por rotación,
+  // para repartir las consultas de WhatsApp entre todo el equipo.
+  useEffect(() => {
+    let cancelled = false
+    getNextWhatsAppAgent().then((agent) => {
+      if (!cancelled && agent?.phone) setAssignedAgent(agent)
+    })
+    return () => { cancelled = true }
+  }, [])
 
   const normalizePropertyTypeLabel = (text) => {
     if (!text || typeof text !== 'string') return text
@@ -68,9 +91,22 @@ export default function PropertyDetail({ property }) {
   const propertyTypeName = normalizePropertyTypeLabel(property.type?.name) || 'Propiedad'
   const propertyAddress = property.address?.street_name || property.address || property.real_address || 'Dirección no disponible'
   const propertyPublicUrl = `https://www.silviafernandezpropiedades.com.ar/propiedad/${property.id}`
-  const whatsappNumber = '5492216006474'
+  // Si la rotación no respondió, no concentrar el fallback en una sola persona:
+  // se sortea entre el equipo para no repetir siempre el mismo número.
+  const whatsappNumber = assignedAgent?.phone || FALLBACK_CONTACTS[Math.floor(Math.random() * FALLBACK_CONTACTS.length)].phone
   const whatsappMessage = `Hola, consulto por esta propiedad: ${property.publication_title || propertyTypeName}\n\n${propertyPublicUrl}`
   const whatsappHref = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(whatsappMessage)}`
+
+  const handleWhatsAppClick = (extraSource) => {
+    logWhatsAppClick({
+      name: assignedAgent?.name,
+      phone: whatsappNumber,
+      source: extraSource || 'property-detail',
+      propertyId: String(property.id),
+      propertyTitle: property.publication_title || propertyTypeName,
+      assigned: Boolean(assignedAgent),
+    })
+  }
 
   const normalizeText = (value) => {
     if (value === null || value === undefined) return ''
@@ -736,6 +772,7 @@ export default function PropertyDetail({ property }) {
               property={property}
               whatsappHref={whatsappHref}
               whatsappNumber={whatsappNumber}
+              onWhatsAppClick={handleWhatsAppClick}
               onEmailClick={() => setShowContactForm(true)}
               onShare={handleShare}
               idCopied={idCopied}
@@ -752,6 +789,7 @@ export default function PropertyDetail({ property }) {
                   className="contact-btn whatsapp-btn"
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={() => handleWhatsAppClick('property-detail-sidebar')}
                 >
                   <FaWhatsapp />
                   <span>WhatsApp</span>
@@ -799,6 +837,7 @@ export default function PropertyDetail({ property }) {
           className="mobile-bar-btn whatsapp-bar-btn"
           target="_blank"
           rel="noopener noreferrer"
+          onClick={() => handleWhatsAppClick('property-detail-mobile-bar')}
         >
           <FaWhatsapp />
           <span>WhatsApp</span>

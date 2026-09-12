@@ -31,6 +31,10 @@ const nextConfig = {
           source: '/api/development/:path*',
           destination: 'http://localhost:3001/api/development/:path*',
         },
+        {
+          source: '/api/whatsapp/:path*',
+          destination: 'http://localhost:3001/api/whatsapp/:path*',
+        },
       ],
     }
   },

@@ -40,6 +40,7 @@ export default function TemporaryRentalCalendarCard({
   property,
   whatsappHref,
   whatsappNumber,
+  onWhatsAppClick,
   onEmailClick,
   onShare,
   idCopied,
@@ -137,6 +138,7 @@ export default function TemporaryRentalCalendarCard({
     const propertyUrl = `https://www.silviafernandezpropiedades.com.ar/propiedad/${property?.id}`
     const message = `Hola, quiero consultar disponibilidad para "${propertyTitle}" del ${formatShortDate(rangeStart)} al ${formatShortDate(rangeEnd)}.\n\n${propertyUrl}`
     const href = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`
+    onWhatsAppClick?.('property-detail-calendar')
     window.open(href, '_blank', 'noopener,noreferrer')
   }
 
@@ -201,7 +203,13 @@ export default function TemporaryRentalCalendarCard({
       </button>
 
       <div className="temp-rental-contact-row">
-        <a href={whatsappHref} target="_blank" rel="noopener noreferrer" className="temp-contact-btn whatsapp">
+        <a
+          href={whatsappHref}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="temp-contact-btn whatsapp"
+          onClick={() => onWhatsAppClick?.('property-detail-calendar')}
+        >
           <FaWhatsapp />
           <span>WhatsApp</span>
         </a>

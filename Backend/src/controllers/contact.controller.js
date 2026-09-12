@@ -1,10 +1,31 @@
 // controllers/contactController.js
 import Mailjet from 'node-mailjet';
+import axios from 'axios';
 
 const mailjet = Mailjet.apiConnect(
     `${process.env.MJ_APIKEY_PUBLIC}`,
     `${process.env.MJ_APIKEY_PRIVATE}`
 );
+
+// Además del mail, deja la consulta como Lead en el CRM (source: 'web') para que
+// se pueda contar y hacer seguimiento ahí. Nunca debe romper el envío del formulario.
+const createCrmLead = ({ name, email, phone, message }) => {
+    const baseUrl = process.env.CRM_API_URL;
+    if (!baseUrl) return;
+
+    axios.post(`${baseUrl.replace(/\/$/, '')}/api/public/leads`, {
+        name,
+        email,
+        phone,
+        message,
+        source: 'web',
+    }, {
+        headers: { 'X-Api-Key': process.env.CRM_API_KEY },
+        timeout: 10000,
+    }).catch((error) => {
+        console.error('Error creando lead en CRM desde formulario de contacto:', error.message);
+    });
+};
 
 export const sendContactEmail = async (req, res, next) => {
     const { name, email, phone, message, subject, url, property, direction } = req.body;
@@ -35,6 +56,8 @@ export const sendContactEmail = async (req, res, next) => {
                 }
             ]
         });
+
+        createCrmLead({ name, email, phone, message });
 
         res.status(200).json({ code: 1, message: 'Email sent successfully' });
     } catch (error) {

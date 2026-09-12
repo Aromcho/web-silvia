@@ -16,6 +16,7 @@ import { generateJSON } from './src/utils/jsonGenerator.js';
 import renderPropertySEO from './src/controllers/SEO.controller.js';
 import renderArticuleSEO from './src/controllers/renderArticuleSEO.controller.js';
 import cookieParser from 'cookie-parser';
+import { seedWhatsAppContacts } from './src/controllers/whatsapp.controller.js';
 
 dotenv.config();
 
@@ -26,6 +27,7 @@ const __dirname = path.dirname(__filename);
 const isPrimary = cluster.isPrimary;
 const numCPUs = cpus().length;
 connectDB();
+seedWhatsAppContacts().catch((err) => console.error('Error sembrando contactos de WhatsApp:', err));
 
 if (isPrimary) {
   // Sincronización con Tokko cada minuto

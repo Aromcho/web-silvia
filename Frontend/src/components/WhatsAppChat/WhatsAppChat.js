@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
+import { getNextWhatsAppAgent, logWhatsAppClick } from '../../services/whatsappService';
 import './WhatsAppChat.css';
 
 const contacts = [
@@ -16,6 +17,17 @@ const WhatsAppChat = ({ isOpen: externalIsOpen, onClose, propertyTitle = '', pro
   const [showBubble, setShowBubble] = useState(false);
   const [message, setMessage] = useState('');
   const [showContacts, setShowContacts] = useState(false);
+  const [assignedAgent, setAssignedAgent] = useState(null);
+
+  // Cuando el visitante escribe sin elegir "Alquileres/Ventas/Ver Todos", el mensaje
+  // se manda al agente asignado por rotación en vez de siempre a la misma persona.
+  useEffect(() => {
+    let cancelled = false;
+    getNextWhatsAppAgent().then((agent) => {
+      if (!cancelled && agent?.phone) setAssignedAgent(agent);
+    });
+    return () => { cancelled = true; };
+  }, []);
 
   useEffect(() => {
     // Mostrar la burbuja después de 2 segundos solo si no hay control externo
@@ -54,10 +66,20 @@ const WhatsAppChat = ({ isOpen: externalIsOpen, onClose, propertyTitle = '', pro
     const messageText = quickMessage || message;
     if (!messageText.trim()) return;
 
-    const phone = selectedPhone || '5492255626092'; // Default
-    const fullMessage = propertyTitle || propertyUrl 
+    const phone = selectedPhone || assignedAgent?.phone || formatWhatsAppNumber(contacts[0].phone);
+    const fullMessage = propertyTitle || propertyUrl
       ? `${messageText}${propertyTitle ? `\n\nPropiedad: ${propertyTitle}` : ''}${propertyUrl ? `\nLink: ${propertyUrl}` : ''}`
       : messageText;
+
+    const matchedContact = contacts.find((contact) => formatWhatsAppNumber(contact.phone) === phone);
+    const usedRotation = !selectedPhone && Boolean(assignedAgent?.phone);
+    logWhatsAppClick({
+      name: usedRotation ? assignedAgent.name : matchedContact?.name,
+      phone,
+      source: 'floating-chat',
+      propertyTitle: propertyTitle || undefined,
+      assigned: usedRotation,
+    });
 
     const whatsappURL = `https://wa.me/${phone}?text=${encodeURIComponent(fullMessage)}`;
     window.open(whatsappURL, '_blank');

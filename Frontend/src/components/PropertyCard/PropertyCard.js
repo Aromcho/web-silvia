@@ -10,6 +10,7 @@ import {
   FaWater,
   FaPaw
 } from 'react-icons/fa'
+import { getNextWhatsAppAgent, logWhatsAppClick } from '../../services/whatsappService'
 import './PropertyCard.css'
 
 const normalizeText = (value) => {
@@ -309,14 +310,24 @@ export default function PropertyCard({ property, formatPrice }) {
             <span>Ver Detalles</span>
             <span className="btn-arrow">→</span>
           </button>
-          <button 
+          <button
             className="btn-contact"
-            onClick={(e) => {
+            onClick={async (e) => {
               e.preventDefault()
               e.stopPropagation()
               const propertyUrl = `https://www.silviafernandezpropiedades.com.ar/propiedad/${property.id}`
               const messageText = `Hola, me interesa esta propiedad: ${propertyTitle}`
-              window.open(`https://wa.me/5492255626092?text=${encodeURIComponent(`${messageText}\n\n${propertyUrl}`)}`, '_blank')
+              const agent = await getNextWhatsAppAgent()
+              const phone = agent?.phone || '5492255626092'
+              logWhatsAppClick({
+                name: agent?.name,
+                phone,
+                source: 'property-card',
+                propertyId: String(property.id),
+                propertyTitle,
+                assigned: Boolean(agent),
+              })
+              window.open(`https://wa.me/${phone}?text=${encodeURIComponent(`${messageText}\n\n${propertyUrl}`)}`, '_blank')
             }}
           >
             <FaWhatsapp />
