@@ -36,19 +36,20 @@ if (isPrimary) {
     syncWithTokko();
   });
 
+  // Reconciliación de borrados: antes corría una sola vez por día (3:30 AM), así que una propiedad
+  // marcada "no disponible" en el CRM podía tardar hasta 24hs en desaparecer de la web (el sync de
+  // cada minuto solo trae altas/updates por delta de updatedSince, nunca "esto hay que sacarlo").
+  // Ahora corre en el mismo tick de cada minuto, justo después del sync: la demora máxima queda en
+  // ~1 minuto en vez de un día. Sigue sin aplicar en modo 'tokko' (ese modo ya borra en su propio sync).
+  cron.schedule('* * * * *', () => {
+    if ((process.env.PROPERTY_SOURCE || 'tokko') !== 'crm') return;
+    reconcileDeletedProperties().catch(err => console.error('Error reconciliando borrados:', err));
+  });
+
   // Regenerar direcciones_y_barrios.json todos los días a las 3:00 AM
   cron.schedule('0 3 * * *', () => {
     console.log('Regenerando direcciones y barrios...');
     generateJSON();
-  });
-
-  // Reconciliación diaria de borrados: el sync de cada minuto solo trae altas/updates
-  // (delta por updatedSince), así que las bajas se detectan aparte una vez por día
-  // comparando contra los IDs activos que reporta el CRM.
-  cron.schedule('30 3 * * *', () => {
-    if ((process.env.PROPERTY_SOURCE || 'tokko') !== 'crm') return; // el modo tokko ya borra en su propio sync
-    console.log('Reconciliando propiedades eliminadas...');
-    reconcileDeletedProperties().catch(err => console.error('Error reconciliando borrados:', err));
   });
 
   // Generar el JSON al iniciar el servidor por primera vez

@@ -356,7 +356,9 @@ export default function PropertiesSearchNew() {
       }
     }
     
-    const isUsd = currency === 'USD' || currency === 'Dólar Estadounidense'
+    // Un precio cargado a mano en el CRM sin tocar el selector de moneda se guarda sin currency —
+    // no es que sea en pesos, nunca se llegó a grabar. Se trata como USD, no como ARS.
+    const isUsd = !currency || currency === 'USD' || currency === 'Dólar Estadounidense'
     if (!price || price === 1 || (price === 100 && isUsd)) return 'Consultar precio'
 
     try {

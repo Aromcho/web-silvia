@@ -390,7 +390,10 @@ export default function PropertyDetail({ property }) {
     if (isRentalOperationType(op)) return 'Consultar precio'
 
     const priceObj = op?.prices?.[0] || {}
-    const isUsd = priceObj.currency === 'USD' || priceObj.currency === 'Dólar Estadounidense'
+    // Un precio cargado a mano en el CRM sin tocar el selector de moneda se guarda sin currency —
+    // no es que sea en pesos, nunca se llegó a grabar. Se trata como USD (igual que ya hace
+    // Print.jsx), no como ARS.
+    const isUsd = !priceObj.currency || priceObj.currency === 'USD' || priceObj.currency === 'Dólar Estadounidense'
     if (!priceObj.price || priceObj.price === 1 || (priceObj.price === 100 && isUsd)) return 'Consultar precio'
 
     try {
