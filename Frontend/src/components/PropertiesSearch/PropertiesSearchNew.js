@@ -396,7 +396,7 @@ export default function PropertiesSearchNew() {
       <div className="search-container">
         {/* Filtros modernos */}
         <div className="filters-section">
-          <h2 className="filters-title">Encuentra tu propiedad ideal</h2>
+          <h2 className="filters-title">Encontrá tu propiedad ideal</h2>
           
           {/* Filtros de operación y ubicación */}
           <div className="operation-and-location">
