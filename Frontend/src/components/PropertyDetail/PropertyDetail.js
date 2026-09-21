@@ -492,6 +492,7 @@ export default function PropertyDetail({ property }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...contactForm,
+          propertyId: property.id,
           propertyTitle: property.publication_title || propertyTypeName,
           propertyUrl: propertyPublicUrl,
         }),

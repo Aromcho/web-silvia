@@ -94,10 +94,32 @@ function buildGeneralHTML({ name, email, phone, message }) {
   `
 }
 
+// Vuelca la consulta como Lead en el CRM (source: 'web') además del mail, para que aparezca en
+// Reportes > Consultas de la web. No debe tumbar el envío del mail si el CRM está caído o mal
+// configurado — es un canal aparte, no la vía principal de notificación.
+async function createCrmLead({ name, email, phone, message, propertyId }) {
+  const baseUrl = process.env.CRM_API_URL
+  const apiKey = process.env.CRM_API_KEY
+  if (!baseUrl || !apiKey) {
+    console.error('CRM_API_URL o CRM_API_KEY no configurados — no se creó el lead en el CRM')
+    return
+  }
+  try {
+    const res = await fetch(`${baseUrl.replace(/\/$/, '')}/api/public/leads`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey },
+      body: JSON.stringify({ name, email, phone, message, propertyId, source: 'web' }),
+    })
+    if (!res.ok) console.error('El CRM rechazó el lead de la web:', res.status, await res.text())
+  } catch (error) {
+    console.error('Error creando lead en el CRM:', error.message)
+  }
+}
+
 export async function POST(request) {
   try {
     const body = await request.json()
-    const { name, email, phone, message, propertyTitle, propertyUrl } = body
+    const { name, email, phone, message, propertyId, propertyTitle, propertyUrl } = body
 
     if (!name || !email || !phone) {
       return Response.json({ error: 'Nombre, email y teléfono son obligatorios' }, { status: 400 })
@@ -112,6 +134,10 @@ export async function POST(request) {
     const html = isPropertyInquiry
       ? buildPropertyHTML({ name, email, phone, message, propertyTitle, propertyUrl })
       : buildGeneralHTML({ name, email, phone, message })
+
+    // El lead se guarda en el CRM sea que el mail salga bien o no — son dos canales
+    // independientes, uno no tiene que tumbar al otro.
+    createCrmLead({ name, email, phone, message, propertyId }).catch(() => {})
 
     await transporter.sendMail({
       from: `"Web Silvia Fernández" <${process.env.EMAIL_USER}>`,
