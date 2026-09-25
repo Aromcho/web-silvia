@@ -23,7 +23,12 @@ const Print = React.forwardRef(function Print({ property }, ref) {
   const rawPropertyType = property?.type?.name || ''
   const propertyType = rawPropertyType.toLowerCase() === 'hotel' ? 'Complejo' : rawPropertyType
   const location = property?.location?.name || ''
-  const subtitle = [propertyType, location].filter(Boolean).join(' en ')
+  const typeAndLocation = [propertyType, location].filter(Boolean).join(' en ')
+
+  // Título de la publicación arriba y dirección como subtítulo.
+  // Si la propiedad no tiene título, se usa la dirección como título.
+  const title = property?.publication_title || property?.address || ''
+  const subtitle = property?.publication_title ? property?.address : typeAndLocation
 
   const stats = [
     property?.surface > 0 && {
@@ -93,7 +98,7 @@ const Print = React.forwardRef(function Print({ property }, ref) {
 
         <div className="print-overlay-content">
           <div className="print-overlay-title">
-            {property.address}
+            {title}
           </div>
           {subtitle && (
             <div className="print-overlay-subtitle">{subtitle}</div>
