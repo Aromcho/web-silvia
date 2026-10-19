@@ -26,6 +26,9 @@ export const metadata = {
     title: "Silvia Fernández - Inmobiliaria",
     description: "Más de 15 años de experiencia en el mercado inmobiliario. Encontrá tu hogar ideal con Silvia Fernández.",
   },
+  other: {
+    "facebook-domain-verification": "44lai038bjh2b1wjogfzl4mdvkir56",
+  },
 };
 
 export default function RootLayout({ children }) {
