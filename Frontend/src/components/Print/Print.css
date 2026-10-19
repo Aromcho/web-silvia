@@ -14,15 +14,19 @@
     print-color-adjust: exact !important;
   }
 
-  body * { visibility: hidden; }
+  /* Se oculta todo lo demás con display:none (no visibility) para que no
+     ocupe espacio y el documento impreso quede en una sola hoja */
+  body > *:not(.pp-print-wrapper) { display: none !important; }
 
-  .pp-print-wrapper,
-  .pp-print-wrapper * { visibility: visible; }
+  html, body {
+    margin: 0 !important;
+    padding: 0 !important;
+    height: auto !important;
+    min-height: 0 !important;
+  }
 
   .pp-print-wrapper {
-    position: fixed;
-    top: 0;
-    left: 0;
+    position: static;
     width: 297mm;
     height: 210mm;
     overflow: hidden;

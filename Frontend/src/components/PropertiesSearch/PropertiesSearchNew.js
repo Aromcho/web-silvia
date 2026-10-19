@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { getProperties, autocompleteProperties } from '../../services/propertyService'
 import PropertyCard from '../PropertyCard/PropertyCard'
+import GuestsFilter, { MAX_GUESTS, guestsText } from '../GuestsFilter/GuestsFilter'
 import { 
   FaHome, 
   FaBuilding, 
@@ -12,6 +13,7 @@ import {
   FaTh,
   FaList
 } from 'react-icons/fa'
+import { isOperationPriceHidden } from '../../helpers/index.js'
 import './PropertiesSearchNew.css'
 
 const PAGE_SIZE = 12
@@ -94,6 +96,7 @@ const buildSearchCacheKey = (filtersSnapshot) => {
     type: filtersSnapshot.type || '',
     location: filtersSnapshot.location || '',
     sort: filtersSnapshot.sort || 'recent',
+    guests: filtersSnapshot.guests || 0,
   })}`
 }
 
@@ -140,7 +143,9 @@ export default function PropertiesSearchNew() {
     operation: searchParams.get('operation') || 'venta',
     type: searchParams.get('type') || '',
     location: searchParams.get('location') || '',
-    sort: 'recent'
+    sort: 'recent',
+    // Cantidad de personas: solo aplica con la operación "alquiler" (?personas=4)
+    guests: Math.min(parseInt(searchParams.get('personas'), 10) || 0, MAX_GUESTS)
   })
   const [appliedFilters, setAppliedFilters] = useState(filters)
   const [viewMode, setViewMode] = useState('grid')
@@ -180,6 +185,10 @@ export default function PropertiesSearchNew() {
 
     if (filtersSnapshot.location) {
       apiFilters.searchQuery = filtersSnapshot.location.trim()
+    }
+
+    if (filtersSnapshot.operation === 'alquiler' && filtersSnapshot.guests > 0) {
+      apiFilters.minGuests = filtersSnapshot.guests
     }
 
     return apiFilters
@@ -290,7 +299,9 @@ export default function PropertiesSearchNew() {
   const handleFilterChange = (key, value) => {
     setFilters(prev => ({
       ...prev,
-      [key]: value
+      [key]: value,
+      // El filtro de personas no aplica a venta: se limpia al cambiar de operación
+      ...(key === 'operation' && value !== 'alquiler' ? { guests: 0 } : {})
     }))
 
     // Autocompletado para ubicación
@@ -337,12 +348,9 @@ export default function PropertiesSearchNew() {
   const formatPrice = (property) => {
     if (!property) return 'Consultar precio'
     
-    // Verificar si es alquiler
-    if (property.operations && property.operations.length > 0) {
-      const operationType = property.operations[0].operation_type
-      if (operationType && (operationType.includes('Alquiler') || operationType === 'Rent')) {
-        return 'Consultar precio'
-      }
+    // Alquiler (o precio oculto desde el CRM) -> "Consultar precio"
+    if (property.operations && property.operations.length > 0 && isOperationPriceHidden(property.operations[0])) {
+      return 'Consultar precio'
     }
     
     let price = null
@@ -461,6 +469,18 @@ export default function PropertiesSearchNew() {
             </div>
           </div>
 
+          {/* Cantidad de personas — solo para alquiler */}
+          {filters.operation === 'alquiler' && (
+            <div className="guests-filter-row">
+              <GuestsFilter value={filters.guests} onChange={(n) => handleFilterChange('guests', n)} />
+              {filters.guests > 0 && (
+                <p className="guests-filter-hint">
+                  Mostrando alquileres temporarios con capacidad para {guestsText(filters.guests)} o más.
+                </p>
+              )}
+            </div>
+          )}
+
           {/* Tipos de propiedad */}
           <div className="property-types">
             <button 
@@ -577,9 +597,16 @@ export default function PropertiesSearchNew() {
                     color: '#64748b'
                   }}>
                     <p style={{ fontSize: '1.2rem', marginBottom: '0.5rem' }}>
-                      No se encontraron propiedades con los filtros seleccionados
+                      {filters.operation === 'alquiler' && filters.guests > 0
+                        ? `No encontramos alquileres para ${guestsText(filters.guests)} o más`
+                        : 'No se encontraron propiedades con los filtros seleccionados'}
                     </p>
                     <p>Intenta ajustar los filtros para obtener más resultados</p>
+                    {filters.operation === 'alquiler' && filters.guests > 0 && (
+                      <button type="button" className="guests-filter-reset" onClick={() => handleFilterChange('guests', 0)}>
+                        Quitar filtro de personas
+                      </button>
+                    )}
                   </div>
                 )}
               </div>

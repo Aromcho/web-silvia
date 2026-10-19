@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import {
   FaHome,
   FaBed,
@@ -12,6 +13,7 @@ import {
   FaUniversity,
   FaDollarSign,
   FaPaw,
+  FaUsers,
   FaWater,
   FaCalendarAlt,
   FaMapMarkerAlt,
@@ -31,6 +33,7 @@ import { FaWandMagicSparkles } from 'react-icons/fa6'
 import Print from '../Print/Print'
 import TemporaryRentalCalendarCard from './TemporaryRentalCalendarCard'
 import { getNextWhatsAppAgent, logWhatsAppClick } from '../../services/whatsappService'
+import { isOperationPriceHidden } from '../../helpers/index.js'
 import './PropertyDetail.css'
 
 // Espejo del seed de WhatsAppContact en el backend, solo para el fallback cuando
@@ -48,6 +51,9 @@ export default function PropertyDetail({ property }) {
   const [currentMediaIndex, setCurrentMediaIndex] = useState(0)
   const [lightboxIndex, setLightboxIndex] = useState(0)
   const [showLightbox, setShowLightbox] = useState(false)
+  // El componente de impresión se monta vía portal en <body> (solo en cliente)
+  const [printMounted, setPrintMounted] = useState(false)
+  useEffect(() => setPrintMounted(true), [])
   const [showAIModal, setShowAIModal] = useState(false)
   const [aiLightboxIndex, setAiLightboxIndex] = useState(null)
   const [showContactForm, setShowContactForm] = useState(false)
@@ -277,14 +283,26 @@ export default function PropertyDetail({ property }) {
     getBooleanFromKeys(property, ['acepta_mascotas', 'aceptaMascotas', 'pets_allowed', 'accept_pets']) ||
     hasKeywordInCollections([property.tags, property.custom_tags, property.features, property.amenities], ['acepta mascotas', 'mascotas', 'pets allowed', 'pet friendly'])
 
+  // Capacidad de personas del alquiler temporario ("Hasta 6 personas" -> "Hasta 6" + "Personas")
+  const guestsLabel = isTemporaryRentalProperty ? (property.guests_capacity_label || '') : ''
+
+  // En alquiler temporario no mostramos superficies ni medidas del lote en Características
+  const showMeasures = !isTemporaryRentalProperty
+
   const mainFeatures = [
-    surface && {
+    guestsLabel && {
+      key: 'guests',
+      icon: FaUsers,
+      value: guestsLabel.replace(/\s*personas$/i, ''),
+      label: 'Personas'
+    },
+    showMeasures && surface && {
       key: 'surface',
       icon: FaRuler,
       value: `${formatSurface(surface)}m²`,
       label: 'Sup. total'
     },
-    roofedSurface && {
+    showMeasures && roofedSurface && {
       key: 'roofed_surface',
       icon: FaRuler,
       value: `${formatSurface(roofedSurface)}m²`,
@@ -314,13 +332,13 @@ export default function PropertyDetail({ property }) {
       value: rooms,
       label: 'Ambientes'
     },
-    frontMeasure && {
+    showMeasures && frontMeasure && {
       key: 'front_measure',
       icon: FaArrowsAltH,
       value: `${formatSurface(frontMeasure)}m`,
       label: 'Frente'
     },
-    depthMeasure && {
+    showMeasures && depthMeasure && {
       key: 'depth_measure',
       icon: FaArrowsAltV,
       value: `${formatSurface(depthMeasure)}m`,
@@ -387,7 +405,7 @@ export default function PropertyDetail({ property }) {
 
   // Formatear precio de una operación puntual (Venta, Alquiler o Alquiler temporario)
   const formatOperationPrice = (op) => {
-    if (isRentalOperationType(op)) return 'Consultar precio'
+    if (isOperationPriceHidden(op)) return 'Consultar precio'
 
     const priceObj = op?.prices?.[0] || {}
     // Un precio cargado a mano en el CRM sin tocar el selector de moneda se guarda sin currency —
@@ -519,13 +537,13 @@ export default function PropertyDetail({ property }) {
       <div className="property-price-row">
         <div className="property-price-group">
           {operationsToShow.map((op, index) => {
-            const opIsRental = isRentalOperationType(op)
+            const opPriceHidden = isOperationPriceHidden(op)
             const opPrice = op?.prices?.[0] || {}
             return (
-              <div className={`price ${opIsRental ? "price-consult" : ""}`} key={op?.operation_type || index}>
+              <div className={`price ${opPriceHidden ? "price-consult" : ""}`} key={op?.operation_type || index}>
                 <span className="operation-label">{op?.operation_type || "Consultar"}</span>
                 <span className="price-value">{formatOperationPrice(op)}</span>
-                {!opIsRental && opPrice.period && (
+                {!opPriceHidden && opPrice.period && (
                   <span className="period">{opPrice.period}</span>
                 )}
               </div>
@@ -1045,9 +1063,13 @@ export default function PropertyDetail({ property }) {
       )}
 
       {/* Componente de impresión — oculto en pantalla, visible al imprimir */}
-      <div className="pp-print-wrapper">
-        <Print property={property} />
-      </div>
+      {/* Portal a <body> para que al imprimir se oculte el resto con display:none y salga una sola hoja */}
+      {printMounted && createPortal(
+        <div className="pp-print-wrapper">
+          <Print property={property} />
+        </div>,
+        document.body
+      )}
 
     </div>
   );

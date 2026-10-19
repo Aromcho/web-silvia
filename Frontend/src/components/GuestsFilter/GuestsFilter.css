@@ -1,0 +1,164 @@
+.guests-filter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem 1.5rem;
+  flex-wrap: wrap;
+}
+
+.gf-guests {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.gf-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 700;
+  font-size: 1rem;
+  color: #1e293b;
+}
+
+.gf-label svg {
+  color: var(--primary-color);
+  font-size: 1.15rem;
+}
+
+.gf-stepper {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #f1f8f5;
+  border-radius: 999px;
+  padding: 0.3rem;
+}
+
+.gf-step-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(0, 129, 92, 0.35);
+  background: var(--white-color);
+  color: var(--primary-color);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s, transform 0.1s;
+}
+
+.gf-step-btn:hover:not(:disabled) {
+  background: var(--primary-color);
+  border-color: var(--primary-color);
+  color: var(--white-color);
+}
+
+.gf-step-btn:active:not(:disabled) {
+  transform: scale(0.94);
+}
+
+.gf-step-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.gf-step-btn:focus-visible,
+.gf-chip:focus-visible,
+.gf-clear:focus-visible {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+.gf-step-value {
+  min-width: 150px;
+  text-align: center;
+  font-weight: 700;
+  font-size: 0.98rem;
+  color: #0f172a;
+}
+
+.gf-step-value.is-any {
+  color: #64748b;
+  font-weight: 600;
+}
+
+.gf-quick {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.gf-chip {
+  min-width: 48px;
+  padding: 0.5rem 0.9rem;
+  border-radius: 999px;
+  border: 1.5px solid #e2e8f0;
+  background: var(--white-color);
+  font-weight: 700;
+  font-size: 0.92rem;
+  color: #334155;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.gf-chip:hover {
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+}
+
+.gf-chip.is-active {
+  background: var(--primary-color);
+  border-color: var(--primary-color);
+  color: var(--white-color);
+  box-shadow: 0 4px 12px rgba(0, 129, 92, 0.25);
+}
+
+.gf-clear {
+  border: none;
+  background: none;
+  color: #64748b;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0.4rem 0.3rem;
+}
+
+.gf-clear:hover {
+  color: var(--primary-color);
+}
+
+@media (max-width: 768px) {
+  .guests-filter {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .gf-guests {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+
+  .gf-label {
+    justify-content: center;
+  }
+
+  .gf-stepper {
+    justify-content: space-between;
+  }
+
+  .gf-step-value {
+    min-width: 0;
+    flex: 1;
+  }
+
+  .gf-quick {
+    justify-content: center;
+  }
+}

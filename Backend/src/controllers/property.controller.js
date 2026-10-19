@@ -184,6 +184,7 @@ const getProperties = async (req, res) => {
       searchQuery,
       minGarages,
       maxGarages,
+      minGuests,
       limit = 10,
       offset = 0,
       order = 'DESC',
@@ -297,6 +298,12 @@ const getProperties = async (req, res) => {
         garageFilter.$lte = parseInt(maxGarages, 10);
       }
       andConditions.push({ parking_lot_amount: garageFilter });
+    }
+
+    // Filtro por capacidad de personas (alquiler temporario): entran al menos N personas
+    const guests = parseInt(minGuests, 10);
+    if (guests > 0) {
+      andConditions.push({ guests_capacity: { $gte: guests } });
     }
 
     // Filtro por "destacados"

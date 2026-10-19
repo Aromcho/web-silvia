@@ -107,6 +107,7 @@ export const getProperties = async (filters = {}) => {
     searchQuery: filters.searchQuery,
     minGarages: filters.minGarages,
     maxGarages: filters.maxGarages,
+    minGuests: filters.minGuests || undefined,
     is_starred: filters.is_starred ? 'true' : undefined,
     limit: filters.limit || 10,
     offset: filters.offset || 0,

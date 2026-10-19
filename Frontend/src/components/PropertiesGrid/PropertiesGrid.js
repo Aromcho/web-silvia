@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { getProperties } from '../../services/propertyService';
 import PropertyCard from '../PropertyCard/PropertyCard';
+import { isOperationPriceHidden } from '../../helpers/index.js'
 import './PropertiesGrid.css';
 
 const PAGE_SIZE = 12;
@@ -40,6 +41,7 @@ const buildCategoryCacheKey = (filters) => {
     maxPrice: filters.maxPrice || '',
     minRooms: filters.minRooms || '',
     maxRooms: filters.maxRooms || '',
+    minGuests: filters.minGuests || '',
   })}`;
 };
 
@@ -76,7 +78,7 @@ const writeCategoryCache = (cacheKey, value) => {
   safeStorageSet(cacheKey, JSON.stringify(entry));
 };
 
-const PropertiesGrid = ({ filters = {} }) => {
+const PropertiesGrid = ({ filters = {}, onCountChange, emptyState }) => {
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -155,6 +157,7 @@ const PropertiesGrid = ({ filters = {} }) => {
     if (filters.maxPrice) apiFilters.maxPrice = filters.maxPrice;
     if (filters.minRooms) apiFilters.minRooms = filters.minRooms;
     if (filters.maxRooms) apiFilters.maxRooms = filters.maxRooms;
+    if (filters.minGuests) apiFilters.minGuests = filters.minGuests;
 
     return apiFilters;
   };
@@ -235,15 +238,16 @@ const PropertiesGrid = ({ filters = {} }) => {
     return () => observer.disconnect();
   }, [hasMore, loading, loadingMore, page]);
 
+  useEffect(() => {
+    if (onCountChange) onCountChange(loading ? null : totalCount);
+  }, [loading, totalCount, onCountChange]);
+
   const formatPrice = (property) => {
     if (!property) return 'Consultar precio';
 
-    // Verificar si es alquiler
-    if (property.operations && property.operations.length > 0) {
-      const operationType = property.operations[0].operation_type
-      if (operationType && (operationType.includes('Alquiler') || operationType === 'Rent')) {
-        return 'Consultar precio'
-      }
+    // Alquiler (o precio oculto desde el CRM) -> "Consultar precio"
+    if (property.operations && property.operations.length > 0 && isOperationPriceHidden(property.operations[0])) {
+      return 'Consultar precio'
     }
 
     let price = null;
@@ -308,7 +312,7 @@ const PropertiesGrid = ({ filters = {} }) => {
             <div className="properties-grid">
               {properties.length === 0 ? (
                 <div className="no-results">
-                  <p>No se encontraron propiedades con los criterios seleccionados.</p>
+                  {emptyState || <p>No se encontraron propiedades con los criterios seleccionados.</p>}
                 </div>
               ) : (
                 properties.map((property) => (

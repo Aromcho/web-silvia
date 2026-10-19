@@ -8,9 +8,11 @@ import {
   FaMapMarkerAlt,
   FaWhatsapp,
   FaWater,
-  FaPaw
+  FaPaw,
+  FaUsers
 } from 'react-icons/fa'
 import { getNextWhatsAppAgent, logWhatsAppClick } from '../../services/whatsappService'
+import { isOperationPriceHidden } from '../../helpers/index.js'
 import './PropertyCard.css'
 
 const normalizeText = (value) => {
@@ -157,12 +159,9 @@ export default function PropertyCard({ property, formatPrice }) {
       return formatPrice({ ...property, operations: [saleOperation] })
     }
 
-    // Verificar si es alquiler
-    if (operations.length > 0) {
-      const operationType = operations[0].operation_type
-      if (operationType && (operationType.includes('Alquiler') || operationType === 'Rent')) {
-        return 'Consultar precio'
-      }
+    // Alquiler (o precio oculto desde el CRM) -> "Consultar precio"
+    if (operations.length > 0 && isOperationPriceHidden(operations[0])) {
+      return 'Consultar precio'
     }
     return formatPrice(property)
   }
@@ -180,6 +179,8 @@ export default function PropertyCard({ property, formatPrice }) {
   const isRentalCard = !saleOperation && operations.length > 0
   const distanceToSea = isRentalCard ? getDistanceToSea(property, getFirstPositiveNumber) : null
   const petsFriendly = isRentalCard ? acceptsPets(property) : false
+  // Capacidad de personas (la resuelve el CRM); solo tiene sentido en alquiler temporario
+  const guestsLabel = temporaryRentalOperation ? property.guests_capacity_label : ''
 
   return (
     <Link href={`/propiedad/${property.id}`} className="modern-property-card">
@@ -248,6 +249,12 @@ export default function PropertyCard({ property, formatPrice }) {
             <span className="detail-item">
               <FaHome className="detail-icon" />
               {property.roofed_surface}m² cub.
+            </span>
+          )}
+          {guestsLabel && (
+            <span className="detail-item detail-item--guests">
+              <FaUsers className="detail-icon" />
+              {guestsLabel}
             </span>
           )}
           {isRentalCard && distanceToSea && (

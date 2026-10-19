@@ -5,6 +5,8 @@ import mongoosePaginate from 'mongoose-paginate-v2';
 const operationSchema = new Schema({
   operation_id: { type: Number, index: true },
   operation_type: { type: String, index: true }, // Tipo de operación indexado
+  // Interruptor "Mostrar precio en la web" del CRM (undefined = venta muestra, alquiler no)
+  show_price: Boolean,
   prices: [
     {
       currency: String,
@@ -102,6 +104,10 @@ const propertySchema = new Schema({
   geo_long: { type: Number, index: true }, // Longitud indexada
   gm_location_type: String,
   has_temporary_rent: Boolean,
+  // Capacidad de personas de alquileres temporarios, ya resuelta por el CRM (ver su
+  // utils/rentalCapacity.js): número máximo para filtrar y texto para mostrar.
+  guests_capacity: { type: Number, index: true },
+  guests_capacity_label: String,
   is_denounced: Boolean,
   is_starred_on_web: Boolean,
   legally_checked: String,

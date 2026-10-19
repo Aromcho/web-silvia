@@ -417,3 +417,9 @@
   font-weight: 600;
   text-align: right;
 }
+/* Capacidad de personas (alquiler temporario) */
+.modern-property-card .detail-item--guests,
+.detail-item--guests {
+  color: var(--primary-color);
+  font-weight: 600;
+}

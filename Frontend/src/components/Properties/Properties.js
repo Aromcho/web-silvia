@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import { FaChevronLeft, FaChevronRight, FaStar } from 'react-icons/fa'
 import { getProperties } from '../../services/propertyService'
 import PropertyCard from '../PropertyCard/PropertyCard'
+import { isOperationPriceHidden } from '../../helpers/index.js'
 import './Properties.css'
 
 const HOME_PROPERTIES_CACHE_KEY = 'silvia-home-properties-cache-v2'
@@ -213,12 +214,9 @@ export default function Properties() {
   const formatPrice = (property) => {
     if (!property) return 'Consultar precio'
     
-    // Verificar si es alquiler
-    if (property.operations && property.operations.length > 0) {
-      const operationType = property.operations[0].operation_type
-      if (operationType && (operationType.includes('Alquiler') || operationType === 'Rent')) {
-        return 'Consultar precio'
-      }
+    // Alquiler (o precio oculto desde el CRM) -> "Consultar precio"
+    if (property.operations && property.operations.length > 0 && isOperationPriceHidden(property.operations[0])) {
+      return 'Consultar precio'
     }
     
     // Manejar estructura de Tokko API

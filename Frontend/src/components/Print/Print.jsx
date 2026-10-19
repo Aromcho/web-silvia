@@ -4,7 +4,7 @@ import React from 'react'
 import QRCode from 'react-qr-code'
 import { FaBed, FaBath, FaCar, FaRulerCombined, FaPhone, FaEnvelope } from 'react-icons/fa'
 import { IoLogoWhatsapp } from 'react-icons/io'
-import { formatToMoney } from '../../helpers/index.js'
+import { formatToMoney, isOperationPriceHidden } from '../../helpers/index.js'
 import './Print.css'
 
 const Print = React.forwardRef(function Print({ property }, ref) {
@@ -14,7 +14,9 @@ const Print = React.forwardRef(function Print({ property }, ref) {
   const ops = property?.operations?.[0] || {}
   const price = ops?.prices?.[0] || {}
   const isUsd = price.currency === 'USD' || price.currency === 'Dólar Estadounidense' || !price.currency
-  const priceStr = (!price.price || price.price === 1 || (price.price === 100 && isUsd))
+  // La ficha impresa siempre mostró el precio (también en alquiler); solo se oculta si en el
+  // CRM se apagó explícitamente "Mostrar precio en la web".
+  const priceStr = (!price.price || price.price === 1 || (price.price === 100 && isUsd) || (ops.show_price === false && isOperationPriceHidden(ops)))
     ? 'Consultar precio'
     : `${price.currency || 'USD'} ${formatToMoney(price.price)}`
 

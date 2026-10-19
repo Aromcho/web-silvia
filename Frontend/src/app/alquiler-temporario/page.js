@@ -1,4 +1,4 @@
-import PropertiesGrid from '../../components/PropertiesGrid/PropertiesGrid';
+import TemporaryRentalBrowser from '../../components/TemporaryRentalBrowser/TemporaryRentalBrowser';
 import '../lotes-terrenos/page.css';
 
 export const metadata = {
@@ -18,7 +18,7 @@ export default function AlquilerTemporarioPage() {
           <p>Descubrí opciones de alquiler por temporada en las mejores ubicaciones</p>
         </div>
       </div>
-      <PropertiesGrid filters={{ operation: 'alquiler temporario' }} />
+      <TemporaryRentalBrowser />
     </div>
   );
 }

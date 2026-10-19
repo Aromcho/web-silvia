@@ -1017,3 +1017,49 @@
   
   /* El select ya está visible en mobile */
 }
+/* Filtro de cantidad de personas (solo con operación Alquilar) */
+.search-page .guests-filter-row {
+  background: #f6fbf9;
+  border: 1px solid rgba(0, 129, 92, 0.12);
+  border-radius: 16px;
+  padding: 0.85rem 1rem;
+  margin-bottom: 1.25rem;
+  animation: guestsFilterIn 0.25s ease-out;
+}
+
+.search-page .guests-filter-row .gf-stepper {
+  background: var(--white-color);
+}
+
+.search-page .guests-filter-hint {
+  margin: 0.6rem 0 0;
+  font-size: 0.88rem;
+  color: #475569;
+  font-weight: 500;
+}
+
+.search-page .guests-filter-reset {
+  margin-top: 1rem;
+  padding: 0.65rem 1.3rem;
+  border-radius: 999px;
+  border: none;
+  background: var(--primary-color);
+  color: var(--white-color);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.search-page .guests-filter-reset:hover {
+  background: #006b4d;
+}
+
+@keyframes guestsFilterIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (max-width: 768px) {
+  .search-page .guests-filter-hint {
+    text-align: center;
+  }
+}

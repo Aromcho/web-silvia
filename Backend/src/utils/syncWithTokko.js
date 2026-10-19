@@ -59,6 +59,7 @@ function mapCrmProperty(property) {
   const operations = Array.isArray(property.operations)
     ? property.operations.map(op => ({
         operation_type: op.operation_type || null,
+        ...(typeof op.show_price === 'boolean' ? { show_price: op.show_price } : {}),
         prices: (op.prices || []).map(price => ({
           currency: price.currency,
           price: price.price || 0,
