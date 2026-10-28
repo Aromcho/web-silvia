@@ -6,7 +6,7 @@ import './Footer.css';
 const whatsappContacts = [
   { name: 'Silvia', phone: '5492255509408' },
   { name: 'Fabiana', phone: '5492255626092' },
-  { name: 'Sucursal Mar Azul', phone: '5492255622841' },
+  { name: 'Valentin', phone: '5492255622841' },
   { name: 'Paul', phone: '5492254602453' },
   { name: 'Cecilia', phone: '5492216006474' },
   { name: 'Pablo', phone: '5492255609992' }
@@ -134,7 +134,7 @@ const Footer = () => {
           <div className="footer-bottom-content">
             <p>&copy; {currentYear} Silvia Fernández Inmobiliaria. Todos los derechos reservados.</p>
             <div className="footer-bottom-links">
-              <Link href="#privacy">Política de Privacidad</Link>
+              <Link href="/privacidad">Política de Privacidad</Link>
               <Link href="#terms">Términos y Condiciones</Link>
             </div>
           </div>

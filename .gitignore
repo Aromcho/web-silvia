@@ -16,3 +16,7 @@ yarn-error.log*
 *.swo
 Backend/direcciones_y_barrios.json
 uploads/
+
+# Builds sin downtime (NEXT_DIST_DIR) y backups del build anterior
+.next-*/
+Frontend/.next-*/

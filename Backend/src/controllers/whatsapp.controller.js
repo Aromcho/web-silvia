@@ -7,7 +7,7 @@ import WhatsAppRotation from '../models/WhatsAppRotation.model.js';
 const DEFAULT_CONTACTS = [
   { name: 'Silvia', phone: '5492255509408', order: 0 },
   { name: 'Fabiana', phone: '5492255626092', order: 1 },
-  { name: 'Sucursal Mar Azul', phone: '5492255622841', order: 2 },
+  { name: 'Valentin', phone: '5492255622841', order: 2 },
   { name: 'Paul', phone: '5492254602453', order: 3 },
   { name: 'Cecilia', phone: '5492216006474', order: 4 },
   { name: 'Pablo', phone: '5492255609992', order: 5 },

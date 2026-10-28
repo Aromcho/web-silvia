@@ -1,6 +1,15 @@
 'use client';
 import './page.css';
 
+const EQUIPO = [
+  { nombre: 'Valentin', foto: '/assets/images/equipo/valentin.png' },
+  { nombre: 'Fabiana', foto: '/assets/images/equipo/fabiana.png' },
+  { nombre: 'Cecilia', foto: '/assets/images/equipo/cecilia.png' },
+  { nombre: 'Paul', foto: '/assets/images/equipo/paul.png' },
+  { nombre: 'Pablo', foto: '/assets/images/equipo/pablo.png' },
+  { nombre: 'Arom', foto: '/assets/images/equipo/arom.png' },
+];
+
 export default function NosotrosPage() {
   return (
     <div className="nosotros-page">
@@ -13,6 +22,21 @@ export default function NosotrosPage() {
       
       <div className="nosotros-content">
         <div className="container">
+          <section className="team-section">
+            <h2>Nuestro <span className="underline">Equipo</span></h2>
+            <p className="team-subtitle">Las personas que te acompañan en cada paso</p>
+            <div className="team-grid">
+              {EQUIPO.map((m) => (
+                <div className="team-card" key={m.nombre}>
+                  <div className="team-photo">
+                    <img src={m.foto} alt={m.nombre} />
+                  </div>
+                  <h3>{m.nombre}</h3>
+                </div>
+              ))}
+            </div>
+          </section>
+
           <section className="about-section">
             <div className="about-grid">
               <div className="about-image">
