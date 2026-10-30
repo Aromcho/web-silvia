@@ -38,7 +38,7 @@ const Header = () => {
                 <Link href="/lotes-terrenos" className="nav-link">Lotes - Terrenos</Link>
               </li>
               <li className="nav-item">
-                <Link href="/alquiler-temporario" className="nav-link">Alquiler Temporario</Link>
+                <Link href="/alquiler-temporario" className="nav-link">Alquileres</Link>
               </li>
               <li className="nav-item">
                 <Link href="/complejos" className="nav-link">Complejos</Link>
@@ -79,7 +79,7 @@ const Header = () => {
           <ul className="mobile-nav-list">
             <li><Link href="/propiedades" onClick={toggleMenu}>Propiedades</Link></li>
             <li><Link href="/lotes-terrenos" onClick={toggleMenu}>Lotes - Terrenos</Link></li>
-            <li><Link href="/alquiler-temporario" onClick={toggleMenu}>Alquiler Temporario</Link></li>
+            <li><Link href="/alquiler-temporario" onClick={toggleMenu}>Alquileres</Link></li>
             <li><Link href="/complejos" onClick={toggleMenu}>Complejos</Link></li>
             <li><Link href="/nosotros" onClick={toggleMenu}>Nosotros</Link></li>
             <li><Link href="/mapa" onClick={toggleMenu}>Mapa</Link></li>

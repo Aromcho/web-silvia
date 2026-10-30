@@ -2,8 +2,8 @@ import TemporaryRentalBrowser from '../../components/TemporaryRentalBrowser/Temp
 import '../lotes-terrenos/page.css';
 
 export const metadata = {
-  title: 'Alquiler Temporario | Silvia Fernández Inmobiliaria',
-  description: 'Descubrí opciones de alquiler temporario en las mejores ubicaciones de Mar de las Pampas y Mar Azul.',
+  title: 'Alquileres temporarios y anuales | Silvia Fernández Inmobiliaria',
+  description: 'Descubrí opciones de alquiler temporario y anual en las mejores ubicaciones de Mar de las Pampas y Mar Azul.',
   alternates: {
     canonical: '/alquiler-temporario',
   },
@@ -14,8 +14,8 @@ export default function AlquilerTemporarioPage() {
     <div className="alquiler-temporario-page">
       <div className="page-hero">
         <div className="container">
-          <h1>Alquiler Temporario</h1>
-          <p>Descubrí opciones de alquiler por temporada en las mejores ubicaciones</p>
+          <h1>Alquileres</h1>
+          <p>Alquileres temporarios y anuales en las mejores ubicaciones</p>
         </div>
       </div>
       <TemporaryRentalBrowser />

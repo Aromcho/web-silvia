@@ -145,7 +145,8 @@ const PropertiesGrid = ({ filters = {}, onCountChange, emptyState }) => {
         'alquiler-temporario': ['Alquiler temporal', 'Alquiler Temporario', 'Alquiler temporario'],
         'alquiler temporario': ['Alquiler temporal', 'Alquiler Temporario', 'Alquiler temporario'],
         'alquiler temporal':   ['Alquiler temporal', 'Alquiler Temporario', 'Alquiler temporario'],
-        'alquiler-anual':      ['Alquiler anual', 'Alquiler Anual'],
+        'alquiler-anual':      ['Alquiler anual'],
+        'alquiler anual':      ['Alquiler anual'],
       };
       const key = filters.operation.toLowerCase();
       apiFilters.operation_type = operationMap[key] || [filters.operation];

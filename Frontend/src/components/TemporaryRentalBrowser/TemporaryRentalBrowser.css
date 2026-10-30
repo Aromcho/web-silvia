@@ -13,6 +13,39 @@
   border: 1px solid rgba(0, 129, 92, 0.08);
 }
 
+/* Pestañas Temporario / Anual */
+.trb-tabs {
+  display: inline-flex;
+  gap: 0.25rem;
+  padding: 0.3rem;
+  margin-bottom: 0.75rem;
+  background: var(--white-color);
+  border-radius: 999px;
+  box-shadow: 0 8px 24px rgba(0, 66, 47, 0.12);
+  border: 1px solid rgba(0, 129, 92, 0.08);
+}
+
+.trb-tab {
+  border: none;
+  background: transparent;
+  color: #475569;
+  font-weight: 700;
+  font-size: 0.95rem;
+  padding: 0.55rem 1.3rem;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.trb-tab:hover {
+  color: var(--primary-color);
+}
+
+.trb-tab.is-active {
+  background: var(--primary-color);
+  color: var(--white-color);
+}
+
 .trb-summary {
   margin: 0.9rem 0.25rem 0;
   font-size: 0.95rem;

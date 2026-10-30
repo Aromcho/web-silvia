@@ -53,9 +53,17 @@ const OPERATION_ALIASES = {
   comprar: ['Venta', 'Sale'],
   alquiler: ['Alquiler', 'Rent'],
   alquileres: ['Alquiler', 'Rent'],
-  'alquiler temporal': ['Alquiler', 'Alquiler temporal', 'Alquiler Temporario', 'Temporary Rent'],
-  'alquiler temporario': ['Alquiler', 'Alquiler temporal', 'Alquiler Temporario', 'Temporary Rent'],
+  // Sin 'Alquiler' a secas: esa regex matchea cualquier alquiler y mezclaba los anuales (locales) con los temporarios
+  'alquiler temporal': ['Alquiler temporal', 'Alquiler Temporario', 'Temporary Rent'],
+  'alquiler temporario': ['Alquiler temporal', 'Alquiler Temporario', 'Temporary Rent'],
 };
+
+// Alquiler anual = operación "Alquiler" a secas (o "Alquiler anual") y ninguna operación temporaria
+const ANNUAL_RENT_KEYS = ['alquiler anual', 'alquiler-anual', 'alquileres anuales', 'anual'];
+const ANNUAL_RENT_CONDITIONS = [
+  { 'operations.operation_type': { $in: [/^\s*alquiler\s*$/i, /^\s*rent\s*$/i, /^\s*alquiler anual\s*$/i] } },
+  { 'operations.operation_type': { $not: /tempor/i } },
+];
 
 const PROPERTY_TYPE_ALIASES = {
   casa: ['Casa', 'Casas', 'House'],
@@ -194,7 +202,13 @@ const getProperties = async (req, res) => {
     const andConditions = [];
 
     // Filtro por tipo de operación
-    const requestedOperations = splitQueryValues(operation_type);
+    const allRequestedOperations = splitQueryValues(operation_type);
+    const wantsAnnualRent = allRequestedOperations.some((v) => ANNUAL_RENT_KEYS.includes(normalizeText(v)));
+    const requestedOperations = allRequestedOperations.filter((v) => !ANNUAL_RENT_KEYS.includes(normalizeText(v)));
+    if (wantsAnnualRent && requestedOperations.length === 0) {
+      andConditions.push(...ANNUAL_RENT_CONDITIONS);
+      andConditions.push({ status: { $not: /^(reservad|vendid)/i } });
+    }
     if (requestedOperations.length > 0) {
       const operationRegexes = buildRegexList(requestedOperations, OPERATION_ALIASES);
 

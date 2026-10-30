@@ -8,13 +8,32 @@ import './TemporaryRentalBrowser.css'
 
 // Listado de alquileres temporarios con filtro por cantidad de personas.
 // La cantidad queda en la URL (?personas=4) para poder compartir la búsqueda.
+// Pestañas: Temporario (por defecto) y Anual (?tipo=anual), así los locales en alquiler anual no aparecen primero.
+const TABS = [
+  { key: 'temporario', label: 'Temporario' },
+  { key: 'anual', label: 'Anual' },
+]
+
 export default function TemporaryRentalBrowser() {
   const [guests, setGuests] = useState(0)
   const [count, setCount] = useState(null)
+  const [tab, setTab] = useState('temporario')
+  const isAnnual = tab === 'anual'
 
   useEffect(() => {
-    const fromUrl = parseInt(new URLSearchParams(window.location.search).get('personas'), 10)
+    const params = new URLSearchParams(window.location.search)
+    const fromUrl = parseInt(params.get('personas'), 10)
     if (fromUrl > 0) setGuests(Math.min(fromUrl, MAX_GUESTS))
+    if (params.get('tipo') === 'anual') setTab('anual')
+  }, [])
+
+  const changeTab = useCallback((next) => {
+    setTab(next)
+    setCount(null)
+    const url = new URL(window.location.href)
+    if (next === 'anual') url.searchParams.set('tipo', 'anual')
+    else url.searchParams.delete('tipo')
+    window.history.replaceState(null, '', url)
   }, [])
 
   const updateGuests = useCallback((next) => {
@@ -25,22 +44,42 @@ export default function TemporaryRentalBrowser() {
     window.history.replaceState(null, '', url)
   }, [])
 
-  const filters = useMemo(() => ({
-    operation: 'alquiler temporario',
-    ...(guests > 0 ? { minGuests: guests } : {}),
-  }), [guests])
+  const filters = useMemo(() => (isAnnual
+    ? { operation: 'alquiler-anual' }
+    : {
+      operation: 'alquiler temporario',
+      ...(guests > 0 ? { minGuests: guests } : {}),
+    }), [guests, isAnnual])
 
   let summary = ''
   if (count !== null) {
-    const noun = count === 1 ? 'alquiler disponible' : 'alquileres disponibles'
-    summary = guests > 0 ? `${count} ${noun} para ${guestsText(guests)} o más` : `${count} ${noun}`
+    if (isAnnual) {
+      summary = `${count} ${count === 1 ? 'alquiler anual disponible' : 'alquileres anuales disponibles'}`
+    } else {
+      const noun = count === 1 ? 'alquiler disponible' : 'alquileres disponibles'
+      summary = guests > 0 ? `${count} ${noun} para ${guestsText(guests)} o más` : `${count} ${noun}`
+    }
   }
 
   return (
     <>
       <div className="trb-bar-wrap">
         <div className="container">
-          <GuestsFilter value={guests} onChange={updateGuests} className="trb-bar" />
+          <div className="trb-tabs" role="tablist" aria-label="Tipo de alquiler">
+            {TABS.map((t) => (
+              <button
+                key={t.key}
+                type="button"
+                role="tab"
+                aria-selected={tab === t.key}
+                className={`trb-tab${tab === t.key ? ' is-active' : ''}`}
+                onClick={() => changeTab(t.key)}
+              >
+                {t.label}
+              </button>
+            ))}
+          </div>
+          {!isAnnual && <GuestsFilter value={guests} onChange={updateGuests} className="trb-bar" />}
           <p className="trb-summary" aria-live="polite">{summary || ' '}</p>
         </div>
       </div>
@@ -48,7 +87,12 @@ export default function TemporaryRentalBrowser() {
       <PropertiesGrid
         filters={filters}
         onCountChange={setCount}
-        emptyState={guests > 0 ? (
+        emptyState={isAnnual ? (
+          <div className="trb-empty">
+            <p>Por ahora no hay alquileres anuales publicados.</p>
+            <span>Escribinos y te avisamos cuando haya opciones.</span>
+          </div>
+        ) : guests > 0 ? (
           <div className="trb-empty">
             <FaUsers className="trb-empty-icon" aria-hidden="true" />
             <p>No encontramos alquileres para {guestsText(guests)} o más.</p>
