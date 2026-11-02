@@ -4,6 +4,9 @@ import Fuse from 'fuse.js';
 import fs from 'fs';
 import path from 'path';
 
+// Texto del buscador como literal: un "(" rompía la búsqueda y permitía regex lentas a propósito.
+const escapeRx = (s = '') => String(s).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
 const normalizeText = (value = '') => String(value)
   .normalize('NFD')
   .replace(/[\u0300-\u036f]/g, '')
@@ -260,7 +263,7 @@ const getProperties = async (req, res) => {
 
     // Filtro por barrio
     if (barrio && barrio.length > 0) {
-      andConditions.push({ 'location.name': { $regex: barrio, $options: 'i' } });
+      andConditions.push({ 'location.name': { $regex: escapeRx(barrio), $options: 'i' } });
     }
 
     // Filtro de búsqueda general
@@ -283,13 +286,13 @@ const getProperties = async (req, res) => {
       ];
 
       const searchConditions = [
-        { $or: searchableFields.map((field) => ({ [field]: { $regex: trimmedQuery, $options: 'i' } })) },
+        { $or: searchableFields.map((field) => ({ [field]: { $regex: escapeRx(trimmedQuery), $options: 'i' } })) },
       ];
 
       if (normalizedTokens.length > 1) {
         searchConditions.push({
           $and: normalizedTokens.map((token) => ({
-            $or: searchableFields.map((field) => ({ [field]: { $regex: token, $options: 'i' } })),
+            $or: searchableFields.map((field) => ({ [field]: { $regex: escapeRx(token), $options: 'i' } })),
           })),
         });
       }

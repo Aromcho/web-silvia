@@ -17,13 +17,13 @@ export const getDevelopments = async (req, res) => {
     const filterObj = {};
 
     if (status) filterObj.status = status;  // Filtra por estado del desarrollo
-    if (name) filterObj.name = { $regex: name, $options: 'i' };  // Búsqueda por nombre del desarrollo con regex
+    if (name) filterObj.name = { $regex: String(name).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), $options: 'i' };  // Búsqueda por nombre del desarrollo con regex
     if (minPrice || maxPrice) {
       filterObj['prices.price'] = {};
       if (minPrice) filterObj['prices.price'].$gte = parseFloat(minPrice);  // Rango de precio mínimo
       if (maxPrice) filterObj['prices.price'].$lte = parseFloat(maxPrice);  // Rango de precio máximo
     }
-    if (location) filterObj['location.address'] = { $regex: location, $options: 'i' };  // Búsqueda por ubicación
+    if (location) filterObj['location.address'] = { $regex: String(location).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), $options: 'i' };  // Búsqueda por ubicación
 
     // Usa el manager para buscar con los filtros aplicados
     const developments = await DevelopmentManager.read(filterObj);

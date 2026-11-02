@@ -1,6 +1,5 @@
 import express from 'express';
 import {
-  createProperty,
   getProperties,
   getPropertyById,
   getRelatedProperties,
@@ -15,7 +14,8 @@ import { autocompleteProperties } from '../../controllers/property.controller.js
 
 const propertyDetail = express.Router();
 
-propertyDetail.post('/', createProperty);
+// Sin POST: las propiedades llegan solo desde el CRM. Antes cualquiera podía crear una con un POST
+// público a /api/property (expuesto además por el rewrite de Next).
 propertyDetail.get('/autocomplete', autocompleteProperties);
 propertyDetail.get('/properties', getProperties);
 propertyDetail.get('/propertyDetail/:id', getpropertyById);

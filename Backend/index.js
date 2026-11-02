@@ -6,12 +6,11 @@ import morgan from 'morgan';
 import cron from 'node-cron';
 import cors from 'cors'; 
 import connectDB from './src/utils/db.js';
-import { syncWithTokko, reconcileDeletedProperties } from './src/utils/syncWithTokko.js';
+import { syncPropertiesFromCRM, reconcileDeletedProperties } from './src/utils/crmSync.js';
 import router from './src/routes/index.router.js';
 import pathHandler from './src/middelwares/pathHandler.mid.js';
 import path from 'path';
 import { fileURLToPath } from 'url'; // Para obtener __dirname si usas módulos ES6
-import { syncDevelopmentsWithTokko } from './src/utils/syncDevelopmentsWithTokko.js';
 import { generateJSON } from './src/utils/jsonGenerator.js';
 import renderPropertySEO from './src/controllers/SEO.controller.js';
 import renderArticuleSEO from './src/controllers/renderArticuleSEO.controller.js';
@@ -30,19 +29,17 @@ connectDB();
 seedWhatsAppContacts().catch((err) => console.error('Error sembrando contactos de WhatsApp:', err));
 
 if (isPrimary) {
-  // Sincronización con Tokko cada minuto
+  // Sincronización de propiedades desde el CRM cada minuto (por delta de updatedSince)
   cron.schedule('* * * * *', () => {
-    console.log('Ejecutando sincronización con Tokko');
-    syncWithTokko();
+    syncPropertiesFromCRM();
   });
 
   // Reconciliación de borrados: antes corría una sola vez por día (3:30 AM), así que una propiedad
   // marcada "no disponible" en el CRM podía tardar hasta 24hs en desaparecer de la web (el sync de
   // cada minuto solo trae altas/updates por delta de updatedSince, nunca "esto hay que sacarlo").
   // Ahora corre en el mismo tick de cada minuto, justo después del sync: la demora máxima queda en
-  // ~1 minuto en vez de un día. Sigue sin aplicar en modo 'tokko' (ese modo ya borra en su propio sync).
+  // ~1 minuto en vez de un día. Tiene freno si el CRM devuelve vacío o la baja es masiva (crmSync.js).
   cron.schedule('* * * * *', () => {
-    if ((process.env.PROPERTY_SOURCE || 'tokko') !== 'crm') return;
     reconcileDeletedProperties().catch(err => console.error('Error reconciliando borrados:', err));
   });
 
