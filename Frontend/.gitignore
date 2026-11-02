@@ -33,7 +33,7 @@ yarn-error.log*
 
 # typescript
 *.tsbuildinfo
-next-env.d.ts
+# next-env.d.ts va en el repo: el deploy del VPS lo restaura con git después del build
 
 # Large media files
 *.mp4
