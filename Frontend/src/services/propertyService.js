@@ -55,7 +55,9 @@ const fetchFromAPI = async (endpoint, params = {}, fetchOptions = {}) => {
     });
 
     if (!response.ok) {
-      throw new Error(`API Error: ${response.status} ${response.statusText}`);
+      const error = new Error(`API Error: ${response.status} ${response.statusText}`);
+      error.status = response.status;
+      throw error;
     }
 
     const data = await response.json();
@@ -132,7 +134,23 @@ export const getPropertyById = async (id, fetchOptions = {}) => {
   if (!id) {
     throw new Error('Property ID is required');
   }
-  return fetchFromAPI(`/${id}`, {}, fetchOptions);
+  // Ficha inexistente o dada de baja: null (la página muestra «ya no está disponible» con 404),
+  // en vez de un error con «API Error: 404».
+  if (!/^\d+$/.test(String(id))) return null;
+  try {
+    return await fetchFromAPI(`/${id}`, {}, fetchOptions);
+  } catch (error) {
+    if (error.status === 404) return null;
+    throw error;
+  }
+};
+
+/**
+ * Propiedades parecidas (misma zona y operación) a una ficha que ya no existe.
+ * @returns {Promise<{removed: object|null, similar: object[]}>}
+ */
+export const getSimilarToRemoved = async (id) => {
+  return fetchFromAPI(`/removed/${encodeURIComponent(id)}/similar`, {}, { cache: 'no-store' });
 };
 
 /**

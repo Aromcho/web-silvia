@@ -33,7 +33,14 @@ import { FaWandMagicSparkles } from 'react-icons/fa6'
 import Print from '../Print/Print'
 import TemporaryRentalCalendarCard from './TemporaryRentalCalendarCard'
 import { getNextWhatsAppAgent, logWhatsAppClick } from '../../services/whatsappService'
-import { isOperationPriceHidden } from '../../helpers/index.js'
+import {
+  isOperationPriceHidden,
+  CONSULTAR_PRECIO,
+  formatOperationPrice as formatSharedOperationPrice,
+  formatDistanceToSea,
+  formatPropertyLocation,
+  tidyPlaceName,
+} from '../../helpers/index.js'
 import './PropertyDetail.css'
 
 // Espejo del seed de WhatsAppContact en el backend, solo para el fallback cuando
@@ -125,7 +132,13 @@ export default function PropertyDetail({ property }) {
 
   // Fotos "PF" (Proyección a Futuro): remodelaciones con IA, no van en la galería normal
   const isAIRemodelPhoto = (photo) => normalizeText(photo?.description) === 'pf'
-  const galleryPhotos = photos.filter((photo) => !isAIRemodelPhoto(photo))
+  // La portada elegida en el CRM abre la galería; el resto sigue en el orden cargado
+  const galleryPhotos = (() => {
+    const list = photos.filter((photo) => !isAIRemodelPhoto(photo))
+    const coverIndex = list.findIndex((photo) => photo.is_front_cover)
+    if (coverIndex <= 0) return list
+    return [list[coverIndex], ...list.slice(0, coverIndex), ...list.slice(coverIndex + 1)]
+  })()
   const aiRemodelPhotos = photos.filter(isAIRemodelPhoto)
 
   // Video de YouTube de la propiedad (si tiene)
@@ -262,7 +275,7 @@ export default function PropertyDetail({ property }) {
   const age = getFirstPositiveNumber(property.age)
   // distanciaMar es texto libre cargado a mano en el CRM (ej: "500m", "5 cuadras"), por eso
   // se muestra tal cual en vez de pasarlo por formatSurface como el resto de las medidas.
-  const manualDistanceToSea = typeof property.distanciaMar === 'string' ? property.distanciaMar.trim() : ''
+  const manualDistanceToSea = typeof property.distanciaMar === 'string' ? formatDistanceToSea(property.distanciaMar) : ''
   const distanceToSea = manualDistanceToSea || getFirstPositiveNumber(
     getExtraAttributeValue(['distancia', 'distancia al mar', 'distancia mar'])
   )
@@ -347,7 +360,7 @@ export default function PropertyDetail({ property }) {
     distanceToSea && {
       key: 'distance_to_sea',
       icon: FaWater,
-      value: manualDistanceToSea ? manualDistanceToSea : `${formatSurface(distanceToSea)}m`,
+      value: manualDistanceToSea ? manualDistanceToSea : `${formatSurface(distanceToSea)} m`,
       label: 'Del mar'
     },
     age && {
@@ -404,28 +417,8 @@ export default function PropertyDetail({ property }) {
   }
 
   // Formatear precio de una operación puntual (Venta, Alquiler o Alquiler temporario)
-  const formatOperationPrice = (op) => {
-    if (isOperationPriceHidden(op)) return 'Consultar precio'
-
-    const priceObj = op?.prices?.[0] || {}
-    // Un precio cargado a mano en el CRM sin tocar el selector de moneda se guarda sin currency —
-    // no es que sea en pesos, nunca se llegó a grabar. Se trata como USD (igual que ya hace
-    // Print.jsx), no como ARS.
-    const isUsd = !priceObj.currency || priceObj.currency === 'USD' || priceObj.currency === 'Dólar Estadounidense'
-    if (!priceObj.price || priceObj.price === 1 || (priceObj.price === 100 && isUsd)) return 'Consultar precio'
-
-    try {
-      return new Intl.NumberFormat('es-AR', {
-        style: 'currency',
-        currency: priceObj.currency || 'ARS',
-        currencyDisplay: 'code',
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0
-      }).format(priceObj.price)
-    } catch {
-      return `${priceObj.currency || 'ARS'} ${priceObj.price.toLocaleString('es-AR')}`
-    }
-  }
+  // Misma regla de precios que el resto de la web (helpers/index.js)
+  const formatOperationPrice = (op) => formatSharedOperationPrice(op)
 
   // Compartir
   const handleShare = () => {
@@ -529,20 +522,20 @@ export default function PropertyDetail({ property }) {
       <p className="property-main-address">
         <FaMapMarkerAlt className="address-pin-icon" />
         <span>
-          {property.location?.name || property.address?.city || "Ubicación no disponible"}
-          {property.address?.state && `, ${property.address.state}`},{" "}
-          {propertyAddress}
+          {[formatPropertyLocation(property), String(propertyAddress || '').trim()].filter(Boolean).join(', ') || 'Ubicación a confirmar'}
         </span>
       </p>
       <div className="property-price-row">
         <div className="property-price-group">
           {operationsToShow.map((op, index) => {
-            const opPriceHidden = isOperationPriceHidden(op)
+            const priceText = formatOperationPrice(op)
+            // Oculto desde el CRM o monto de relleno (1, 10, 100...): se ve como "Consultar precio"
+            const opPriceHidden = isOperationPriceHidden(op) || priceText === CONSULTAR_PRECIO
             const opPrice = op?.prices?.[0] || {}
             return (
               <div className={`price ${opPriceHidden ? "price-consult" : ""}`} key={op?.operation_type || index}>
                 <span className="operation-label">{op?.operation_type || "Consultar"}</span>
-                <span className="price-value">{formatOperationPrice(op)}</span>
+                <span className="price-value">{priceText}</span>
                 {!opPriceHidden && opPrice.period && (
                   <span className="period">{opPrice.period}</span>
                 )}
@@ -736,9 +729,9 @@ export default function PropertyDetail({ property }) {
                 <div>
                   <p className="location-address">{propertyAddress}</p>
                   <p className="location-details">
-                    {property.location?.full_location ||
-                      property.location?.name ||
-                      "Ubicación no disponible"}
+                    {(property.location?.full_location
+                      ? property.location.full_location.split('|').map(tidyPlaceName).filter(Boolean).join(' | ')
+                      : formatPropertyLocation(property)) || 'Ubicación a confirmar'}
                   </p>
                 </div>
               </div>

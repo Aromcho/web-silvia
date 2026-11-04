@@ -1,4 +1,5 @@
 import Property from '../models/Property.model.js';
+import RemovedProperty from '../models/RemovedProperty.model.js';
 import PropertyManager from '../manager/property.manager.js';
 import Fuse from 'fuse.js';
 import fs from 'fs';
@@ -457,6 +458,51 @@ const getRelatedProperties = async (req, res) => {
   }
 };
 
+// Para un link viejo de una ficha dada de baja: hasta 3 propiedades disponibles de la misma
+// zona y operación (con el rastro que guarda crmSync al borrar). Si no hay rastro o no hay
+// parecidas, se completa con las más recientes de la misma operación y, por último, destacadas.
+const NOT_AVAILABLE_STATUSES = ['vendida', 'vendido', 'alquilado', 'alquilada'];
+
+const getSimilarToRemoved = async (req, res) => {
+  try {
+    const id = parseInt(req.params.id, 10);
+    const limit = 3;
+    const tombstone = Number.isFinite(id) ? await RemovedProperty.findOne({ id }).lean() : null;
+
+    const base = { status: { $nin: NOT_AVAILABLE_STATUSES }, id: { $ne: id } };
+    const sort = { is_starred: -1, updatedAt: -1, id: -1 };
+    const found = [];
+    const seen = new Set();
+    const take = async (query) => {
+      if (found.length >= limit) return;
+      const docs = await Property.find({ ...base, ...query, id: { $nin: [id, ...seen] } })
+        .sort(sort)
+        .limit(limit - found.length)
+        .lean();
+      docs.forEach((doc) => { seen.add(doc.id); found.push(doc); });
+    };
+
+    const operation = tombstone?.operation_types?.[0];
+    const location = tombstone?.location_name;
+    const operationQuery = operation ? { 'operations.operation_type': operation } : {};
+    if (location) {
+      await take({ ...operationQuery, 'location.name': new RegExp(`^\\s*${escapeRegex(location)}\\s*$`, 'i') });
+    }
+    if (operation) await take(operationQuery);
+    await take({});
+
+    res.json({
+      removed: tombstone
+        ? { id: tombstone.id, title: tombstone.title, location: tombstone.location_name, operation: operation || '' }
+        : null,
+      similar: found,
+    });
+  } catch (error) {
+    console.error('Error al buscar parecidas a una ficha dada de baja:', error);
+    res.status(500).json({ message: 'Error al buscar propiedades parecidas' });
+  }
+};
+
 const getNeighborhoods = async (req, res) => {
   try {
     const neighborhoods = await PropertyManager.aggregate([
@@ -479,10 +525,14 @@ const getNeighborhoods = async (req, res) => {
 
 const getFavorites = async (req, res) => {
   try {
-    const { list } = req.query;
-    const ids = list.split(',').map(id => parseInt(id, 10));
+    const ids = String(req.query.list || '')
+      .split(',')
+      .map(id => parseInt(id, 10))
+      .filter(Number.isFinite)
+      .slice(0, 100);
+    if (!ids.length) return res.status(200).json([]);
 
-    const properties = await PropertyManager.read({ id: { $in: ids } }).lean(); // Usamos lean()
+    const properties = await Property.find({ id: { $in: ids } }).lean();
 
     res.status(200).json(properties);
   } catch (error) {
@@ -551,6 +601,7 @@ export {
   getProperties,
   getPropertyById,
   getRelatedProperties,
+  getSimilarToRemoved,
   getNeighborhoods,
   getFavorites,
   getAllPropertyIds,

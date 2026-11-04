@@ -4,7 +4,6 @@ import React, { useEffect, useRef, useState } from 'react'
 import { FaChevronLeft, FaChevronRight, FaStar } from 'react-icons/fa'
 import { getProperties } from '../../services/propertyService'
 import PropertyCard from '../PropertyCard/PropertyCard'
-import { isOperationPriceHidden } from '../../helpers/index.js'
 import './Properties.css'
 
 const HOME_PROPERTIES_CACHE_KEY = 'silvia-home-properties-cache-v2'
@@ -210,58 +209,6 @@ export default function Properties() {
     })
   }
 
-  // Función para formatear precio
-  const formatPrice = (property) => {
-    if (!property) return 'Consultar precio'
-    
-    // Alquiler (o precio oculto desde el CRM) -> "Consultar precio"
-    if (property.operations && property.operations.length > 0 && isOperationPriceHidden(property.operations[0])) {
-      return 'Consultar precio'
-    }
-    
-    // Manejar estructura de Tokko API
-    let price = null
-    let currency = 'ARS'
-    
-    if (property.operations && property.operations.length > 0) {
-      const operation = property.operations[0]
-      if (operation.prices && operation.prices.length > 0) {
-        price = operation.prices[0].price
-        currency = operation.prices[0].currency
-      }
-    } else {
-      price = property.price || property.total_price
-      currency = property.currency?.name || property.currency || 'ARS'
-    }
-    
-    // Un precio cargado a mano en el CRM sin tocar el selector de moneda se guarda sin currency —
-    // no es que sea en pesos, nunca se llegó a grabar. Se trata como USD, no como ARS.
-    const isUsd = !currency || currency === 'USD' || currency === 'Dólar Estadounidense'
-    if (!price || price === 1 || (price === 100 && isUsd)) return 'Consultar precio'
-
-    try {
-      // Mapear códigos de moneda de Tokko
-      const currencyMap = {
-        'Peso Argentino': 'ARS',
-        'USD': 'USD',
-        'Dólar Estadounidense': 'USD',
-        'ARS': 'ARS'
-      }
-      
-      const mappedCurrency = currencyMap[currency] || currency
-      
-      return new Intl.NumberFormat('es-AR', {
-        style: 'currency',
-        currency: mappedCurrency,
-        currencyDisplay: 'code',
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0
-      }).format(price)
-    } catch (error) {
-      return `${currency} ${price.toLocaleString()}`
-    }
-  }
-
   const PropertySection = ({ title, type, properties, featured = false }) => {
     if (!properties || properties.length === 0) return null
 
@@ -312,13 +259,13 @@ export default function Properties() {
               <div className={`properties-grid${featured ? ' featured-track' : ''}`}>
                 <div className="properties-group">
                   {properties.map((property) => (
-                    <PropertyCard key={property.id} property={property} formatPrice={formatPrice} />
+                    <PropertyCard key={property.id} property={property} />
                   ))}
                 </div>
                 {featured && (
                   <div className="properties-group" aria-hidden="true">
                     {properties.map((property) => (
-                      <PropertyCard key={`${property.id}-clone`} property={property} formatPrice={formatPrice} />
+                      <PropertyCard key={`${property.id}-clone`} property={property} />
                     ))}
                   </div>
                 )}

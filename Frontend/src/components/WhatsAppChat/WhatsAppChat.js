@@ -209,7 +209,7 @@ const WhatsAppChat = ({ isOpen: externalIsOpen, onClose, propertyTitle = '', pro
           <div className="chat-footer">
             <input
               type="text"
-              placeholder="Escribe tu mensaje..."
+              placeholder="Escribí tu mensaje..."
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}

@@ -60,8 +60,8 @@ export default function NosotrosPage() {
                   marca la diferencia en cada transacción.
                 </p>
                 <p>
-                  Si buscas un equipo confiable, apasionado y altamente capacitado para guiarte en tu próxima inversión 
-                  inmobiliaria, Silvia Fernández Inmobiliaria es tu mejor elección. Descubre la experiencia de trabajar 
+                  Si buscás un equipo confiable, apasionado y altamente capacitado para guiarte en tu próxima inversión 
+                  inmobiliaria, Silvia Fernández Inmobiliaria es tu mejor elección. Descubrí la experiencia de trabajar 
                   con expertos que ponen tu bienestar en el centro de todo.
                 </p>
               </div>

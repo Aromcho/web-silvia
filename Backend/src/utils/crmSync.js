@@ -1,5 +1,6 @@
 import axios from 'axios';
 import Property from '../models/Property.model.js';
+import RemovedProperty from '../models/RemovedProperty.model.js';
 
 // Sincronización de propiedades desde el CRM (única fuente). Reemplaza a syncWithTokko.js:
 // ya no se trabaja con Tokko, así que se sacó ese camino y el default PROPERTY_SOURCE='tokko'.
@@ -145,6 +146,33 @@ export async function reconcileDeletedProperties() {
   if (total > 0 && toDelete / total > MAX_DELETE_RATIO) {
     console.error(`Reconciliación de borrados abortada: se iban a borrar ${toDelete} de ${total} propiedades (más del ${MAX_DELETE_RATIO * 100} %).`);
     return 0;
+  }
+
+  // Antes de borrar se guarda un rastro mínimo (zona, tipo, operación) para la página
+  // «Esta propiedad ya no está disponible» con parecidas.
+  try {
+    const removed = await Property.find(filter, {
+      id: 1, publication_title: 1, address: 1, 'location.name': 1, 'type.name': 1, 'operations.operation_type': 1,
+    }).lean();
+    if (removed.length) {
+      await RemovedProperty.bulkWrite(removed.map((p) => ({
+        updateOne: {
+          filter: { id: p.id },
+          update: {
+            $set: {
+              title: p.publication_title || (typeof p.address === 'string' ? p.address : '') || '',
+              location_name: (p.location?.name || '').trim(),
+              type_name: p.type?.name || '',
+              operation_types: (p.operations || []).map((op) => op.operation_type).filter(Boolean),
+              removedAt: new Date(),
+            },
+          },
+          upsert: true,
+        },
+      })));
+    }
+  } catch (err) {
+    console.error('No se pudo guardar el rastro de las bajas:', err.message);
   }
 
   const result = await Property.deleteMany(filter);

@@ -13,7 +13,6 @@ import {
   FaTh,
   FaList
 } from 'react-icons/fa'
-import { isOperationPriceHidden } from '../../helpers/index.js'
 import './PropertiesSearchNew.css'
 
 const PAGE_SIZE = 12
@@ -345,44 +344,6 @@ export default function PropertiesSearchNew() {
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
-  const formatPrice = (property) => {
-    if (!property) return 'Consultar precio'
-    
-    // Alquiler (o precio oculto desde el CRM) -> "Consultar precio"
-    if (property.operations && property.operations.length > 0 && isOperationPriceHidden(property.operations[0])) {
-      return 'Consultar precio'
-    }
-    
-    let price = null
-    let currency = 'ARS'
-    
-    if (property.operations && property.operations.length > 0) {
-      const operation = property.operations[0]
-      if (operation.prices && operation.prices.length > 0) {
-        price = operation.prices[0].price
-        currency = operation.prices[0].currency
-      }
-    }
-    
-    // Un precio cargado a mano en el CRM sin tocar el selector de moneda se guarda sin currency —
-    // no es que sea en pesos, nunca se llegó a grabar. Se trata como USD, no como ARS.
-    const isUsd = !currency || currency === 'USD' || currency === 'Dólar Estadounidense'
-    if (!price || price === 1 || (price === 100 && isUsd)) return 'Consultar precio'
-
-    try {
-      const formattedPrice = new Intl.NumberFormat('es-AR', {
-        style: 'currency',
-        currency: currency,
-        currencyDisplay: 'code',
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0
-      }).format(price)
-      return formattedPrice
-    } catch (error) {
-      return `${currency} ${price.toLocaleString('es-AR')}`
-    }
-  }
-
   const renderSkeletonGrid = (count = 6) => (
     <div className="loading-grid search-loading-grid">
       {[...Array(count)].map((_, i) => (
@@ -583,10 +544,7 @@ export default function PropertiesSearchNew() {
                         animation: `fadeInUp 0.6s ease-out ${index * 0.1}s both`
                       }}
                     >
-                      <PropertyCard 
-                        property={property} 
-                        formatPrice={formatPrice}
-                      />
+                      <PropertyCard property={property} />
                     </div>
                   ))
                 ) : (

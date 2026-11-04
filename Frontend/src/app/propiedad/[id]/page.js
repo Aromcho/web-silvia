@@ -1,20 +1,13 @@
+import { notFound } from 'next/navigation'
 import { getPropertyById } from '../../../services/propertyService'
 import PropertyDetail from '../../../components/PropertyDetail/PropertyDetail'
+import { getCoverPhoto, tidyPlaceName } from '../../../helpers/index.js'
 
-const getPropertyCoverImage = (property) => {
-  const photos = (property?.photos || []).filter(
-    (photo) => (photo?.description || '').trim().toLowerCase() !== 'pf'
-  )
-
-  if (!photos.length) return null
-
-  const frontCover = photos.find((photo) => photo.is_front_cover)
-  return (frontCover || photos[0]).image || (frontCover || photos[0]).thumb || null
-}
+const getPropertyCoverImage = (property) => getCoverPhoto(property)
 
 const buildPropertyMetadata = (property) => {
   const title = property?.publication_title || property?.type?.name || 'Propiedad'
-  const location = property?.location?.name || property?.address?.city || property?.address?.street_name || 'Mar de las Pampas'
+  const location = tidyPlaceName(property?.location?.name || property?.address?.city) || 'Mar de las Pampas'
   const operation = property?.operations?.[0]?.operation_type || 'venta o alquiler'
   const description = `Detalle de ${title} en ${location}. Consultá esta propiedad para ${operation} con Silvia Fernández Inmobiliaria.`
   const coverImage = getPropertyCoverImage(property)
@@ -47,8 +40,9 @@ export async function generateMetadata({ params }) {
 
     if (!property) {
       return {
-        title: 'Propiedad no encontrada | Silvia Fernández Inmobiliaria',
-        description: 'No encontramos la propiedad solicitada en Silvia Fernández Inmobiliaria.',
+        title: 'Esta propiedad ya no está disponible | Silvia Fernández Inmobiliaria',
+        description: 'La propiedad se vendió, se alquiló o fue dada de baja. Mirá opciones parecidas en Silvia Fernández Inmobiliaria.',
+        robots: { index: false, follow: true },
       }
     }
 
@@ -62,30 +56,25 @@ export async function generateMetadata({ params }) {
 }
 
 export default async function PropertyPage({ params }) {
+  let property = null
   try {
-    const property = await getPropertyById(params.id, { cache: 'no-store' })
-
-    if (!property) {
-      return (
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '70vh', padding: '2rem', textAlign: 'center' }}>
-          <h2 style={{ color: '#64748b', marginBottom: '1rem' }}>Propiedad no encontrada</h2>
-          <a href="/propiedades" style={{ padding: '12px 24px', background: '#00815c', color: 'white', borderRadius: '12px', textDecoration: 'none', fontWeight: '600' }}>
-            Volver a Propiedades
-          </a>
-        </div>
-      )
-    }
-
-    return <PropertyDetail property={property} />
+    property = await getPropertyById(params.id, { cache: 'no-store' })
   } catch (error) {
+    // Falla del servidor (no una ficha dada de baja): aviso sin el detalle técnico
+    console.error(`No se pudo cargar la ficha ${params.id}:`, error.message)
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '70vh', padding: '2rem', textAlign: 'center' }}>
-        <h2 style={{ color: '#ef4444', marginBottom: '1rem' }}>Error al cargar la propiedad</h2>
-        <p style={{ color: '#64748b', marginBottom: '1.5rem' }}>{error.message}</p>
-        <a href="/propiedades" style={{ padding: '12px 24px', background: '#00815c', color: 'white', borderRadius: '12px', textDecoration: 'none', fontWeight: '600' }}>
-          Volver a Propiedades
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '70vh', padding: '7rem 1.5rem 3rem', textAlign: 'center' }}>
+        <h1 style={{ color: '#0f172a', fontSize: '1.6rem', fontWeight: 800, marginBottom: '0.75rem' }}>No pudimos cargar esta propiedad</h1>
+        <p style={{ color: '#475569', marginBottom: '1.5rem', maxWidth: 440 }}>Probá de nuevo en unos segundos. Si sigue igual, escribinos por WhatsApp y te la mandamos.</p>
+        <a href={`/propiedad/${params.id}`} style={{ padding: '12px 24px', background: '#00815c', color: 'white', borderRadius: '12px', textDecoration: 'none', fontWeight: 700 }}>
+          Reintentar
         </a>
       </div>
     )
   }
+
+  // Ficha dada de baja o inexistente: 404 real para Google y página con parecidas (not-found.js)
+  if (!property) notFound()
+
+  return <PropertyDetail property={property} />
 }

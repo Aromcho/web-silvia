@@ -12,7 +12,13 @@ import {
   FaUsers
 } from 'react-icons/fa'
 import { getNextWhatsAppAgent, logWhatsAppClick } from '../../services/whatsappService'
-import { isOperationPriceHidden } from '../../helpers/index.js'
+import {
+  formatOperationPrice,
+  formatPropertyPrice,
+  formatPropertyLocation,
+  formatDistanceToSea,
+  getCoverPhoto,
+} from '../../helpers/index.js'
 import './PropertyCard.css'
 
 const normalizeText = (value) => {
@@ -44,13 +50,13 @@ const hasKeywordInCollections = (collections, keywords) => {
 // Misma lógica que PropertyDetail.js: distanciaMar es texto libre cargado a mano en el CRM
 // (ej: "500m", "5 cuadras"), por eso se muestra tal cual en vez de formatearlo como medida.
 const getDistanceToSea = (property, getFirstPositiveNumber) => {
-  const manual = typeof property.distanciaMar === 'string' ? property.distanciaMar.trim() : ''
+  const manual = typeof property.distanciaMar === 'string' ? formatDistanceToSea(property.distanciaMar) : ''
   if (manual) return manual
   const attributes = Array.isArray(property.extra_attributes) ? property.extra_attributes : []
   const normalizedNames = ['distancia', 'distancia al mar', 'distancia mar'].map(normalizeText)
   const match = attributes.find((attr) => normalizedNames.includes(normalizeText(attr?.name)))
   const numeric = getFirstPositiveNumber(match?.value)
-  return numeric ? `${numeric}m` : null
+  return numeric ? `${numeric} m` : null
 }
 
 const acceptsPets = (property) =>
@@ -113,7 +119,7 @@ const isFinancingEligible = (property) => {
     : false
 }
 
-export default function PropertyCard({ property, formatPrice }) {
+export default function PropertyCard({ property }) {
   const parsePositiveNumber = (value) => {
     if (value === null || value === undefined || value === '') return null
 
@@ -154,16 +160,13 @@ export default function PropertyCard({ property, formatPrice }) {
   const temporaryRentalOperation = operations.find(isTemporaryRentalOperation)
   const regularRentalOperation = operations.find(isRegularRentalOperation)
 
+  // Una sola regla de precios para toda la web (helpers/index.js). Con venta + alquiler se
+  // prioriza el precio de venta; alquiler/temporario o precio oculto -> "Consultar precio".
   const getDisplayPrice = () => {
     if (saleOperation && saleOperation !== operations[0]) {
-      return formatPrice({ ...property, operations: [saleOperation] })
+      return formatOperationPrice(saleOperation)
     }
-
-    // Alquiler (o precio oculto desde el CRM) -> "Consultar precio"
-    if (operations.length > 0 && isOperationPriceHidden(operations[0])) {
-      return 'Consultar precio'
-    }
-    return formatPrice(property)
+    return formatPropertyPrice(property)
   }
 
   const propertyTitle = normalizePropertyTypeLabel(
@@ -185,16 +188,16 @@ export default function PropertyCard({ property, formatPrice }) {
   return (
     <Link href={`/propiedad/${property.id}`} className="modern-property-card">
       <div className="property-image">
-        <img 
-          src={
-            property.photos?.[0]?.image || 
-            property.photos?.[0]?.thumb || 
-            property.images?.[0] || 
-            'https://via.placeholder.com/400x300/34495e/ffffff?text=Sin+Imagen'
-          } 
+        <img
+          src={getCoverPhoto(property) || property.images?.[0] || '/assets/images/logo.jpg'}
           alt={propertyTitle}
+          loading="lazy"
+          decoding="async"
           onError={(e) => {
-            e.target.src = 'https://via.placeholder.com/400x300/34495e/ffffff?text=Sin+Imagen';
+            if (!e.currentTarget.dataset.fallback) {
+              e.currentTarget.dataset.fallback = '1'
+              e.currentTarget.src = '/assets/images/logo.jpg'
+            }
           }}
         />
         <div className="property-badge">
@@ -308,7 +311,7 @@ export default function PropertyCard({ property, formatPrice }) {
         
         <p className="property-location">
           <FaMapMarkerAlt className="location-icon" />
-          {property.address?.city || property.location?.name || (typeof property.location === 'string' ? property.location : '') || 'Ubicación no disponible'}, {property.address?.state || ''}
+          {formatPropertyLocation(property) || 'Ubicación a confirmar'}
         </p>
         <p className="property-id">ID #{property.id}</p>
         

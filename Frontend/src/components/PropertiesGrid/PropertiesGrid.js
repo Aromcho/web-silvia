@@ -2,7 +2,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { getProperties } from '../../services/propertyService';
 import PropertyCard from '../PropertyCard/PropertyCard';
-import { isOperationPriceHidden } from '../../helpers/index.js'
 import './PropertiesGrid.css';
 
 const PAGE_SIZE = 12;
@@ -243,55 +242,6 @@ const PropertiesGrid = ({ filters = {}, onCountChange, emptyState }) => {
     if (onCountChange) onCountChange(loading ? null : totalCount);
   }, [loading, totalCount, onCountChange]);
 
-  const formatPrice = (property) => {
-    if (!property) return 'Consultar precio';
-
-    // Alquiler (o precio oculto desde el CRM) -> "Consultar precio"
-    if (property.operations && property.operations.length > 0 && isOperationPriceHidden(property.operations[0])) {
-      return 'Consultar precio'
-    }
-
-    let price = null;
-    let currency = 'ARS';
-
-    if (property.operations && property.operations.length > 0) {
-      const operation = property.operations[0];
-      if (operation.prices && operation.prices.length > 0) {
-        price = operation.prices[0].price;
-        currency = operation.prices[0].currency;
-      }
-    } else {
-      price = property.price || property.total_price;
-      currency = property.currency?.name || property.currency || 'ARS';
-    }
-
-    // Un precio cargado a mano en el CRM sin tocar el selector de moneda se guarda sin currency —
-    // no es que sea en pesos, nunca se llegó a grabar. Se trata como USD, no como ARS.
-    const isUsd = !currency || currency === 'USD' || currency === 'Dólar Estadounidense';
-    if (!price || price === 1 || (price === 100 && isUsd)) return 'Consultar precio';
-
-    const currencyMap = {
-      'Peso Argentino': 'ARS',
-      'Dólar Estadounidense': 'USD',
-      USD: 'USD',
-      ARS: 'ARS',
-    };
-
-    const mappedCurrency = currencyMap[currency] || currency;
-    
-    try {
-      return new Intl.NumberFormat('es-AR', {
-        style: 'currency',
-        currency: mappedCurrency,
-        currencyDisplay: 'code',
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0
-      }).format(price);
-    } catch (error) {
-      return `${mappedCurrency} ${price.toLocaleString('es-AR')}`;
-    }
-  };
-
   return (
     <div className="properties-grid-container">
       <div className="container">
@@ -320,7 +270,6 @@ const PropertiesGrid = ({ filters = {}, onCountChange, emptyState }) => {
                   <PropertyCard
                     key={property.id}
                     property={property}
-                    formatPrice={formatPrice}
                   />
                 ))
               )}

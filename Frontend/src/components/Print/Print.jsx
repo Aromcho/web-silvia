@@ -4,27 +4,27 @@ import React from 'react'
 import QRCode from 'react-qr-code'
 import { FaBed, FaBath, FaCar, FaRulerCombined, FaPhone, FaEnvelope } from 'react-icons/fa'
 import { IoLogoWhatsapp } from 'react-icons/io'
-import { formatToMoney, isOperationPriceHidden } from '../../helpers/index.js'
+import { CONSULTAR_PRECIO, formatOperationPrice, getCoverPhoto, tidyPlaceName } from '../../helpers/index.js'
 import './Print.css'
 
 const Print = React.forwardRef(function Print({ property }, ref) {
   const photos = (property?.photos || []).filter(p => !p.is_blueprint)
-  const mainPhoto = photos[0]?.image || photos[0]?.thumb || ''
+  // Portada elegida en el CRM; si no hay, la primera foto que no sea plano
+  const mainPhoto = getCoverPhoto(property) || photos[0]?.image || photos[0]?.thumb || ''
 
   const ops = property?.operations?.[0] || {}
-  const price = ops?.prices?.[0] || {}
-  const isUsd = price.currency === 'USD' || price.currency === 'Dólar Estadounidense' || !price.currency
   // La ficha impresa siempre mostró el precio (también en alquiler); solo se oculta si en el
-  // CRM se apagó explícitamente "Mostrar precio en la web".
-  const priceStr = (!price.price || price.price === 1 || (price.price === 100 && isUsd) || (ops.show_price === false && isOperationPriceHidden(ops)))
-    ? 'Consultar precio'
-    : `${price.currency || 'USD'} ${formatToMoney(price.price)}`
+  // CRM se apagó explícitamente "Mostrar precio en la web". Los montos de relleno (1, 10, 11,
+  // 100...) salen como "Consultar precio", con la misma regla que el resto de la web.
+  const priceStr = ops.show_price === false
+    ? CONSULTAR_PRECIO
+    : formatOperationPrice(ops, { ignoreHidden: true })
 
   const propertyUrl = `https://www.silviafernandezpropiedades.com.ar/propiedad/${property?.id}`
 
   const rawPropertyType = property?.type?.name || ''
   const propertyType = rawPropertyType.toLowerCase() === 'hotel' ? 'Complejo' : rawPropertyType
-  const location = property?.location?.name || ''
+  const location = tidyPlaceName(property?.location?.name)
   const typeAndLocation = [propertyType, location].filter(Boolean).join(' en ')
 
   // Título de la publicación arriba y dirección como subtítulo.

@@ -51,10 +51,10 @@ export default function Contact() {
       <div className="container">
         <div className="contact-home-panel">
           <div className="contact-home-header">
-            <p className="contact-kicker">Contáctanos</p>
-            <h2 id="contact-home-title">Estamos aquí para ayudarte</h2>
+            <p className="contact-kicker">Contactanos</p>
+            <h2 id="contact-home-title">Estamos acá para ayudarte</h2>
             <p className="contact-home-copy">
-              Envíanos un mensaje y nos pondremos en contacto contigo lo antes posible.
+              Mandanos un mensaje y te respondemos lo antes posible.
             </p>
           </div>
 
@@ -79,7 +79,7 @@ export default function Contact() {
                   value={form.message}
                   onChange={handleChange}
                   rows="5"
-                  placeholder="Escribe tu mensaje aquí..."
+                  placeholder="Escribí tu mensaje acá..."
                   required
                 ></textarea>
               </label>

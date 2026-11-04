@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { getProperties } from '../../services/propertyService';
+import { formatPropertyPrice } from '../../helpers/index.js';
 import './PropertiesSearch.css';
 
 const PropertiesSearch = ({ defaultFilters = {} }) => {
@@ -153,32 +154,8 @@ const PropertiesSearch = ({ defaultFilters = {} }) => {
     loadProperties();
   };
 
-  const formatPrice = (property) => {
-    if (!property || !property.price) return 'Consultar precio';
-    
-    // Verificar si es alquiler
-    if (property.operations && property.operations.length > 0) {
-      const operationType = property.operations[0].operation_type
-      if (operationType && (operationType.includes('Alquiler') || operationType === 'Rent')) {
-        return 'Consultar precio'
-      }
-    }
-    
-    const currency = property.currency || 'USD';
-    const price = property.price;
-    
-    try {
-      return new Intl.NumberFormat('es-AR', {
-        style: 'currency',
-        currency: currency,
-        currencyDisplay: 'code',
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0
-      }).format(price);
-    } catch (error) {
-      return `${currency} ${price.toLocaleString()}`;
-    }
-  };
+  // Misma regla de precios que el resto de la web (helpers/index.js)
+  const formatPrice = formatPropertyPrice;
 
   return (
     <div className="properties-search">
