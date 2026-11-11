@@ -45,6 +45,10 @@ const videoSchema = new Schema({
   title: String,
   url: String,
   video_id: String,
+  // provider: 'youtube' | 'instagram' | 'mp4' (desde el CRM). Miniatura del reel o del video.
+  thumbnail: String,
+  ig_media_id: String,
+  addedAt: Date,
 });
 
 // Schema principal para PropertyDetails

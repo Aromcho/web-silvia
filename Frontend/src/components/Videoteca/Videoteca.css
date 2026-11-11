@@ -1,0 +1,414 @@
+/* Videoteca: mismo verde y tipografía que el resto de la web. Mobile primero. */
+
+.vt-page {
+  background:
+    radial-gradient(ellipse at 10% 0%, rgba(0, 129, 92, 0.08) 0%, transparent 55%),
+    radial-gradient(ellipse at 95% 5%, rgba(123, 220, 181, 0.14) 0%, transparent 45%),
+    #f8fafc;
+  min-height: 80vh;
+  padding-bottom: 4rem;
+}
+
+.vt-container {
+  width: 100%;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 0 1.25rem;
+}
+
+.vt-hero {
+  padding: 7.5rem 0 1.75rem;
+  text-align: center;
+}
+
+.vt-kicker {
+  display: inline-block;
+  margin: 0 0 0.9rem;
+  padding: 0.35rem 0.85rem;
+  border-radius: 999px;
+  background: rgba(0, 129, 92, 0.1);
+  color: var(--primary-color, #00815c);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.vt-title {
+  margin: 0 0 0.6rem;
+  color: #0f172a;
+  font-size: clamp(1.6rem, 4.2vw, 2.5rem);
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+.vt-copy {
+  margin: 0 auto;
+  max-width: 540px;
+  color: #475569;
+  font-size: 1.02rem;
+  line-height: 1.6;
+  text-wrap: pretty;
+}
+
+/* Barra de filtros */
+.vt-toolbar {
+  position: sticky;
+  top: 72px;
+  z-index: 5;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+  padding: 0.75rem;
+  border: 1px solid rgba(15, 23, 42, 0.06);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 6px 22px rgba(15, 23, 42, 0.06);
+}
+
+.vt-tabs {
+  display: flex;
+  gap: 0.35rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+  max-width: 100%;
+}
+
+.vt-tabs::-webkit-scrollbar { display: none; }
+
+.vt-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex: 0 0 auto;
+  padding: 0.55rem 0.95rem;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: #334155;
+  font: inherit;
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.vt-tab:hover { background: rgba(0, 129, 92, 0.07); }
+
+.vt-tab.is-active {
+  background: var(--primary-color, #00815c);
+  color: #fff;
+}
+
+.vt-tab-count {
+  min-width: 1.5rem;
+  padding: 0.05rem 0.4rem;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.07);
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+.vt-tab.is-active .vt-tab-count { background: rgba(255, 255, 255, 0.22); }
+
+.vt-filters {
+  display: flex;
+  gap: 0.5rem;
+  flex: 1 1 auto;
+  justify-content: flex-end;
+  min-width: 0;
+}
+
+.vt-field {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+  padding: 0 0.85rem;
+  height: 42px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background: #fff;
+  color: #64748b;
+}
+
+.vt-field:focus-within {
+  border-color: var(--primary-color, #00815c);
+  box-shadow: 0 0 0 3px rgba(0, 129, 92, 0.12);
+}
+
+.vt-field select,
+.vt-field input {
+  min-width: 0;
+  width: 100%;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #0f172a;
+  font: inherit;
+  font-size: 0.92rem;
+}
+
+.vt-field--search { flex: 0 1 260px; }
+
+.vt-results {
+  margin: 0 0 0.9rem;
+  color: #64748b;
+  font-size: 0.9rem;
+}
+
+/* Grilla */
+.vt-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+  gap: 1.25rem;
+}
+
+.vt-card {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid rgba(15, 23, 42, 0.06);
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.vt-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 32px rgba(15, 23, 42, 0.1);
+}
+
+.vt-thumb {
+  position: relative;
+  display: block;
+  aspect-ratio: 4 / 3;
+  background: #0f172a;
+  overflow: hidden;
+}
+
+.vt-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(0.86);
+  transition: transform 0.35s, filter 0.2s;
+}
+
+.vt-card:hover .vt-thumb img {
+  transform: scale(1.04);
+  filter: brightness(0.78);
+}
+
+.vt-play {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 58px;
+  height: 58px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-left: 4px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.95);
+  color: var(--primary-color, #00815c);
+  font-size: 1.2rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  transform: translate(-50%, -50%);
+  transition: transform 0.2s;
+}
+
+.vt-card:hover .vt-play { transform: translate(-50%, -50%) scale(1.08); }
+
+.vt-badge {
+  position: absolute;
+  top: 0.7rem;
+  left: 0.7rem;
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.72);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.vt-badge--instagram { background: linear-gradient(135deg, #f58529, #dd2a7b 55%, #8134af); }
+.vt-badge--youtube { background: #e11d2e; }
+.vt-badge--mp4 { background: var(--primary-color, #00815c); }
+
+.vt-badge--count {
+  left: auto;
+  right: 0.7rem;
+}
+
+.vt-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  flex: 1;
+  padding: 0.95rem 1rem 1rem;
+}
+
+.vt-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+  color: #64748b;
+  font-size: 0.8rem;
+}
+
+.vt-id {
+  flex: 0 0 auto;
+  padding: 0.1rem 0.45rem;
+  border-radius: 6px;
+  background: #f1f5f9;
+  color: #334155;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.vt-place {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.vt-name {
+  margin: 0;
+  font-size: 1.02rem;
+  font-weight: 700;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.vt-name a {
+  color: #0f172a;
+  text-decoration: none;
+}
+
+.vt-name a:hover { color: var(--primary-color, #00815c); }
+
+.vt-facts {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.35rem 0.75rem;
+}
+
+.vt-price {
+  color: var(--primary-color, #00815c);
+  font-size: 1.05rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.vt-sea {
+  color: #475569;
+  font-size: 0.82rem;
+}
+
+.vt-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+  margin-top: auto;
+  padding-top: 0.5rem;
+}
+
+.vt-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  height: 42px;
+  padding: 0 0.75rem;
+  border-radius: 12px;
+  font: inherit;
+  font-size: 0.88rem;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.vt-btn--whatsapp {
+  border: 0;
+  background: #25d366;
+  color: #fff;
+}
+
+.vt-btn--whatsapp:hover { background: #1ebe5b; }
+
+.vt-btn--ghost {
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  color: #0f172a;
+}
+
+.vt-btn--ghost:hover {
+  border-color: var(--primary-color, #00815c);
+  color: var(--primary-color, #00815c);
+}
+
+.vt-empty {
+  padding: 3rem 1rem;
+  color: #64748b;
+  text-align: center;
+}
+
+/* Esqueleto de carga */
+.vt-card--skeleton .vt-thumb {
+  background: linear-gradient(90deg, #e2e8f0, #f1f5f9, #e2e8f0);
+  background-size: 200% 100%;
+  animation: vt-shimmer 1.2s infinite linear;
+}
+
+.vt-skel-line {
+  height: 12px;
+  border-radius: 6px;
+  background: #e2e8f0;
+}
+
+.vt-skel-line--short { width: 55%; }
+
+@keyframes vt-shimmer {
+  from { background-position: 200% 0; }
+  to { background-position: -200% 0; }
+}
+
+@media (max-width: 720px) {
+  .vt-hero { padding: 6.25rem 0 1.25rem; }
+  .vt-toolbar {
+    top: 60px;
+    padding: 0.6rem;
+    border-radius: 16px;
+  }
+  .vt-filters {
+    width: 100%;
+    justify-content: stretch;
+  }
+  .vt-field { flex: 1 1 50%; }
+  .vt-field--search { flex: 1 1 50%; }
+  .vt-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vt-card, .vt-thumb img, .vt-play { transition: none; }
+  .vt-card--skeleton .vt-thumb { animation: none; }
+}

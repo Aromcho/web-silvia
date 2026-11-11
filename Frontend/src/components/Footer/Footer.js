@@ -66,6 +66,7 @@ const Footer = () => {
                 <li><Link href="/">Inicio</Link></li>
                 <li><Link href="/nosotros">Nosotros</Link></li>
                 <li><Link href="/#propiedades">Propiedades</Link></li>
+                <li><Link href="/videos">Videos de propiedades</Link></li>
                 <li><Link href="/#servicios">Servicios</Link></li>
                 <li><Link href="/#contacto">Contacto</Link></li>
               </ul>

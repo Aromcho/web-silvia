@@ -40,6 +40,9 @@ import {
   formatDistanceToSea,
   formatPropertyLocation,
   tidyPlaceName,
+  getCoverPhoto,
+  getPropertyVideos,
+  VIDEO_KIND_LABEL,
 } from '../../helpers/index.js'
 import './PropertyDetail.css'
 
@@ -71,6 +74,34 @@ export default function PropertyDetail({ property }) {
   const [assignedAgent, setAssignedAgent] = useState(null)
   const sidebarRef = useRef(null)
   const sidebarTopRef = useRef(0)
+  const galleryRef = useRef(null)
+  // Reel de Instagram abierto en grande (el embed de Instagram es vertical y no entra en la galería)
+  const [reelModal, setReelModal] = useState(null)
+
+  // Link corto /v/:id o ?video=1 → la ficha abre directo en el primer video
+  useEffect(() => {
+    if (typeof window === 'undefined' || !property) return
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('video') || !getPropertyVideos(property).length) return
+    const hasPhotos = (property.photos || []).some((p) => String(p?.description || '').trim().toLowerCase() !== 'pf')
+    setCurrentMediaIndex(hasPhotos ? 1 : 0)
+    // El header es fijo: se deja su alto de margen para que el video no quede tapado
+    const t = setTimeout(() => {
+      const el = galleryRef.current
+      if (!el) return
+      const header = document.querySelector('header')
+      const offset = (header?.getBoundingClientRect().height || 80) + 12
+      window.scrollTo({ top: Math.max(0, el.getBoundingClientRect().top + window.scrollY - offset), behavior: 'smooth' })
+    }, 350)
+    return () => clearTimeout(t)
+  }, [property?.id])
+
+  useEffect(() => {
+    if (!reelModal) return
+    const onKey = (ev) => { if (ev.key === 'Escape') setReelModal(null) }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [reelModal])
 
   // Cada vista de ficha de propiedad recibe un agente distinto por rotación,
   // para repartir las consultas de WhatsApp entre todo el equipo.
@@ -141,24 +172,16 @@ export default function PropertyDetail({ property }) {
   })()
   const aiRemodelPhotos = photos.filter(isAIRemodelPhoto)
 
-  // Video de YouTube de la propiedad (si tiene)
-  const getYoutubeVideoId = (video) => {
-    if (!video) return null
-    if (video.video_id) return video.video_id
+  // Videos de la propiedad (YouTube, reels de Instagram y MP4 subidos al CRM)
+  const propertyVideos = getPropertyVideos(property)
+  const coverPhotoUrl = getCoverPhoto(property) || galleryPhotos[0]?.thumb || '/assets/images/logo.jpg'
 
-    const url = video.url || video.player_url || ''
-    const match = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{6,})/)
-    return match ? match[1] : null
-  }
-
-  const youtubeVideoId = getYoutubeVideoId(property.videos?.[0])
-  const hasVideo = Boolean(youtubeVideoId)
-
-  // Secuencia de medios del carrusel principal: el video (si hay) ocupa la 2da posición
+  // Secuencia de medios del carrusel principal: la portada primero y enseguida los videos
   const mediaItems = galleryPhotos.map((photo, index) => ({ type: 'photo', photo, index }))
-  if (hasVideo) {
-    mediaItems.splice(1, 0, { type: 'video' })
+  if (propertyVideos.length) {
+    mediaItems.splice(Math.min(1, mediaItems.length), 0, ...propertyVideos.map((video) => ({ type: 'video', video })))
   }
+  const firstVideoIndex = mediaItems.findIndex((item) => item.type === 'video')
   const currentMediaItem = mediaItems[currentMediaIndex] || mediaItems[0]
   const thumbnailItems = mediaItems.slice(0, 5)
   const remainingMediaCount = mediaItems.length - thumbnailItems.length
@@ -590,18 +613,48 @@ export default function PropertyDetail({ property }) {
       <div className="container property-detail-container">
         <div className="left-column">
           {/* Galería */}
-          <div className="property-gallery">
+          <div className="property-gallery" ref={galleryRef}>
             {mediaItems.length > 0 ? (
               <>
                 <div className="main-image">
-                  {currentMediaItem.type === 'video' ? (
+                  {currentMediaItem.type === 'video' && currentMediaItem.video.kind === 'youtube' ? (
                     <iframe
+                      key={currentMediaItem.video.key}
                       className="main-video-frame"
-                      src={`https://www.youtube.com/embed/${youtubeVideoId}?autoplay=1&mute=1`}
-                      title={property.publication_title || 'Video de la propiedad'}
+                      src={currentMediaItem.video.embedUrl}
+                      title={currentMediaItem.video.title || property.publication_title || 'Video de la propiedad'}
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                       allowFullScreen
                     />
+                  ) : currentMediaItem.type === 'video' && currentMediaItem.video.kind === 'mp4' ? (
+                    <video
+                      key={currentMediaItem.video.key}
+                      className="main-video-frame main-video-file"
+                      src={currentMediaItem.video.src}
+                      poster={currentMediaItem.video.thumb || undefined}
+                      controls
+                      autoPlay
+                      muted
+                      playsInline
+                      preload="metadata"
+                    />
+                  ) : currentMediaItem.type === 'video' ? (
+                    <button
+                      type="button"
+                      className="reel-poster"
+                      onClick={() => setReelModal(currentMediaItem.video)}
+                      aria-label="Ver el reel de esta propiedad"
+                    >
+                      <img
+                        src={currentMediaItem.video.thumb || coverPhotoUrl}
+                        alt=""
+                        onError={(ev) => { if (ev.currentTarget.src !== coverPhotoUrl) ev.currentTarget.src = coverPhotoUrl }}
+                      />
+                      <span className="reel-poster-cta">
+                        <span className="reel-poster-play"><FaPlay /></span>
+                        Ver el reel
+                      </span>
+                    </button>
                   ) : (
                     <img
                       src={
@@ -642,6 +695,16 @@ export default function PropertyDetail({ property }) {
                   <div className="image-counter">
                     {currentMediaIndex + 1} / {mediaItems.length}
                   </div>
+                  {firstVideoIndex >= 0 && currentMediaItem.type === 'photo' && (
+                    <button
+                      type="button"
+                      className="watch-video-chip"
+                      onClick={() => setCurrentMediaIndex(firstVideoIndex)}
+                    >
+                      <FaPlay />
+                      {propertyVideos.length > 1 ? `Ver videos (${propertyVideos.length})` : 'Ver video'}
+                    </button>
+                  )}
                   {aiRemodelPhotos.length > 0 && (
                     <button
                       className="ai-remodel-btn"
@@ -658,17 +721,21 @@ export default function PropertyDetail({ property }) {
                     {thumbnailItems.map((item, index) =>
                       item.type === 'video' ? (
                         <div
-                          key="video-thumb"
+                          key={item.video.key}
                           className={`video-thumb${currentMediaIndex === index ? " active" : ""}`}
                           onClick={() => setCurrentMediaIndex(index)}
+                          role="button"
+                          aria-label={`Ver ${VIDEO_KIND_LABEL[item.video.kind] || 'video'} de la propiedad`}
                         >
                           <img
-                            src={`https://img.youtube.com/vi/${youtubeVideoId}/hqdefault.jpg`}
+                            src={item.video.thumb || coverPhotoUrl}
                             alt="Video de la propiedad"
+                            onError={(ev) => { if (ev.currentTarget.src !== coverPhotoUrl) ev.currentTarget.src = coverPhotoUrl }}
                           />
                           <span className="play-icon">
                             <FaPlay />
                           </span>
+                          <span className="video-thumb-kind">{VIDEO_KIND_LABEL[item.video.kind] || 'Video'}</span>
                         </div>
                       ) : (
                         <img
@@ -873,6 +940,29 @@ export default function PropertyDetail({ property }) {
           <span>Compartir</span>
         </button>
       </div>
+
+      {/* Reel de Instagram en grande (vertical) */}
+      {reelModal && printMounted && createPortal(
+        <div className="reel-modal" onClick={() => setReelModal(null)} role="dialog" aria-modal="true" aria-label="Reel de la propiedad">
+          <div className="reel-modal-box" onClick={(ev) => ev.stopPropagation()}>
+            <button type="button" className="reel-modal-close" onClick={() => setReelModal(null)} aria-label="Cerrar">
+              <FaTimes />
+            </button>
+            <iframe
+              className="reel-modal-frame"
+              src={reelModal.embedUrl}
+              title={reelModal.title || 'Reel de la propiedad'}
+              allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
+              allowFullScreen
+              scrolling="no"
+            />
+            <a className="reel-modal-link" href={reelModal.watchUrl} target="_blank" rel="noopener noreferrer">
+              Abrir en Instagram
+            </a>
+          </div>
+        </div>,
+        document.body
+      )}
 
       {/* Lightbox para galería completa */}
       {showLightbox && (

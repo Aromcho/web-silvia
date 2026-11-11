@@ -503,6 +503,27 @@ const getSimilarToRemoved = async (req, res) => {
   }
 };
 
+// Videoteca (/videos): todas las propiedades disponibles que tienen al menos un video (YouTube,
+// reel de Instagram o MP4), con lo justo para la tarjeta. Lo usa el equipo para mandar videos por
+// WhatsApp y los clientes para recorrer propiedades en video.
+const getPropertiesWithVideos = async (_req, res) => {
+  try {
+    const docs = await Property.find(
+      { status: { $nin: NOT_AVAILABLE_STATUSES }, 'videos.0': { $exists: true } },
+      {
+        id: 1, publication_title: 1, type: 1, location: 1, operations: 1, photos: 1, videos: 1,
+        distanciaMar: 1, suite_amount: 1, room_amount: 1, bathroom_amount: 1, total_surface: 1,
+        roofed_surface: 1, status: 1, is_starred: 1, updatedAt: 1, capacidad: 1, cantidadPersonas: 1,
+      },
+    ).sort({ is_starred: -1, updatedAt: -1, id: -1 }).lean();
+    res.set('Cache-Control', 'public, max-age=60');
+    res.json(docs);
+  } catch (error) {
+    console.error('Error al obtener la videoteca:', error);
+    res.status(500).json({ message: 'Error al obtener los videos' });
+  }
+};
+
 const getNeighborhoods = async (req, res) => {
   try {
     const neighborhoods = await PropertyManager.aggregate([
@@ -602,6 +623,7 @@ export {
   getPropertyById,
   getRelatedProperties,
   getSimilarToRemoved,
+  getPropertiesWithVideos,
   getNeighborhoods,
   getFavorites,
   getAllPropertyIds,

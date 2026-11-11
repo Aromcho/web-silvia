@@ -9,7 +9,8 @@ import {
   FaWhatsapp,
   FaWater,
   FaPaw,
-  FaUsers
+  FaUsers,
+  FaPlay
 } from 'react-icons/fa'
 import { getNextWhatsAppAgent, logWhatsAppClick } from '../../services/whatsappService'
 import {
@@ -18,6 +19,7 @@ import {
   formatPropertyLocation,
   formatDistanceToSea,
   getCoverPhoto,
+  getPropertyVideos,
 } from '../../helpers/index.js'
 import './PropertyCard.css'
 
@@ -218,6 +220,11 @@ export default function PropertyCard({ property }) {
             return 'Consultar'
           })()}
         </div>
+        {getPropertyVideos(property).length > 0 && (
+          <div className="property-video-badge" title="Tiene video">
+            <FaPlay aria-hidden="true" /> Video
+          </div>
+        )}
         {(creditEligible || financingEligible) && (
           <div className="property-eligibility-badges">
             {creditEligible && (

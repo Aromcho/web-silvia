@@ -7,6 +7,7 @@ import {
   getFavorites,
   getAllPropertyIds, // new function
   getSimilarToRemoved,
+  getPropertiesWithVideos,
 } from '../../controllers/property.controller.js';
 import { getpropertyById } from '../../controllers/property.controller.js';
 import { autocompleteProperties } from '../../controllers/property.controller.js';
@@ -26,6 +27,7 @@ propertyDetail.get('/propertyDetail/:id/related', getRelatedProperties);
 propertyDetail.get('/favorites', getFavorites);
 propertyDetail.get('/properties/ids', getAllPropertyIds);
 propertyDetail.get('/removed/:id/similar', getSimilarToRemoved);
+propertyDetail.get('/videos', getPropertiesWithVideos);
 propertyDetail.get('/:id', getPropertyById);
 
 // details routes

@@ -44,6 +44,9 @@ const Header = () => {
                 <Link href="/complejos" className="nav-link">Complejos</Link>
               </li>
               <li className="nav-item">
+                <Link href="/videos" className="nav-link">Videos</Link>
+              </li>
+              <li className="nav-item">
                 <Link href="/nosotros" className="nav-link">Nosotros</Link>
               </li>
               <li className="nav-item">
@@ -81,6 +84,7 @@ const Header = () => {
             <li><Link href="/lotes-terrenos" onClick={toggleMenu}>Lotes - Terrenos</Link></li>
             <li><Link href="/alquiler-temporario" onClick={toggleMenu}>Alquileres</Link></li>
             <li><Link href="/complejos" onClick={toggleMenu}>Complejos</Link></li>
+            <li><Link href="/videos" onClick={toggleMenu}>Videos</Link></li>
             <li><Link href="/nosotros" onClick={toggleMenu}>Nosotros</Link></li>
             <li><Link href="/mapa" onClick={toggleMenu}>Mapa</Link></li>
           </ul>

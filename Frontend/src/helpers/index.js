@@ -128,3 +128,54 @@ export const getCoverPhoto = (property) => {
   const cover = photos.find((photo) => photo.is_front_cover) || photos[0]
   return cover ? cover.image || cover.thumb || cover.original || null : null
 }
+
+// Videos de la propiedad, de cualquier fuente cargada en el CRM: YouTube, reel de Instagram o MP4.
+// Devuelve una lista lista para mostrar: { kind, key, embedUrl | src, watchUrl, thumb, title }.
+const YOUTUBE_RE = /(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/|live\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/
+const INSTAGRAM_RE = /instagram\.com\/(?:[\w.]+\/)?(reel|reels|p|tv)\/([A-Za-z0-9_-]+)/
+const MP4_RE = /\.(mp4|m4v|webm|mov)(\?|#|$)/i
+
+export const getPropertyVideos = (property) => {
+  const list = Array.isArray(property?.videos) ? [...property.videos] : []
+  list.sort((a, b) => (a?.order ?? 0) - (b?.order ?? 0))
+  const seen = new Set()
+  const out = []
+  list.forEach((video, index) => {
+    if (!video) return
+    const url = String(video.url || video.player_url || '')
+    const title = video.title || video.description || ''
+    let item = null
+    const yt = video.video_id && (!video.provider || video.provider === 'youtube') ? [null, video.video_id] : url.match(YOUTUBE_RE)
+    const ig = url.match(INSTAGRAM_RE)
+    if (yt && yt[1] && video.provider !== 'instagram' && video.provider !== 'mp4') {
+      item = {
+        kind: 'youtube',
+        key: `yt-${yt[1]}`,
+        embedUrl: `https://www.youtube.com/embed/${yt[1]}?autoplay=1&mute=1&rel=0&playsinline=1`,
+        watchUrl: `https://www.youtube.com/watch?v=${yt[1]}`,
+        thumb: video.thumbnail || `https://i.ytimg.com/vi/${yt[1]}/hqdefault.jpg`,
+        title,
+      }
+    } else if (ig) {
+      const type = ig[1] === 'reels' ? 'reel' : ig[1]
+      item = {
+        kind: 'instagram',
+        key: `ig-${ig[2]}`,
+        embedUrl: `https://www.instagram.com/${type}/${ig[2]}/embed`,
+        watchUrl: `https://www.instagram.com/${type}/${ig[2]}/`,
+        // La miniatura que da Instagram es un link firmado que vence a los días: se usa la portada
+        thumb: /cdninstagram|fbcdn/i.test(video.thumbnail || '') ? '' : video.thumbnail || '',
+        title,
+      }
+    } else if (video.provider === 'mp4' || MP4_RE.test(url)) {
+      item = { kind: 'mp4', key: `mp4-${video._id || index}`, src: url, watchUrl: url, thumb: video.thumbnail || '', title }
+    }
+    if (item && !seen.has(item.key)) {
+      seen.add(item.key)
+      out.push(item)
+    }
+  })
+  return out
+}
+
+export const VIDEO_KIND_LABEL = { youtube: 'YouTube', instagram: 'Reel', mp4: 'Video' }

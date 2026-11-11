@@ -103,6 +103,178 @@
   border: 0;
 }
 
+/* MP4 subido al CRM: sin recortar (muchos son verticales, grabados con el celular) */
+.property-detail-page .main-image .main-video-file {
+  display: block;
+  object-fit: contain;
+  background: #0f172a;
+}
+
+/* Reel de Instagram: póster con play, se abre en grande */
+.property-detail-page .main-image .reel-poster {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: #0f172a;
+  cursor: pointer;
+}
+
+.property-detail-page .main-image .reel-poster img {
+  filter: brightness(0.72);
+}
+
+.property-detail-page .main-image .reel-poster-cta {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  color: #fff;
+  font-weight: 700;
+  font-size: 1.05rem;
+  letter-spacing: 0.01em;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.45);
+  pointer-events: none;
+}
+
+.property-detail-page .main-image .reel-poster-play {
+  width: 72px;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #f58529, #dd2a7b 50%, #8134af);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  font-size: 1.5rem;
+  padding-left: 4px;
+  transition: transform 0.2s;
+}
+
+.property-detail-page .main-image .reel-poster:hover .reel-poster-play {
+  transform: scale(1.08);
+}
+
+/* Botón «Ver video» sobre las fotos */
+.property-detail-page .watch-video-chip {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.95);
+  color: #0f172a;
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.property-detail-page .watch-video-chip svg {
+  color: var(--primary-color);
+}
+
+.property-detail-page .watch-video-chip:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.25);
+}
+
+.property-detail-page .thumbnails .video-thumb .video-thumb-kind {
+  position: absolute;
+  left: 6px;
+  bottom: 6px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.65);
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  pointer-events: none;
+}
+
+/* Modal del reel */
+.reel-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(2, 6, 23, 0.85);
+  backdrop-filter: blur(6px);
+}
+
+.reel-modal-box {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: min(420px, 100%);
+}
+
+.reel-modal-frame {
+  width: 100%;
+  height: min(780px, calc(100vh - 110px));
+  height: min(780px, calc(100dvh - 110px));
+  border: 0;
+  border-radius: 16px;
+  background: #fff;
+}
+
+.reel-modal-close {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  z-index: 1;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 50%;
+  background: #fff;
+  color: #0f172a;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+}
+
+.reel-modal-link {
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-decoration: underline;
+}
+
+@media (max-width: 640px) {
+  .property-detail-page .watch-video-chip {
+    top: 0.75rem;
+    left: 0.75rem;
+    padding: 8px 13px;
+    font-size: 0.82rem;
+  }
+  .property-detail-page .main-image .reel-poster-play {
+    width: 60px;
+    height: 60px;
+    font-size: 1.25rem;
+  }
+  .reel-modal { padding: 10px; }
+  .reel-modal-close { top: 4px; right: 4px; }
+}
+
 .property-detail-page .expand-btn {
   position: absolute;
   top: 1rem;
@@ -1097,8 +1269,17 @@
     min-height: 280px;
   }
 
+  /* 5 miniaturas + «+N fotos» en una sola fila: con 5 columnas el sexto bajaba de renglón y
+     achicaba la foto principal a una franja */
   .property-detail-page .thumbnails {
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(6, 1fr);
+    gap: 0.6rem;
+  }
+
+  .property-detail-page .thumbnails img,
+  .property-detail-page .thumbnails .video-thumb,
+  .property-detail-page .thumbnails .more-photos {
+    height: 72px;
   }
 
   .property-detail-page .features-grid {
@@ -1119,6 +1300,11 @@
 
   .property-detail-page .property-title-section {
     margin-top: 0;
+  }
+
+  /* En tablet el título quedaba debajo del header fijo */
+  .property-detail-page .property-title-section.title-desktop {
+    margin-top: 6.75rem;
   }
 }
 

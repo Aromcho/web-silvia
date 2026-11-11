@@ -154,6 +154,14 @@ export const getSimilarToRemoved = async (id) => {
 };
 
 /**
+ * Videoteca: propiedades disponibles con al menos un video (YouTube, reel o MP4).
+ * @returns {Promise<object[]>}
+ */
+export const getPropertiesWithVideos = async () => {
+  return fetchFromAPI('/videos', {}, { cache: 'no-store' });
+};
+
+/**
  * Obtener barrios/vecindarios disponibles
  * Retorna lista de ciudades agrupadas por cantidad de propiedades
  * @returns {Promise<array>} Lista de barrios
