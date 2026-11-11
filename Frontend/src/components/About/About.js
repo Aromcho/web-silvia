@@ -84,10 +84,10 @@ const About = () => {
                   <div className="office-card">
                     <div className="office-image">
                       <Image
-                        src="/assets/images/oficina-central.png"
-                        alt="Oficina Central"
+                        src="/assets/images/oficinas/central-portada.webp"
+                        alt="Oficina Central de Silvia Fernández en Mar Azul"
                         width={300}
-                        height={200}
+                        height={188}
                       />
                     </div>
                     <div className="office-details">
@@ -99,10 +99,10 @@ const About = () => {
                   <div className="office-card">
                     <div className="office-image">
                       <Image
-                        src="/assets/images/oficina-sucursal.jpg"
-                        alt="Sucursal Norte"
+                        src="/assets/images/oficinas/boutique-portada.webp"
+                        alt="Sucursal boutique de Silvia Fernández en Mar de las Pampas"
                         width={300}
-                        height={200}
+                        height={188}
                       />
                     </div>
                     <div className="office-details">

@@ -1,5 +1,37 @@
 'use client';
+import { useEffect, useState } from 'react';
 import './page.css';
+
+const FOTOS_OFICINAS = {
+  central: [
+    { src: '/assets/images/oficinas/central-1.webp', alt: 'Frente de la oficina Central en Mar Azul' },
+    { src: '/assets/images/oficinas/central-2.webp', alt: 'Vidriera de la oficina Central en Mar Azul' },
+    { src: '/assets/images/oficinas/central-3.webp', alt: 'Lateral de la oficina Central en Mar Azul' },
+  ],
+  boutique: [
+    { src: '/assets/images/oficinas/boutique-1.webp', alt: 'Esquina e ingreso de la sucursal boutique en Mar de las Pampas' },
+    { src: '/assets/images/oficinas/boutique-2.webp', alt: 'Vidriera de la sucursal boutique en Mar de las Pampas' },
+    { src: '/assets/images/oficinas/boutique-3.webp', alt: 'Lateral de la sucursal boutique en Mar de las Pampas' },
+  ],
+};
+
+function GaleriaOficina({ fotos, onAbrir }) {
+  return (
+    <div className="office-gallery">
+      {fotos.map((foto) => (
+        <button
+          key={foto.src}
+          type="button"
+          className="office-gallery-thumb"
+          onClick={() => onAbrir(foto)}
+          aria-label={`Ver foto: ${foto.alt}`}
+        >
+          <img src={foto.src} alt={foto.alt} loading="lazy" />
+        </button>
+      ))}
+    </div>
+  );
+}
 
 const EQUIPO = [
   { nombre: 'Valentin', foto: '/assets/images/equipo/valentin.png' },
@@ -11,8 +43,23 @@ const EQUIPO = [
 ];
 
 export default function NosotrosPage() {
+  const [fotoAbierta, setFotoAbierta] = useState(null);
+
+  useEffect(() => {
+    if (!fotoAbierta) return;
+    const cerrarConEsc = (e) => { if (e.key === 'Escape') setFotoAbierta(null); };
+    window.addEventListener('keydown', cerrarConEsc);
+    return () => window.removeEventListener('keydown', cerrarConEsc);
+  }, [fotoAbierta]);
+
   return (
     <div className="nosotros-page">
+      {fotoAbierta && (
+        <div className="office-lightbox" role="dialog" aria-modal="true" onClick={() => setFotoAbierta(null)}>
+          <button type="button" className="office-lightbox-close" aria-label="Cerrar">×</button>
+          <img src={fotoAbierta.src} alt={fotoAbierta.alt} onClick={(e) => e.stopPropagation()} />
+        </div>
+      )}
       <div className="page-hero">
         <div className="container">
           <h1>Sobre Nosotros</h1>
@@ -128,7 +175,7 @@ export default function NosotrosPage() {
             <h2>Nuestras <span className="underline">Oficinas</span></h2>
             <div className="offices-grid">
               <div className="office-card">
-                <div className="office-image" style={{backgroundImage: 'url(/assets/images/oficina-central.png)'}}></div>
+                <div className="office-image" style={{backgroundImage: 'url(/assets/images/oficinas/central-portada.webp)'}}></div>
                 <div className="office-info">
                   <h3>Central</h3>
                   <div className="office-location-row">
@@ -143,10 +190,11 @@ export default function NosotrosPage() {
                     </a>
                   </div>
                   <p>En el centro Mar Azul ¡Vení a conocerla!</p>
+                  <GaleriaOficina fotos={FOTOS_OFICINAS.central} onAbrir={setFotoAbierta} />
                 </div>
               </div>
               <div className="office-card">
-                <div className="office-image" style={{backgroundImage: 'url(/assets/images/oficina-sucursal.jpg)'}}></div>
+                <div className="office-image" style={{backgroundImage: 'url(/assets/images/oficinas/boutique-portada.webp)'}}></div>
                 <div className="office-info">
                   <h3>Sucursal</h3>
                   <div className="office-location-row">
@@ -161,6 +209,7 @@ export default function NosotrosPage() {
                     </a>
                   </div>
                   <p>Te esperamos para asesorarte de forma personalizada.</p>
+                  <GaleriaOficina fotos={FOTOS_OFICINAS.boutique} onAbrir={setFotoAbierta} />
                 </div>
               </div>
             </div>
