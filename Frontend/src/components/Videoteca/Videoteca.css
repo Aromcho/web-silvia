@@ -1,55 +1,20 @@
-/* Videoteca: mismo verde y tipografía que el resto de la web. Mobile primero. */
+/* Videoteca: usa el .page-hero verde de las otras páginas y tarjetas como las de propiedades. Mobile primero. */
 
 .vt-page {
-  background:
-    radial-gradient(ellipse at 10% 0%, rgba(0, 129, 92, 0.08) 0%, transparent 55%),
-    radial-gradient(ellipse at 95% 5%, rgba(123, 220, 181, 0.14) 0%, transparent 45%),
-    #f8fafc;
+  background: var(--white-color, #fff);
   min-height: 80vh;
   padding-bottom: 4rem;
 }
 
 .vt-container {
   width: 100%;
-  max-width: 1240px;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 0 1.25rem;
+  padding: 0 20px;
 }
 
-.vt-hero {
-  padding: 7.5rem 0 1.75rem;
-  text-align: center;
-}
-
-.vt-kicker {
-  display: inline-block;
-  margin: 0 0 0.9rem;
-  padding: 0.35rem 0.85rem;
-  border-radius: 999px;
-  background: rgba(0, 129, 92, 0.1);
-  color: var(--primary-color, #00815c);
-  font-size: 0.8rem;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-}
-
-.vt-title {
-  margin: 0 0 0.6rem;
-  color: #0f172a;
-  font-size: clamp(1.6rem, 4.2vw, 2.5rem);
-  font-weight: 800;
-  line-height: 1.15;
-  letter-spacing: -0.02em;
-  text-wrap: balance;
-}
-
-.vt-copy {
-  margin: 0 auto;
-  max-width: 540px;
-  color: #475569;
-  font-size: 1.02rem;
-  line-height: 1.6;
-  text-wrap: pretty;
+.vt-body {
+  padding-top: 2.5rem;
 }
 
 /* Barra de filtros */
@@ -174,16 +139,16 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  border: 1px solid rgba(15, 23, 42, 0.06);
-  border-radius: 18px;
+  border: 1px solid rgba(0, 0, 0, 0.04);
+  border-radius: 20px;
   background: #fff;
-  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05);
-  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+  transition: transform 0.3s, box-shadow 0.3s;
 }
 
 .vt-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 14px 32px rgba(15, 23, 42, 0.1);
+  transform: translateY(-6px);
+  box-shadow: 0 16px 40px var(--shadow-medium, rgba(0, 129, 92, 0.2));
 }
 
 .vt-thumb {
@@ -295,7 +260,7 @@
 }
 
 .vt-name a {
-  color: #0f172a;
+  color: #2d3748;
   text-decoration: none;
 }
 
@@ -390,7 +355,6 @@
 }
 
 @media (max-width: 720px) {
-  .vt-hero { padding: 6.25rem 0 1.25rem; }
   .vt-toolbar {
     top: 60px;
     padding: 0.6rem;

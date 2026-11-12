@@ -8,6 +8,7 @@ import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { FaPlay, FaWhatsapp, FaLink, FaCheck, FaSearch, FaMapMarkerAlt } from 'react-icons/fa'
 import { getPropertiesWithVideos } from '../../services/propertyService'
+import '../../app/lotes-terrenos/page.css'
 import {
   formatOperationPrice,
   formatPropertyLocation,
@@ -126,15 +127,12 @@ export default function Videoteca() {
 
   return (
     <main className="vt-page">
-      <section className="vt-hero">
-        <div className="vt-container">
-          <p className="vt-kicker">Videoteca</p>
-          <h1 className="vt-title">Recorré las propiedades en video</h1>
-          <p className="vt-copy">
-            Antes de visitarlas, miralas por dentro. Cada video tiene un link corto para compartir.
-          </p>
+      <div className="page-hero">
+        <div className="container">
+          <h1>Videos de propiedades</h1>
+          <p>Recorré las propiedades en video antes de visitarlas</p>
         </div>
-      </section>
+      </div>
 
       <section className="vt-container vt-body">
         <div className="vt-toolbar">
