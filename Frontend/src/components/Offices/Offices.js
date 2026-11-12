@@ -5,7 +5,7 @@ const offices = [
     title: 'Central',
     location: '📍 Calle 34, Mar del Plata & Mar Azul',
     description: 'En el centro Mar Azul ¡Vení a conocerla!',
-    image: '/assets/images/oficinas/central-portada.webp',
+    image: '/assets/images/oficina-central.png',
     mapsUrl: 'https://maps.app.goo.gl/nRSsuL4ouVaqjUVd8',
     mapsEmbedUrl: 'https://www.google.com/maps?q=Calle+34,+Mar+del+Plata,+Mar+Azul&output=embed'
   },
