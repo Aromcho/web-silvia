@@ -119,6 +119,14 @@ export const formatDistanceToSea = (raw) => {
   return text
 }
 
+// Versión liviana de una foto del CRM (WebP al ancho pedido) vía el optimizador de Next.
+// Anchos válidos: 256 (miniatura), 640 (tarjeta), 1080/1200 (foto grande). Otras URLs quedan igual.
+const CRM_UPLOADS = 'https://apicrm.silviafernandezpropiedades.com.ar/uploads/'
+export const imgUrl = (src, width = 640) => {
+  if (!src || typeof src !== 'string' || !src.startsWith(CRM_UPLOADS)) return src
+  return `/_next/image?url=${encodeURIComponent(src)}&w=${width}&q=72`
+}
+
 // Foto de portada elegida en el CRM (is_front_cover); si no hay, la primera.
 // Las fotos «PF» (remodelación con IA) y los planos nunca son portada.
 export const getCoverPhoto = (property) => {

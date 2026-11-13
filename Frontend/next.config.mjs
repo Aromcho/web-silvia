@@ -10,6 +10,16 @@ const nextConfig = {
     ignoreDuringBuilds: true,
   },
 
+  // Fotos livianas (C10/W6): las fotos del CRM se sirven achicadas y en WebP desde /_next/image
+  // (ver imgUrl en helpers). La primera vez se generan y después salen de la caché.
+  images: {
+    remotePatterns: [
+      { protocol: 'https', hostname: 'apicrm.silviafernandezpropiedades.com.ar', pathname: '/uploads/**' },
+    ],
+    formats: ['image/webp'],
+    minimumCacheTTL: 60 * 60 * 24 * 30,
+  },
+
   async redirects() {
     return [
       {

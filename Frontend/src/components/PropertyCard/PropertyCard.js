@@ -20,6 +20,7 @@ import {
   formatDistanceToSea,
   getCoverPhoto,
   getPropertyVideos,
+  imgUrl,
 } from '../../helpers/index.js'
 import './PropertyCard.css'
 
@@ -191,7 +192,7 @@ export default function PropertyCard({ property }) {
     <Link href={`/propiedad/${property.id}`} className="modern-property-card">
       <div className="property-image">
         <img
-          src={getCoverPhoto(property) || property.images?.[0] || '/assets/images/logo.jpg'}
+          src={imgUrl(getCoverPhoto(property) || property.images?.[0], 640) || '/assets/images/logo.jpg'}
           alt={propertyTitle}
           loading="lazy"
           decoding="async"

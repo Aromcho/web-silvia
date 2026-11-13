@@ -43,6 +43,7 @@ import {
   getCoverPhoto,
   getPropertyVideos,
   VIDEO_KIND_LABEL,
+  imgUrl,
 } from '../../helpers/index.js'
 import './PropertyDetail.css'
 
@@ -657,10 +658,11 @@ export default function PropertyDetail({ property }) {
                     </button>
                   ) : (
                     <img
-                      src={
+                      src={imgUrl(
                         galleryPhotos[currentMediaItem.index]?.image ||
-                        galleryPhotos[currentMediaItem.index]?.thumb
-                      }
+                        galleryPhotos[currentMediaItem.index]?.thumb,
+                        1200
+                      )}
                       alt={currentPhotoCaption || property.publication_title}
                       onClick={() => {
                         setLightboxIndex(currentMediaItem.index)
@@ -740,8 +742,9 @@ export default function PropertyDetail({ property }) {
                       ) : (
                         <img
                           key={item.index}
-                          src={item.photo.thumb || item.photo.image}
+                          src={imgUrl(item.photo.thumb || item.photo.image, 256)}
                           alt={`Imagen ${item.index + 1}`}
+                          loading="lazy"
                           className={currentMediaIndex === index ? "active" : ""}
                           onClick={() => setCurrentMediaIndex(index)}
                         />

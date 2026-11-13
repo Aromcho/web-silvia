@@ -17,6 +17,7 @@ import {
   getPropertyVideos,
   tidyPlaceName,
   VIDEO_KIND_LABEL,
+  imgUrl,
 } from '../../helpers/index.js'
 import './Videoteca.css'
 
@@ -208,7 +209,7 @@ export default function Videoteca() {
                   <article key={property.id} className="vt-card">
                     <Link href={href} className="vt-thumb" aria-label={`Ver el video de ${property.publication_title || `la propiedad #${property.id}`}`}>
                       <img
-                        src={first.thumb || cover}
+                        src={first.thumb || imgUrl(cover, 640)}
                         alt=""
                         loading="lazy"
                         onError={(ev) => { if (!ev.currentTarget.src.endsWith(cover)) ev.currentTarget.src = cover }}
