@@ -524,6 +524,21 @@ const getPropertiesWithVideos = async (_req, res) => {
   }
 };
 
+// Sitemap (W6): todas las fichas disponibles con su última modificación, para que Google las indexe
+const getSitemapEntries = async (_req, res) => {
+  try {
+    const docs = await Property.find(
+      { status: { $nin: NOT_AVAILABLE_STATUSES } },
+      { id: 1, updatedAt: 1, _id: 0 },
+    ).sort({ updatedAt: -1 }).lean();
+    res.set('Cache-Control', 'public, max-age=600');
+    res.json(docs.map((d) => ({ id: d.id, updatedAt: d.updatedAt })));
+  } catch (error) {
+    console.error('Error al armar el sitemap:', error);
+    res.status(500).json({ message: 'Error al armar el sitemap' });
+  }
+};
+
 const getNeighborhoods = async (req, res) => {
   try {
     const neighborhoods = await PropertyManager.aggregate([
@@ -624,6 +639,7 @@ export {
   getRelatedProperties,
   getSimilarToRemoved,
   getPropertiesWithVideos,
+  getSitemapEntries,
   getNeighborhoods,
   getFavorites,
   getAllPropertyIds,

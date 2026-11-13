@@ -1,38 +1,7 @@
 import { notFound } from 'next/navigation'
 import { getPropertyById } from '../../../services/propertyService'
 import PropertyDetail from '../../../components/PropertyDetail/PropertyDetail'
-import { getCoverPhoto, tidyPlaceName } from '../../../helpers/index.js'
-
-const getPropertyCoverImage = (property) => getCoverPhoto(property)
-
-const buildPropertyMetadata = (property) => {
-  const title = property?.publication_title || property?.type?.name || 'Propiedad'
-  const location = tidyPlaceName(property?.location?.name || property?.address?.city) || 'Mar de las Pampas'
-  const operation = property?.operations?.[0]?.operation_type || 'venta o alquiler'
-  const description = `Detalle de ${title} en ${location}. Consultá esta propiedad para ${operation} con Silvia Fernández Inmobiliaria.`
-  const coverImage = getPropertyCoverImage(property)
-
-  return {
-    title: `${title} | Silvia Fernández Inmobiliaria`,
-    description,
-    alternates: {
-      canonical: `/propiedad/${property?.id || ''}`,
-    },
-    openGraph: {
-      title: `${title} | Silvia Fernández Inmobiliaria`,
-      description,
-      url: `/propiedad/${property?.id || ''}`,
-      type: 'article',
-      ...(coverImage && { images: [{ url: coverImage, alt: title }] }),
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title: `${title} | Silvia Fernández Inmobiliaria`,
-      description,
-      ...(coverImage && { images: [coverImage] }),
-    },
-  }
-}
+import { buildPropertyMetadata, buildPropertyJsonLd } from '../../../helpers/seo.js'
 
 export async function generateMetadata({ params }) {
   try {
@@ -76,5 +45,16 @@ export default async function PropertyPage({ params }) {
   // Ficha dada de baja o inexistente: 404 real para Google y página con parecidas (not-found.js)
   if (!property) notFound()
 
-  return <PropertyDetail property={property} />
+  const jsonLd = buildPropertyJsonLd(property)
+  return (
+    <>
+      {jsonLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }}
+        />
+      )}
+      <PropertyDetail property={property} />
+    </>
+  )
 }

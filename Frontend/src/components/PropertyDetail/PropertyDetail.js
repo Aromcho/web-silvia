@@ -78,6 +78,22 @@ export default function PropertyDetail({ property }) {
   const galleryRef = useRef(null)
   // Reel de Instagram abierto en grande (el embed de Instagram es vertical y no entra en la galería)
   const [reelModal, setReelModal] = useState(null)
+  const touchStartX = useRef(null)
+  const touchStartY = useRef(null)
+  const galleryLenRef = useRef(0)
+
+  // Galería a pantalla completa: Esc cierra y las flechas pasan de foto (W7)
+  useEffect(() => {
+    if (!showLightbox) return undefined
+    const onKey = (ev) => {
+      const n = galleryLenRef.current || 1
+      if (ev.key === 'Escape') setShowLightbox(false)
+      else if (ev.key === 'ArrowRight') setLightboxIndex((i) => (i + 1) % n)
+      else if (ev.key === 'ArrowLeft') setLightboxIndex((i) => (i - 1 + n) % n)
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [showLightbox])
 
   // Link corto /v/:id o ?video=1 → la ficha abre directo en el primer video
   useEffect(() => {
@@ -172,6 +188,7 @@ export default function PropertyDetail({ property }) {
     return [list[coverIndex], ...list.slice(0, coverIndex), ...list.slice(coverIndex + 1)]
   })()
   const aiRemodelPhotos = photos.filter(isAIRemodelPhoto)
+  galleryLenRef.current = galleryPhotos.length
 
   // Videos de la propiedad (YouTube, reels de Instagram y MP4 subidos al CRM)
   const propertyVideos = getPropertyVideos(property)
@@ -431,6 +448,18 @@ export default function PropertyDetail({ property }) {
     setLightboxIndex((prev) => (prev - 1 + galleryPhotos.length) % galleryPhotos.length)
   }
 
+  // Deslizar con el dedo (W7): izquierda = siguiente, derecha = anterior
+  const swipe = (onNext, onPrev) => ({
+    onTouchStart: (ev) => { touchStartX.current = ev.touches[0].clientX; touchStartY.current = ev.touches[0].clientY },
+    onTouchEnd: (ev) => {
+      if (touchStartX.current === null) return
+      const dx = ev.changedTouches[0].clientX - touchStartX.current
+      const dy = ev.changedTouches[0].clientY - touchStartY.current
+      touchStartX.current = null
+      if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy) * 1.3) (dx < 0 ? onNext : onPrev)()
+    },
+  })
+
   // Navegación de imágenes en el modal "Remodelar con IA"
   const nextAIImage = () => {
     setAiLightboxIndex((prev) => (prev + 1) % aiRemodelPhotos.length)
@@ -617,7 +646,7 @@ export default function PropertyDetail({ property }) {
           <div className="property-gallery" ref={galleryRef}>
             {mediaItems.length > 0 ? (
               <>
-                <div className="main-image">
+                <div className="main-image" {...(mediaItems.length > 1 ? swipe(nextMedia, prevMedia) : {})}>
                   {currentMediaItem.type === 'video' && currentMediaItem.video.kind === 'youtube' ? (
                     <iframe
                       key={currentMediaItem.video.key}
@@ -686,10 +715,10 @@ export default function PropertyDetail({ property }) {
                   )}
                   {mediaItems.length > 1 && (
                     <>
-                      <button className="nav-btn prev-btn" onClick={prevMedia}>
+                      <button className="nav-btn prev-btn" onClick={prevMedia} aria-label="Foto anterior">
                         <FaChevronLeft />
                       </button>
-                      <button className="nav-btn next-btn" onClick={nextMedia}>
+                      <button className="nav-btn next-btn" onClick={nextMedia} aria-label="Foto siguiente">
                         <FaChevronRight />
                       </button>
                     </>
@@ -998,6 +1027,7 @@ export default function PropertyDetail({ property }) {
             src={galleryPhotos[lightboxIndex]?.image}
             alt={galleryPhotos[lightboxIndex]?.description || property.publication_title}
             onClick={(e) => e.stopPropagation()}
+            {...swipe(nextLightboxImage, prevLightboxImage)}
           />
           {galleryPhotos[lightboxIndex]?.description && (
             <div className="lightbox-caption">{galleryPhotos[lightboxIndex].description}</div>
