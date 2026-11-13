@@ -2,6 +2,14 @@
 import { useState, useEffect, useRef } from 'react';
 import { getProperties } from '../../services/propertyService';
 import PropertyCard from '../PropertyCard/PropertyCard';
+import {
+  getListSnapshot,
+  isPropertyCardClick,
+  restoreWindowScroll,
+  saveListSnapshot,
+  slimPropertiesForSnapshot,
+  useIsomorphicLayoutEffect,
+} from '../../helpers/listRestore';
 import './PropertiesGrid.css';
 
 const PAGE_SIZE = 12;
@@ -77,6 +85,26 @@ const writeCategoryCache = (cacheKey, value) => {
   safeStorageSet(cacheKey, JSON.stringify(entry));
 };
 
+// Esqueleto de carga (también lo usa /alquiler-temporario como fallback del Suspense)
+export const PropertiesGridSkeleton = ({ count = 6 }) => (
+  <div className="properties-grid-container">
+    <div className="container">
+      <div className="loading-grid">
+        {[...Array(count)].map((_, i) => (
+          <div key={i} className="property-skeleton">
+            <div className="skeleton-image"></div>
+            <div className="skeleton-content">
+              <div className="skeleton-title"></div>
+              <div className="skeleton-price"></div>
+              <div className="skeleton-details"></div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+);
+
 const PropertiesGrid = ({ filters = {}, onCountChange, emptyState }) => {
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -87,10 +115,41 @@ const PropertiesGrid = ({ filters = {}, onCountChange, emptyState }) => {
   const loadMoreRef = useRef(null);
   const requestIdRef = useRef(0);
   const cacheKeyRef = useRef(buildCategoryCacheKey(filters));
+  // Clave de filtros restaurada desde la foto de "volver atrás": mientras coincida, no se recarga
+  const restoredKeyRef = useRef(null);
+  const [pendingScrollY, setPendingScrollY] = useState(null);
+
+  // Volver atrás desde una ficha: se arma el listado desde la foto antes del primer pintado
+  useIsomorphicLayoutEffect(() => {
+    const cacheKey = buildCategoryCacheKey(filters);
+    const snapshot = getListSnapshot(cacheKey);
+    if (!snapshot) return;
+
+    restoredKeyRef.current = cacheKey;
+    setProperties(snapshot.properties || []);
+    setPage(snapshot.page || 0);
+    setHasMore(Boolean(snapshot.hasMore));
+    setTotalCount(snapshot.totalCount || 0);
+    setLoading(false);
+    setLoadingMore(false);
+    setPendingScrollY(snapshot.scrollY);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useIsomorphicLayoutEffect(() => {
+    if (pendingScrollY === null) return;
+    restoreWindowScroll(pendingScrollY);
+    setPendingScrollY(null);
+  }, [pendingScrollY]);
 
   useEffect(() => {
     const cacheKey = buildCategoryCacheKey(filters);
     cacheKeyRef.current = cacheKey;
+
+    if (restoredKeyRef.current === cacheKey) {
+      return undefined;
+    }
+    restoredKeyRef.current = null;
 
     const cachedData = readCategoryCache(cacheKey);
     if (cachedData) {
@@ -242,12 +301,44 @@ const PropertiesGrid = ({ filters = {}, onCountChange, emptyState }) => {
     if (onCountChange) onCountChange(loading ? null : totalCount);
   }, [loading, totalCount, onCountChange]);
 
+  const handleClickCapture = (event) => {
+    if (!isPropertyCardClick(event)) return;
+    saveListSnapshot({
+      listKey: cacheKeyRef.current,
+      properties: slimPropertiesForSnapshot(properties),
+      page,
+      hasMore,
+      totalCount,
+    });
+  };
+
+  if (loading) {
+    return <PropertiesGridSkeleton />;
+  }
+
   return (
-    <div className="properties-grid-container">
+    <div className="properties-grid-container" onClickCapture={handleClickCapture}>
       <div className="container">
-        {loading ? (
-          <div className="loading-grid">
-            {[...Array(6)].map((_, i) => (
+        <div className="properties-grid">
+          {properties.length === 0 ? (
+            <div className="no-results">
+              {emptyState || <p>No se encontraron propiedades con los criterios seleccionados.</p>}
+            </div>
+          ) : (
+            properties.map((property) => (
+              <PropertyCard
+                key={property.id}
+                property={property}
+              />
+            ))
+          )}
+        </div>
+
+        <div ref={loadMoreRef} className="infinite-scroll-sentinel" aria-hidden="true" />
+
+        {loadingMore && (
+          <div className="loading-grid loading-more-grid">
+            {[...Array(3)].map((_, i) => (
               <div key={i} className="property-skeleton">
                 <div className="skeleton-image"></div>
                 <div className="skeleton-content">
@@ -258,40 +349,6 @@ const PropertiesGrid = ({ filters = {}, onCountChange, emptyState }) => {
               </div>
             ))}
           </div>
-        ) : (
-          <>
-            <div className="properties-grid">
-              {properties.length === 0 ? (
-                <div className="no-results">
-                  {emptyState || <p>No se encontraron propiedades con los criterios seleccionados.</p>}
-                </div>
-              ) : (
-                properties.map((property) => (
-                  <PropertyCard
-                    key={property.id}
-                    property={property}
-                  />
-                ))
-              )}
-            </div>
-
-            <div ref={loadMoreRef} className="infinite-scroll-sentinel" aria-hidden="true" />
-
-            {loadingMore && (
-              <div className="loading-grid loading-more-grid">
-                {[...Array(3)].map((_, i) => (
-                  <div key={i} className="property-skeleton">
-                    <div className="skeleton-image"></div>
-                    <div className="skeleton-content">
-                      <div className="skeleton-title"></div>
-                      <div className="skeleton-price"></div>
-                      <div className="skeleton-details"></div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </>
         )}
       </div>
     </div>

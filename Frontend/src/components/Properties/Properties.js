@@ -4,6 +4,15 @@ import React, { useEffect, useRef, useState } from 'react'
 import { FaChevronLeft, FaChevronRight, FaStar } from 'react-icons/fa'
 import { getProperties } from '../../services/propertyService'
 import PropertyCard from '../PropertyCard/PropertyCard'
+import {
+  getListSnapshot,
+  isPropertyCardClick,
+  restoreWindowScroll,
+  saveListSnapshot,
+  setScrollLeftInstant,
+  slimPropertiesForSnapshot,
+  useIsomorphicLayoutEffect,
+} from '../../helpers/listRestore'
 import './Properties.css'
 
 const HOME_PROPERTIES_CACHE_KEY = 'silvia-home-properties-cache-v2'
@@ -55,6 +64,72 @@ const writeCachedSectionsData = (sectionsData) => {
   }
 }
 
+// Fuera de Properties: si se define adentro, cada render crea un componente nuevo y React
+// remonta los carruseles (se pierde su scroll horizontal).
+const PropertySection = ({ title, type, properties, featured = false, onScroll, registerScroller }) => {
+  if (!properties || properties.length === 0) return null
+
+  return (
+    <div className={`property-section${featured ? ' property-section--featured' : ''}`}>
+      <div className="section-surface">
+        {featured && (
+          <div className="featured-stars" aria-label="Selección destacada con cinco estrellas">
+            {[...Array(5)].map((_, index) => (
+              <FaStar key={index} />
+            ))}
+          </div>
+        )}
+
+        <div className="section-header">
+          <div className="section-heading">
+            <h2 className="section-title">{title}</h2>
+          </div>
+        </div>
+
+        <div className={`carousel-shell${featured ? ' carousel-shell--featured' : ''}`}>
+          {!featured && (
+            <>
+              <button
+                type="button"
+                className="carousel-arrow carousel-arrow--left"
+                onClick={() => onScroll(type, 'prev')}
+                aria-label={`Ver propiedades anteriores de ${title}`}
+              >
+                <FaChevronLeft />
+              </button>
+              <button
+                type="button"
+                className="carousel-arrow carousel-arrow--right"
+                onClick={() => onScroll(type, 'next')}
+                aria-label={`Ver siguientes propiedades de ${title}`}
+              >
+                <FaChevronRight />
+              </button>
+            </>
+          )}
+
+          <div className={`properties-scroll-container${featured ? ' featured-carousel' : ''}`} ref={(node) => registerScroller(type, node)}>
+            <div className={`properties-grid${featured ? ' featured-track' : ''}`}>
+              <div className="properties-group">
+                {properties.map((property) => (
+                  <PropertyCard key={property.id} property={property} />
+                ))}
+              </div>
+              {featured && (
+                <div className="properties-group" aria-hidden="true">
+                  {properties.map((property) => (
+                    <PropertyCard key={`${property.id}-clone`} property={property} />
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export default function Properties() {
   const sectionScrollerRefs = useRef({})
   const [sectionsData, setSectionsData] = useState({
@@ -66,8 +141,33 @@ export default function Properties() {
   })
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  // Volver atrás desde una ficha: scroll vertical y de cada carrusel a restaurar después de pintar
+  const restoredRef = useRef(false)
+  const [pendingScroll, setPendingScroll] = useState(null)
+
+  useIsomorphicLayoutEffect(() => {
+    const snapshot = getListSnapshot(HOME_PROPERTIES_CACHE_KEY)
+    if (!snapshot?.sectionsData) return
+
+    restoredRef.current = true
+    setSectionsData(snapshot.sectionsData)
+    setError(null)
+    setLoading(false)
+    setPendingScroll({ y: snapshot.scrollY, carousels: snapshot.carousels || {} })
+  }, [])
+
+  useIsomorphicLayoutEffect(() => {
+    if (!pendingScroll) return
+    Object.entries(pendingScroll.carousels).forEach(([type, left]) => {
+      setScrollLeftInstant(sectionScrollerRefs.current[type], left)
+    })
+    restoreWindowScroll(pendingScroll.y)
+    setPendingScroll(null)
+  }, [pendingScroll])
 
   useEffect(() => {
+    if (restoredRef.current) return undefined
+
     const cachedData = readCachedSectionsData()
 
     if (cachedData) {
@@ -189,6 +289,26 @@ export default function Properties() {
     return all
   }
 
+  const registerScroller = (type, node) => {
+    if (node) {
+      sectionScrollerRefs.current[type] = node
+    }
+  }
+
+  // Al tocar una card se guarda la foto de la home (secciones cargadas + scroll de cada carrusel)
+  const handleClickCapture = (event) => {
+    if (!isPropertyCardClick(event)) return
+
+    const carousels = {}
+    Object.entries(sectionScrollerRefs.current).forEach(([type, node]) => {
+      if (node && node.scrollLeft > 0) carousels[type] = node.scrollLeft
+    })
+    const slimSections = Object.fromEntries(
+      Object.entries(sectionsData).map(([type, list]) => [type, Array.isArray(list) ? slimPropertiesForSnapshot(list) : list])
+    )
+    saveListSnapshot({ listKey: HOME_PROPERTIES_CACHE_KEY, sectionsData: slimSections, carousels })
+  }
+
   const scrollSection = (type, direction = 'next') => {
     const container = sectionScrollerRefs.current[type]
 
@@ -207,74 +327,6 @@ export default function Properties() {
       left: offset,
       behavior: 'smooth'
     })
-  }
-
-  const PropertySection = ({ title, type, properties, featured = false }) => {
-    if (!properties || properties.length === 0) return null
-
-    return (
-      <div className={`property-section${featured ? ' property-section--featured' : ''}`}>
-        <div className="section-surface">
-          {featured && (
-            <div className="featured-stars" aria-label="Selección destacada con cinco estrellas">
-              {[...Array(5)].map((_, index) => (
-                <FaStar key={index} />
-              ))}
-            </div>
-          )}
-
-          <div className="section-header">
-            <div className="section-heading">
-              <h2 className="section-title">{title}</h2>
-            </div>
-          </div>
-
-          <div className={`carousel-shell${featured ? ' carousel-shell--featured' : ''}`}>
-            {!featured && (
-              <>
-                <button
-                  type="button"
-                  className="carousel-arrow carousel-arrow--left"
-                  onClick={() => scrollSection(type, 'prev')}
-                  aria-label={`Ver propiedades anteriores de ${title}`}
-                >
-                  <FaChevronLeft />
-                </button>
-                <button
-                  type="button"
-                  className="carousel-arrow carousel-arrow--right"
-                  onClick={() => scrollSection(type, 'next')}
-                  aria-label={`Ver siguientes propiedades de ${title}`}
-                >
-                  <FaChevronRight />
-                </button>
-              </>
-            )}
-
-            <div className={`properties-scroll-container${featured ? ' featured-carousel' : ''}`} ref={(node) => {
-              if (node) {
-                sectionScrollerRefs.current[type] = node
-              }
-            }}>
-              <div className={`properties-grid${featured ? ' featured-track' : ''}`}>
-                <div className="properties-group">
-                  {properties.map((property) => (
-                    <PropertyCard key={property.id} property={property} />
-                  ))}
-                </div>
-                {featured && (
-                  <div className="properties-group" aria-hidden="true">
-                    {properties.map((property) => (
-                      <PropertyCard key={`${property.id}-clone`} property={property} />
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    )
   }
 
   if (loading) {
@@ -345,15 +397,17 @@ export default function Properties() {
   ]
 
   return (
-    <section className="properties-section">
+    <section className="properties-section" onClickCapture={handleClickCapture}>
       <div className="container">
-        {sections.map((section, index) => (
+        {sections.map((section) => (
           <PropertySection
-            key={index}
+            key={section.type}
             title={section.title}
             type={section.type}
             properties={section.properties}
             featured={section.featured}
+            onScroll={scrollSection}
+            registerScroller={registerScroller}
           />
         ))}
       </div>

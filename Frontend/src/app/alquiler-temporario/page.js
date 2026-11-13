@@ -1,4 +1,6 @@
+import { Suspense } from 'react';
 import TemporaryRentalBrowser from '../../components/TemporaryRentalBrowser/TemporaryRentalBrowser';
+import { PropertiesGridSkeleton } from '../../components/PropertiesGrid/PropertiesGrid';
 import '../lotes-terrenos/page.css';
 
 export const metadata = {
@@ -18,7 +20,10 @@ export default function AlquilerTemporarioPage() {
           <p>Alquileres temporarios y anuales en las mejores ubicaciones</p>
         </div>
       </div>
-      <TemporaryRentalBrowser />
+      {/* TemporaryRentalBrowser lee ?tipo y ?personas con useSearchParams: Next pide un Suspense */}
+      <Suspense fallback={<PropertiesGridSkeleton />}>
+        <TemporaryRentalBrowser />
+      </Suspense>
     </div>
   );
 }

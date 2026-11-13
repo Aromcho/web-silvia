@@ -5,6 +5,14 @@ import { useSearchParams } from 'next/navigation'
 import { getProperties, autocompleteProperties } from '../../services/propertyService'
 import PropertyCard from '../PropertyCard/PropertyCard'
 import GuestsFilter, { MAX_GUESTS, guestsText } from '../GuestsFilter/GuestsFilter'
+import {
+  getListSnapshot,
+  isPropertyCardClick,
+  restoreWindowScroll,
+  saveListSnapshot,
+  slimPropertiesForSnapshot,
+  useIsomorphicLayoutEffect,
+} from '../../helpers/listRestore'
 import { 
   FaHome, 
   FaBuilding, 
@@ -125,6 +133,43 @@ const readSearchCache = (cacheKey) => {
   }
 }
 
+const SORT_OPTIONS = ['recent', 'price_desc', 'price_asc']
+
+// Filtros a partir de la URL (?operation=alquiler&type=Casa&location=...&personas=4&orden=price_asc)
+const filtersFromParams = (params) => {
+  const operation = params.get('operation') || 'venta'
+  const sort = params.get('orden')
+  return {
+    operation,
+    type: params.get('type') || '',
+    location: params.get('location') || '',
+    sort: SORT_OPTIONS.includes(sort) ? sort : 'recent',
+    // Cantidad de personas: solo aplica con la operación "alquiler"
+    guests: operation === 'alquiler' ? Math.min(parseInt(params.get('personas'), 10) || 0, MAX_GUESTS) : 0,
+  }
+}
+
+// Escribe los filtros aplicados en la URL actual (sin agregar entradas al historial)
+const writeFiltersToUrl = (filtersSnapshot) => {
+  const url = new URL(window.location.href)
+  const setParam = (key, value) => {
+    if (value) url.searchParams.set(key, value)
+    else url.searchParams.delete(key)
+  }
+
+  setParam('operation', filtersSnapshot.operation)
+  setParam('type', filtersSnapshot.type)
+  setParam('location', filtersSnapshot.location.trim())
+  setParam('personas', filtersSnapshot.operation === 'alquiler' && filtersSnapshot.guests > 0 ? String(filtersSnapshot.guests) : '')
+  setParam('orden', filtersSnapshot.sort !== 'recent' ? filtersSnapshot.sort : '')
+
+  const nextSearch = url.searchParams.toString()
+  if (url.search !== window.location.search) {
+    window.history.replaceState(null, '', url)
+  }
+  return nextSearch
+}
+
 const writeSearchCache = (cacheKey, value) => {
   const entry = { ...value, timestamp: Date.now() }
   cachedSearchResults = cachedSearchResults || {}
@@ -138,14 +183,8 @@ export default function PropertiesSearchNew() {
   const [loading, setLoading] = useState(true)
   const [loadingMore, setLoadingMore] = useState(false)
   const [totalCount, setTotalCount] = useState(0)
-  const [filters, setFilters] = useState({
-    operation: searchParams.get('operation') || 'venta',
-    type: searchParams.get('type') || '',
-    location: searchParams.get('location') || '',
-    sort: 'recent',
-    // Cantidad de personas: solo aplica con la operación "alquiler" (?personas=4)
-    guests: Math.min(parseInt(searchParams.get('personas'), 10) || 0, MAX_GUESTS)
-  })
+  // Los filtros viven en la URL: al volver atrás desde una ficha se recuperan (antes volvía a "Comprar")
+  const [filters, setFilters] = useState(() => filtersFromParams(searchParams))
   const [appliedFilters, setAppliedFilters] = useState(filters)
   const [viewMode, setViewMode] = useState('grid')
   const [suggestions, setSuggestions] = useState([])
@@ -156,6 +195,66 @@ export default function PropertiesSearchNew() {
   const loadMoreRef = useRef(null)
   const requestIdRef = useRef(0)
   const cacheKeyRef = useRef(buildSearchCacheKey(filters))
+  // Último query string que escribimos nosotros (o con el que se entró). Si la URL pasa a otro
+  // (ej. "Propiedades" del header estando en /propiedades?operation=alquiler), se adoptan esos filtros.
+  const lastSearchRef = useRef(null)
+  const appliedFiltersRef = useRef(appliedFilters)
+  appliedFiltersRef.current = appliedFilters
+  const isFirstUrlSyncRef = useRef(true)
+  // Clave de filtros restaurada desde la foto de "volver atrás": mientras coincida, no se recarga
+  const restoredKeyRef = useRef(null)
+  const [pendingScrollY, setPendingScrollY] = useState(null)
+  // Al restaurar no se repite la animación de entrada (con delays de hasta varios segundos por card)
+  const [skipEnterAnimation, setSkipEnterAnimation] = useState(false)
+
+  // Volver atrás desde una ficha: se arma el listado desde la foto antes del primer pintado
+  useIsomorphicLayoutEffect(() => {
+    const cacheKey = buildSearchCacheKey(appliedFilters)
+    const snapshot = getListSnapshot(cacheKey)
+    if (!snapshot) return
+
+    restoredKeyRef.current = cacheKey
+    setProperties(snapshot.properties || [])
+    setTotalCount(snapshot.totalCount || 0)
+    setPage(snapshot.page || 0)
+    setHasMore(Boolean(snapshot.hasMore))
+    if (snapshot.viewMode === 'list' || snapshot.viewMode === 'grid') setViewMode(snapshot.viewMode)
+    setSkipEnterAnimation(true)
+    setLoading(false)
+    setLoadingMore(false)
+    setPendingScrollY(snapshot.scrollY)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  useIsomorphicLayoutEffect(() => {
+    if (pendingScrollY === null) return
+    restoreWindowScroll(pendingScrollY)
+    setPendingScrollY(null)
+  }, [pendingScrollY])
+
+  // Filtros aplicados -> URL (replaceState: cambiar filtros no agrega pasos al botón atrás).
+  // En el montaje no se escribe: los filtros salen de la URL, que ya está bien.
+  useEffect(() => {
+    if (isFirstUrlSyncRef.current) {
+      isFirstUrlSyncRef.current = false
+      lastSearchRef.current = searchParams.toString()
+      return
+    }
+    lastSearchRef.current = writeFiltersToUrl(appliedFilters)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [appliedFilters])
+
+  // La URL cambió desde afuera estando en /propiedades (ej. "Propiedades" del header): adoptarla
+  useEffect(() => {
+    const currentSearch = searchParams.toString()
+    if (lastSearchRef.current === null || currentSearch === lastSearchRef.current) return
+
+    lastSearchRef.current = currentSearch
+    const next = filtersFromParams(searchParams)
+    if (buildSearchCacheKey(next) === buildSearchCacheKey(appliedFiltersRef.current)) return
+    setFilters(next)
+    setAppliedFilters(next)
+  }, [searchParams])
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -251,6 +350,12 @@ export default function PropertiesSearchNew() {
     const cacheKey = buildSearchCacheKey(appliedFilters)
     cacheKeyRef.current = cacheKey
 
+    if (restoredKeyRef.current === cacheKey) {
+      return undefined
+    }
+    restoredKeyRef.current = null
+    setSkipEnterAnimation(false)
+
     const cachedData = readSearchCache(cacheKey)
     if (cachedData) {
       setProperties(cachedData.properties || [])
@@ -343,6 +448,18 @@ export default function PropertiesSearchNew() {
     document.addEventListener('mousedown', handleClickOutside)
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
+
+  const handleResultsClickCapture = (event) => {
+    if (!isPropertyCardClick(event)) return
+    saveListSnapshot({
+      listKey: cacheKeyRef.current,
+      properties: slimPropertiesForSnapshot(properties),
+      totalCount,
+      page,
+      hasMore,
+      viewMode,
+    })
+  }
 
   const renderSkeletonGrid = (count = 6) => (
     <div className="loading-grid search-loading-grid">
@@ -513,7 +630,7 @@ export default function PropertiesSearchNew() {
         </div>
 
         {/* Resultados */}
-        <div className="results-section">
+        <div className="results-section" onClickCapture={handleResultsClickCapture}>
           <div className="results-header">
             <div className="view-toggle">
               <button 
@@ -540,7 +657,7 @@ export default function PropertiesSearchNew() {
                   properties.map((property, index) => (
                     <div 
                       key={property.id || index}
-                      style={{
+                      style={skipEnterAnimation ? undefined : {
                         animation: `fadeInUp 0.6s ease-out ${index * 0.1}s both`
                       }}
                     >

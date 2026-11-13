@@ -1,6 +1,7 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { FaUsers } from 'react-icons/fa'
 import PropertiesGrid from '../PropertiesGrid/PropertiesGrid'
 import GuestsFilter, { MAX_GUESTS, guestsText } from '../GuestsFilter/GuestsFilter'
@@ -14,18 +15,21 @@ const TABS = [
   { key: 'anual', label: 'Anual' },
 ]
 
-export default function TemporaryRentalBrowser() {
-  const [guests, setGuests] = useState(0)
-  const [count, setCount] = useState(null)
-  const [tab, setTab] = useState('temporario')
-  const isAnnual = tab === 'anual'
+// Valores iniciales tomados de la URL desde el primer render: así el listado no pide primero
+// los filtros por defecto y, al volver atrás desde una ficha, coincide con la foto guardada.
+const guestsFromParams = (params) => {
+  const fromUrl = parseInt(params.get('personas'), 10)
+  return fromUrl > 0 ? Math.min(fromUrl, MAX_GUESTS) : 0
+}
 
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search)
-    const fromUrl = parseInt(params.get('personas'), 10)
-    if (fromUrl > 0) setGuests(Math.min(fromUrl, MAX_GUESTS))
-    if (params.get('tipo') === 'anual') setTab('anual')
-  }, [])
+const tabFromParams = (params) => (params.get('tipo') === 'anual' ? 'anual' : 'temporario')
+
+export default function TemporaryRentalBrowser() {
+  const searchParams = useSearchParams()
+  const [guests, setGuests] = useState(() => guestsFromParams(searchParams))
+  const [count, setCount] = useState(null)
+  const [tab, setTab] = useState(() => tabFromParams(searchParams))
+  const isAnnual = tab === 'anual'
 
   const changeTab = useCallback((next) => {
     setTab(next)
