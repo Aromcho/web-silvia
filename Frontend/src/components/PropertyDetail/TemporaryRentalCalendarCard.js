@@ -213,7 +213,7 @@ export default function TemporaryRentalCalendarCard({
           <FaWhatsapp />
           <span>WhatsApp</span>
         </a>
-        <a href="tel:+5492216006474" className="temp-contact-btn phone">
+        <a href={`tel:+${whatsappNumber || '5492216006474'}`} className="temp-contact-btn phone" onClick={() => onWhatsAppClick?.('property-detail-calendar-call')}>
           <FaPhone />
           <span>Llamar</span>
         </a>

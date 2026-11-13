@@ -3,16 +3,19 @@
  * API Base: /api/whatsapp/
  */
 
+import { getAttribution } from './attribution';
+
 const buildUrl = (endpoint) => `/api/whatsapp${endpoint}`;
 
 /**
- * Pide el próximo agente en la rotación para mostrar en el botón de WhatsApp
- * de una ficha de propiedad. Devuelve null si el backend no responde.
+ * Asesor de turno para el botón de WhatsApp y «Llamar». Solo mira el turno (peek): la rotación
+ * avanza cuando alguien consulta de verdad (logWhatsAppClick), no cada vez que se abre una página.
+ * Devuelve null si el backend no responde.
  * @returns {Promise<{name: string, phone: string} | null>}
  */
 export const getNextWhatsAppAgent = async () => {
   try {
-    const res = await fetch(buildUrl('/next-agent'), { cache: 'no-store' });
+    const res = await fetch(buildUrl('/next-agent?peek=1'), { cache: 'no-store' });
     if (!res.ok) return null;
     return await res.json();
   } catch {
@@ -31,7 +34,8 @@ export const logWhatsAppClick = (payload) => {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       keepalive: true,
-      body: JSON.stringify(payload),
+      // Con el origen del visitante (campaña, anuncio o sitio) y su código «Ref.» (X6)
+      body: JSON.stringify({ ...payload, attribution: getAttribution() }),
     }).catch(() => {});
   } catch {
     // no-op

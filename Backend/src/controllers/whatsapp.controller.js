@@ -35,6 +35,14 @@ export const getNextAgent = async (req, res, next) => {
       return res.status(404).json({ message: 'No hay contactos de WhatsApp activos' });
     }
 
+    // ?peek=1: solo mira quién está de turno (la web lo muestra al abrir la página). El turno pasa
+    // al siguiente cuando alguien consulta de verdad (logClick con assigned), no por cada visita.
+    if (req.query.peek) {
+      const current = await WhatsAppRotation.findOne({ key: ROTATION_KEY }).lean();
+      const agent = contacts[(current?.cursor || 0) % contacts.length];
+      return res.json({ name: agent.name, phone: agent.phone });
+    }
+
     const state = await WhatsAppRotation.findOneAndUpdate(
       { key: ROTATION_KEY },
       { $inc: { cursor: 1 } },
@@ -54,11 +62,14 @@ export const getNextAgent = async (req, res, next) => {
 // haya salido de la rotación automática o que el visitante haya elegido el contacto a mano.
 export const logClick = async (req, res, next) => {
   try {
-    const { name, phone, source, propertyId, propertyTitle, assigned } = req.body || {};
+    const { name, phone, source, propertyId, propertyTitle, assigned, attribution } = req.body || {};
     if (!phone) {
       return res.status(400).json({ message: 'phone es requerido' });
     }
 
+    // Origen del visitante (X6): solo campos conocidos y cortos
+    const a = attribution && typeof attribution === 'object' ? attribution : {};
+    const clean = (v, n = 120) => (typeof v === 'string' ? v.slice(0, n) : '');
     await WhatsAppClick.create({
       name,
       phone,
@@ -66,8 +77,17 @@ export const logClick = async (req, res, next) => {
       propertyId,
       propertyTitle,
       assigned: Boolean(assigned),
+      channel: clean(a.channel, 40) || 'directo',
+      ref: clean(a.code, 6),
+      utm: { source: clean(a.source), medium: clean(a.medium), campaign: clean(a.campaign), content: clean(a.content), term: clean(a.term) },
+      referrer: clean(a.referrer, 300),
+      landing: clean(a.landing, 200),
     });
     await WhatsAppContact.updateOne({ phone }, { $inc: { totalClicks: 1 } });
+    // La consulta real hace avanzar el turno: la próxima persona ve al siguiente asesor
+    if (assigned) {
+      await WhatsAppRotation.updateOne({ key: ROTATION_KEY }, { $inc: { cursor: 1 } }, { upsert: true });
+    }
 
     res.status(201).json({ ok: true });
   } catch (error) {

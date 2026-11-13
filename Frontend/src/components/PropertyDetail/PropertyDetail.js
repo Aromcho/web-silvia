@@ -33,6 +33,7 @@ import { FaWandMagicSparkles } from 'react-icons/fa6'
 import Print from '../Print/Print'
 import TemporaryRentalCalendarCard from './TemporaryRentalCalendarCard'
 import { getNextWhatsAppAgent, logWhatsAppClick } from '../../services/whatsappService'
+import { getAttribution } from '../../services/attribution'
 import {
   isOperationPriceHidden,
   CONSULTAR_PRECIO,
@@ -559,6 +560,7 @@ export default function PropertyDetail({ property }) {
           propertyId: property.id,
           propertyTitle: property.publication_title || propertyTypeName,
           propertyUrl: propertyPublicUrl,
+          attribution: getAttribution(),
         }),
       })
       if (!res.ok) throw new Error()
@@ -917,7 +919,7 @@ export default function PropertyDetail({ property }) {
                   <span>Email</span>
                 </button>
 
-                <a href="tel:+5492216006474" className="contact-btn phone-btn">
+                <a href={`tel:+${whatsappNumber}`} className="contact-btn phone-btn" onClick={() => handleWhatsAppClick('property-detail-call')}>
                   <FaPhone />
                   <span>Llamar</span>
                 </a>
@@ -963,7 +965,7 @@ export default function PropertyDetail({ property }) {
           <FaEnvelope />
           <span>Email</span>
         </button>
-        <a href="tel:+5492216006474" className="mobile-bar-btn phone-bar-btn">
+        <a href={`tel:+${whatsappNumber}`} className="mobile-bar-btn phone-bar-btn" onClick={() => handleWhatsAppClick('property-detail-call-mobile')}>
           <FaPhone />
           <span>Llamar</span>
         </a>

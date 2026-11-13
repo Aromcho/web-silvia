@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { FaEnvelope, FaMapMarkerAlt, FaPhone, FaWhatsapp, FaFacebookF, FaInstagram, FaLinkedin } from 'react-icons/fa'
 import { logWhatsAppClick } from '../../services/whatsappService'
+import { getAttribution } from '../../services/attribution'
 import './Contact.css'
 
 const contacts = [
@@ -35,7 +36,7 @@ export default function Contact() {
       const res = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
+        body: JSON.stringify({ ...form, attribution: getAttribution() }),
       })
 
       if (!res.ok) throw new Error()
