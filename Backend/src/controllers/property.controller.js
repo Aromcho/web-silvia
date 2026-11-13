@@ -331,13 +331,19 @@ const getProperties = async (req, res) => {
 
     const filterObj = andConditions.length > 0 ? { $and: andConditions } : {};
 
+    // Siempre se desempata por id: varias propiedades comparten created_at (altas en lote) y, sin un
+    // orden total, Mongo puede devolverlas en distinto orden entre páginas (repetidas o salteadas).
     let sortObj;
     if (order === 'price_asc') {
-      sortObj = { 'operations.prices.price': 1 };
+      sortObj = { 'operations.prices.price': 1, id: -1 };
     } else if (order === 'price_desc') {
-      sortObj = { 'operations.prices.price': -1 };
+      sortObj = { 'operations.prices.price': -1, id: -1 };
+    } else if (guests > 0) {
+      // Buscando N personas: primero la casa más ajustada (capacidad N), después las más grandes.
+      // Las que no tienen capacidad cargada ya quedan afuera por el $gte del filtro.
+      sortObj = { guests_capacity: 1, created_at: -1, id: -1 };
     } else {
-      sortObj = { created_at: -1 };
+      sortObj = { created_at: -1, id: -1 };
     }
 
 
