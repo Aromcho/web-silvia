@@ -110,6 +110,7 @@ export const getProperties = async (filters = {}) => {
     minGarages: filters.minGarages,
     maxGarages: filters.maxGarages,
     minGuests: filters.minGuests || undefined,
+    exclude_property_type: filters.exclude_property_type,
     is_starred: filters.is_starred ? 'true' : undefined,
     limit: filters.limit || 10,
     offset: filters.offset || 0,

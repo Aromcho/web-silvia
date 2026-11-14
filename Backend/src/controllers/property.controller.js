@@ -197,6 +197,7 @@ const getProperties = async (req, res) => {
       minGarages,
       maxGarages,
       minGuests,
+      exclude_property_type,
       limit = 10,
       offset = 0,
       order = 'DESC',
@@ -235,6 +236,15 @@ const getProperties = async (req, res) => {
 
       if (propertyTypeRegexes.length > 0) {
         andConditions.push({ 'type.name': { $in: propertyTypeRegexes } });
+      }
+    }
+
+    // Tipos a excluir (ej. /propiedades en "Alquilar" no muestra locales)
+    const excludedPropertyTypes = splitQueryValues(exclude_property_type).filter((value) => value !== '-1' && normalizeText(value) !== 'all');
+    if (excludedPropertyTypes.length > 0) {
+      const excludedTypeRegexes = buildRegexList(excludedPropertyTypes, PROPERTY_TYPE_ALIASES);
+      if (excludedTypeRegexes.length > 0) {
+        andConditions.push({ 'type.name': { $nin: excludedTypeRegexes } });
       }
     }
 

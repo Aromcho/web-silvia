@@ -25,7 +25,7 @@ import './PropertiesSearchNew.css'
 
 const PAGE_SIZE = 12
 const FILTER_DEBOUNCE_MS = 250
-const SEARCH_CACHE_KEY_PREFIX = 'silvia-search-properties-cache-v2'
+const SEARCH_CACHE_KEY_PREFIX = 'silvia-search-properties-cache-v3'
 const CACHE_TTL_MS = 60 * 1000 // 1 minuto
 
 let cachedSearchResults = null
@@ -141,7 +141,8 @@ const filtersFromParams = (params) => {
   const sort = params.get('orden')
   return {
     operation,
-    type: params.get('type') || '',
+    // En alquiler no hay filtro por tipo (solo por personas)
+    type: operation === 'alquiler' ? '' : (params.get('type') || ''),
     location: params.get('location') || '',
     sort: SORT_OPTIONS.includes(sort) ? sort : 'recent',
     // Cantidad de personas: solo aplica con la operación "alquiler"
@@ -285,8 +286,12 @@ export default function PropertiesSearchNew() {
       apiFilters.searchQuery = filtersSnapshot.location.trim()
     }
 
-    if (filtersSnapshot.operation === 'alquiler' && filtersSnapshot.guests > 0) {
-      apiFilters.minGuests = filtersSnapshot.guests
+    if (filtersSnapshot.operation === 'alquiler') {
+      // Los locales (alquiler anual) no se muestran en "Alquilar"
+      apiFilters.exclude_property_type = ['Local']
+      if (filtersSnapshot.guests > 0) {
+        apiFilters.minGuests = filtersSnapshot.guests
+      }
     }
 
     return apiFilters
@@ -405,7 +410,9 @@ export default function PropertiesSearchNew() {
       ...prev,
       [key]: value,
       // El filtro de personas no aplica a venta: se limpia al cambiar de operación
-      ...(key === 'operation' && value !== 'alquiler' ? { guests: 0 } : {})
+      ...(key === 'operation' && value !== 'alquiler' ? { guests: 0 } : {}),
+      // En alquiler no hay filtro por tipo: se limpia al pasar a "Alquilar"
+      ...(key === 'operation' && value === 'alquiler' ? { type: '' } : {})
     }))
 
     // Autocompletado para ubicación
@@ -559,7 +566,8 @@ export default function PropertiesSearchNew() {
             </div>
           )}
 
-          {/* Tipos de propiedad */}
+          {/* Tipos de propiedad — solo en "Comprar" (en alquiler se filtra por personas) */}
+          {filters.operation !== 'alquiler' && (<>
           <div className="property-types">
             <button 
               className={`property-type-btn ${filters.type === 'Casa' ? 'active' : ''}`}
@@ -613,6 +621,7 @@ export default function PropertiesSearchNew() {
               <option value="Complejo">Complejo</option>
             </select>
           </div>
+          </>)}
 
           {/* Filtro de orden */}
           <div className="sort-filter">
