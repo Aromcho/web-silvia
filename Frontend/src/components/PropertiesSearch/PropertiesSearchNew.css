@@ -7,6 +7,8 @@
   position: relative;
   overflow-x: hidden;
   overflow-x: clip;
+  /* Contiene el margin-top del .search-container (sin esto queda una franja blanca arriba) */
+  display: flow-root;
 }
 
 /* Hero estático (simple, sin carrusel) */

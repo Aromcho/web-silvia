@@ -40,6 +40,11 @@ body {
   min-height: 100vh;
 }
 
+/* Mismo contenedor de márgenes que daba overflow: hidden, sin scroll propio */
+body {
+  display: flow-root;
+}
+
 body {
   color: var(--foreground);
   background: var(--background);
