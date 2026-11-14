@@ -144,7 +144,8 @@ const filtersFromParams = (params) => {
     // En alquiler no hay filtro por tipo (solo por personas)
     type: operation === 'alquiler' ? '' : (params.get('type') || ''),
     location: params.get('location') || '',
-    sort: SORT_OPTIONS.includes(sort) ? sort : 'recent',
+    // En alquiler no hay precios: sin orden por precio
+    sort: operation !== 'alquiler' && SORT_OPTIONS.includes(sort) ? sort : 'recent',
     // Cantidad de personas: solo aplica con la operación "alquiler"
     guests: operation === 'alquiler' ? Math.min(parseInt(params.get('personas'), 10) || 0, MAX_GUESTS) : 0,
   }
@@ -411,8 +412,8 @@ export default function PropertiesSearchNew() {
       [key]: value,
       // El filtro de personas no aplica a venta: se limpia al cambiar de operación
       ...(key === 'operation' && value !== 'alquiler' ? { guests: 0 } : {}),
-      // En alquiler no hay filtro por tipo: se limpia al pasar a "Alquilar"
-      ...(key === 'operation' && value === 'alquiler' ? { type: '' } : {})
+      // En alquiler no hay filtro por tipo ni orden por precio: se limpian al pasar a "Alquilar"
+      ...(key === 'operation' && value === 'alquiler' ? { type: '', sort: 'recent' } : {})
     }))
 
     // Autocompletado para ubicación
@@ -623,7 +624,8 @@ export default function PropertiesSearchNew() {
           </div>
           </>)}
 
-          {/* Filtro de orden */}
+          {/* Filtro de orden — solo en "Comprar" (los alquileres no tienen precio) */}
+          {filters.operation !== 'alquiler' && (
           <div className="sort-filter">
             <label className="sort-label">Ordenar por:</label>
             <select 
@@ -636,6 +638,7 @@ export default function PropertiesSearchNew() {
               <option value="price_asc">Menor a mayor precio</option>
             </select>
           </div>
+          )}
         </div>
 
         {/* Resultados */}
