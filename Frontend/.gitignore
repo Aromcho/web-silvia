@@ -12,6 +12,8 @@
 # next.js
 /.next/
 /out/
+# fotos de /_next/image ya generadas: se conservan entre deploys (ver scripts/persistent-image-cache.mjs)
+/.image-cache/
 
 # production
 /build

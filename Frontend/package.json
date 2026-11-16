@@ -16,7 +16,8 @@
     "react-dom": "^18",
     "react-icons": "^5.5.0",
     "react-leaflet": "^4.2.1",
-    "react-qr-code": "^2.0.21"
+    "react-qr-code": "^2.0.21",
+    "sharp": "^0.33.5"
   },
   "devDependencies": {
     "eslint": "^8",

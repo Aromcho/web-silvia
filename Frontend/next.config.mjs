@@ -1,3 +1,6 @@
+import { PHASE_PRODUCTION_BUILD } from 'next/constants.js'
+import { linkPersistentImageCache } from './scripts/persistent-image-cache.mjs'
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // Build sin downtime: se compila en otra carpeta (NEXT_DIST_DIR=.next-new) mientras prod sigue sirviendo .next
@@ -11,7 +14,8 @@ const nextConfig = {
   },
 
   // Fotos livianas (C10/W6): las fotos del CRM se sirven achicadas y en WebP desde /_next/image
-  // (ver imgUrl en helpers). La primera vez se generan y después salen de la caché.
+  // (ver imgUrl en helpers). La primera vez se generan (con sharp, ~0,1-0,3 s) y después salen de
+  // la caché, que se conserva entre deploys (ver scripts/persistent-image-cache.mjs).
   images: {
     remotePatterns: [
       { protocol: 'https', hostname: 'apicrm.silviafernandezpropiedades.com.ar', pathname: '/uploads/**' },
@@ -56,4 +60,8 @@ const nextConfig = {
   },
 }
 
-export default nextConfig;
+export default function config(phase) {
+  // En cada build la caché de fotos de la carpeta nueva (.next-new) apunta a la carpeta fija
+  if (phase === PHASE_PRODUCTION_BUILD) linkPersistentImageCache(nextConfig.distDir)
+  return nextConfig
+}
