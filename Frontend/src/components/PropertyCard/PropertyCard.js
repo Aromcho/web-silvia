@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import Link from 'next/link'
 import {
   FaHome,
@@ -10,7 +10,9 @@ import {
   FaWater,
   FaPaw,
   FaUsers,
-  FaPlay
+  FaPlay,
+  FaTimes,
+  FaExternalLinkAlt
 } from 'react-icons/fa'
 import { getNextWhatsAppAgent, logWhatsAppClick } from '../../services/whatsappService'
 import {
@@ -122,7 +124,27 @@ const isFinancingEligible = (property) => {
     : false
 }
 
+// Coordenadas válidas de la propiedad (el CRM a veces deja 0 o vacío)
+const getCoords = (property) => {
+  const lat = Number(property?.geo_lat)
+  const lng = Number(property?.geo_long)
+  if (!Number.isFinite(lat) || !Number.isFinite(lng) || lat === 0 || lng === 0) return null
+  return { lat, lng }
+}
+
+// Corta el click para que no dispare el Link de la card
+const stopCardClick = (e) => {
+  e.preventDefault()
+  e.stopPropagation()
+}
+
 export default function PropertyCard({ property }) {
+  // Mapa sobre la foto: se abre con hover sobre el pin (desktop) o con click (fijo, sirve en mobile)
+  const [mapPinned, setMapPinned] = useState(false)
+  const [mapHover, setMapHover] = useState(false)
+  const coords = getCoords(property)
+  const showMap = Boolean(coords) && (mapPinned || mapHover)
+
   const parsePositiveNumber = (value) => {
     if (value === null || value === undefined || value === '') return null
 
@@ -190,7 +212,56 @@ export default function PropertyCard({ property }) {
 
   return (
     <Link href={`/propiedad/${property.id}`} className="modern-property-card">
-      <div className="property-image">
+      <div
+        className={`property-image ${showMap ? 'property-image--map' : ''}`}
+        onPointerLeave={(e) => { if (e.pointerType === 'mouse') setMapHover(false) }}
+      >
+        {coords && (
+          <button
+            type="button"
+            className={`property-map-pin ${showMap ? 'active' : ''}`}
+            title={mapPinned ? 'Cerrar mapa' : 'Ver ubicación en el mapa'}
+            aria-label={mapPinned ? 'Cerrar mapa' : 'Ver ubicación en el mapa'}
+            aria-pressed={mapPinned}
+            onPointerEnter={(e) => { if (e.pointerType === 'mouse') setMapHover(true) }}
+            onClick={(e) => {
+              stopCardClick(e)
+              if (mapPinned) {
+                setMapPinned(false)
+                setMapHover(false)
+              } else {
+                setMapPinned(true)
+              }
+            }}
+          >
+            {mapPinned ? <FaTimes aria-hidden="true" /> : <FaMapMarkerAlt aria-hidden="true" />}
+          </button>
+        )}
+        {showMap && (
+          // Con hover es solo vista previa (sin interacción, así no se cierra al entrar al iframe);
+          // con click queda fijo y se puede mover/zoomear el mapa
+          <div
+            className={`property-map-overlay ${mapPinned ? 'is-pinned' : ''}`}
+            onClick={mapPinned ? stopCardClick : undefined}
+          >
+            <iframe
+              title={`Ubicación de ${propertyTitle}`}
+              src={`https://www.google.com/maps?q=${coords.lat},${coords.lng}&z=15&output=embed`}
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+            />
+            <button
+              type="button"
+              className="property-map-open"
+              onClick={(e) => {
+                stopCardClick(e)
+                window.open(`https://www.google.com/maps/search/?api=1&query=${coords.lat},${coords.lng}`, '_blank', 'noopener')
+              }}
+            >
+              <FaExternalLinkAlt aria-hidden="true" /> Abrir en Maps
+            </button>
+          </div>
+        )}
         <img
           src={imgUrl(getCoverPhoto(property) || property.images?.[0], 640) || '/assets/images/logo.jpg'}
           alt={propertyTitle}

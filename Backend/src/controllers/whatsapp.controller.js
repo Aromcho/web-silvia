@@ -110,7 +110,7 @@ export const getStats = async (req, res, next) => {
     if (to) dateFilter.$lte = new Date(to);
     const match = Object.keys(dateFilter).length ? { createdAt: dateFilter } : {};
 
-    const [byContact, bySource, totalClicks] = await Promise.all([
+    const [byContact, bySource, byChannel, totalClicks] = await Promise.all([
       WhatsAppClick.aggregate([
         { $match: match },
         { $group: { _id: { name: '$name', phone: '$phone' }, total: { $sum: 1 } } },
@@ -119,6 +119,13 @@ export const getStats = async (req, res, next) => {
       WhatsAppClick.aggregate([
         { $match: match },
         { $group: { _id: '$source', total: { $sum: 1 } } },
+        { $sort: { total: -1 } },
+      ]),
+      // Origen del visitante (X6): meta-ads, google, instagram, directo… Los clics anteriores
+      // al registro de origen (13/11) no tienen el campo y salen como «sin dato».
+      WhatsAppClick.aggregate([
+        { $match: match },
+        { $group: { _id: { $ifNull: ['$channel', 'sin dato'] }, total: { $sum: 1 } } },
         { $sort: { total: -1 } },
       ]),
       WhatsAppClick.countDocuments(match),
@@ -132,6 +139,7 @@ export const getStats = async (req, res, next) => {
         total: row.total,
       })),
       bySource: bySource.map((row) => ({ source: row._id || 'unknown', total: row.total })),
+      byChannel: byChannel.map((row) => ({ channel: row._id || 'sin dato', total: row.total })),
     });
   } catch (error) {
     next(error);
