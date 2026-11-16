@@ -37,10 +37,10 @@ import UserManager from '../manager/user.manager.js';
         return res.status(400).json({ message: 'Incorrect password!' });
       }
   
-      const token = jwt.sign({ email: user.email, role: user.role, id: user._id }, process.env.SECRET, { expiresIn: '1h' });
+      const token = jwt.sign({ email: user.email, role: user.role, id: user._id }, process.env.SECRET, { expiresIn: '30d' });
   
-      // Crear una cookie con el token JWT
-      res.cookie('jwt', token, { httpOnly: true, signed: true });
+      // Crear una cookie con el token JWT (sesión de 30 días)
+      res.cookie('jwt', token, { httpOnly: true, signed: true, maxAge: 30 * 24 * 60 * 60 * 1000 });
   
       res.json({ message: 'Login successful!', token , email: user });
     } catch (error) {
