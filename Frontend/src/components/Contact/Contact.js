@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { FaEnvelope, FaMapMarkerAlt, FaPhone, FaWhatsapp, FaFacebookF, FaInstagram, FaLinkedin } from 'react-icons/fa'
+import { FaEnvelope, FaMapMarkerAlt, FaPhone, FaWhatsapp, FaFacebookF, FaInstagram } from 'react-icons/fa'
 import { logWhatsAppClick } from '../../services/whatsappService'
 import { getAttribution } from '../../services/attribution'
 import './Contact.css'
@@ -156,8 +156,7 @@ export default function Contact() {
 
               <div className="contact-socials">
                 <a href="https://www.facebook.com/Silviafernadezpropiedades/" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><FaFacebookF /></a>
-                <a href="#" aria-label="Instagram"><FaInstagram /></a>
-                <a href="#" aria-label="LinkedIn"><FaLinkedin /></a>
+                <a href="https://www.instagram.com/silviafernandezpropiedades/" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><FaInstagram /></a>
               </div>
 
               </div>
