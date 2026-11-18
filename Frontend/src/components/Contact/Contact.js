@@ -155,7 +155,7 @@ export default function Contact() {
               </div>
 
               <div className="contact-socials">
-                <a href="#" aria-label="Facebook"><FaFacebookF /></a>
+                <a href="https://www.facebook.com/Silviafernadezpropiedades/" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><FaFacebookF /></a>
                 <a href="#" aria-label="Instagram"><FaInstagram /></a>
                 <a href="#" aria-label="LinkedIn"><FaLinkedin /></a>
               </div>
