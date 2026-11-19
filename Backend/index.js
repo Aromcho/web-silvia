@@ -8,6 +8,7 @@ import cors from 'cors';
 import connectDB from './src/utils/db.js';
 import { syncPropertiesFromCRM, reconcileDeletedProperties } from './src/utils/crmSync.js';
 import router from './src/routes/index.router.js';
+import internalRouter from './src/routes/internal.router.js';
 import pathHandler from './src/middelwares/pathHandler.mid.js';
 import path from 'path';
 import { fileURLToPath } from 'url'; // Para obtener __dirname si usas módulos ES6
@@ -74,6 +75,9 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use(express.static('dist'));
 app.use('/api', router);
+// Panel central: solo responde a admin-api, desde el mismo servidor y con token (ver internalAuth.mid.js).
+// Tiene que ir antes del catch-all de abajo.
+app.use('/internal', internalRouter);
 app.get('/propertyDetail/:id', (req, res) => {
   const userAgent = req.headers["user-agent"] || "";
   const isBot = /bot|crawl|spider|slurp|facebook|whatsapp|telegram|twitter|linkedin/i.test(userAgent);
