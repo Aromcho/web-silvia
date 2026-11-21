@@ -97,6 +97,24 @@
   transform: scale(1.05);
 }
 
+/* Mientras baja la foto nueva no se ve la anterior (parecía que la galería repetía la misma) */
+.property-detail-page .main-image img.is-loading,
+.property-detail-page .lightbox img.is-loading {
+  opacity: 0;
+}
+.property-detail-page .gallery-loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.95rem;
+  font-weight: 600;
+  pointer-events: none;
+  z-index: 1;
+}
+
 .property-detail-page .main-image .main-video-frame {
   width: 100%;
   height: 100%;

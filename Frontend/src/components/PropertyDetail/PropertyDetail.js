@@ -48,6 +48,33 @@ import {
 } from '../../helpers/index.js'
 import './PropertyDetail.css'
 
+// Foto de la galería. Las fotos originales pesan 2–3 MB: al pasar a la siguiente, el navegador
+// seguía mostrando la anterior hasta terminar de bajar la nueva, y en el celular parecía que la
+// galería repetía siempre la misma foto. Ahora la foto anterior desaparece al instante, se ve
+// «Cargando foto…» hasta que llega la nueva, y la siguiente y la anterior se bajan de antemano.
+function GalleryImage({ src, preload = [], className = '', ...rest }) {
+  const [loadedSrc, setLoadedSrc] = useState(null)
+  const loaded = loadedSrc === src
+  useEffect(() => {
+    preload.filter((u) => u && u !== src).forEach((u) => { const img = new Image(); img.src = u })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [src, preload.join('|')])
+  return (
+    <>
+      {!loaded && <span className="gallery-loading" aria-hidden="true">Cargando foto…</span>}
+      <img
+        key={src}
+        src={src}
+        ref={(el) => { if (el && el.complete && el.naturalWidth && loadedSrc !== src) setLoadedSrc(src) }}
+        onLoad={() => setLoadedSrc(src)}
+        onError={() => setLoadedSrc(src)}
+        className={`${className}${loaded ? '' : ' is-loading'}`.trim() || undefined}
+        {...rest}
+      />
+    </>
+  )
+}
+
 // Espejo del seed de WhatsAppContact en el backend, solo para el fallback cuando
 // /api/whatsapp/next-agent no responde (no debería repartirse siempre a la misma persona).
 const FALLBACK_CONTACTS = [
@@ -688,12 +715,12 @@ export default function PropertyDetail({ property }) {
                       </span>
                     </button>
                   ) : (
-                    <img
-                      src={imgUrl(
-                        galleryPhotos[currentMediaItem.index]?.image ||
-                        galleryPhotos[currentMediaItem.index]?.thumb,
-                        1200
-                      )}
+                    <GalleryImage
+                      src={galleryPhotos[currentMediaItem.index]?.image || galleryPhotos[currentMediaItem.index]?.thumb}
+                      preload={[
+                        galleryPhotos[(currentMediaItem.index + 1) % galleryPhotos.length]?.image,
+                        galleryPhotos[(currentMediaItem.index - 1 + galleryPhotos.length) % galleryPhotos.length]?.image,
+                      ]}
                       alt={currentPhotoCaption || property.publication_title}
                       onClick={() => {
                         setLightboxIndex(currentMediaItem.index)
@@ -1025,8 +1052,12 @@ export default function PropertyDetail({ property }) {
           >
             <FaChevronRight />
           </button>
-          <img
+          <GalleryImage
             src={galleryPhotos[lightboxIndex]?.image}
+            preload={[
+              galleryPhotos[(lightboxIndex + 1) % galleryPhotos.length]?.image,
+              galleryPhotos[(lightboxIndex - 1 + galleryPhotos.length) % galleryPhotos.length]?.image,
+            ]}
             alt={galleryPhotos[lightboxIndex]?.description || property.publication_title}
             onClick={(e) => e.stopPropagation()}
             {...swipe(nextLightboxImage, prevLightboxImage)}
