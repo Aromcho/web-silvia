@@ -112,7 +112,20 @@ async function syncFromCRM() {
     }
   }
 
-  lastCrmSyncAt = syncStartedAt;
+  // En el sync completo (al arrancar) se avisa de fichas que la web tiene y el CRM ya no manda,
+  // y de ids repetidos: cualquiera de las dos deja una ficha vieja publicada sin actualizarse.
+  if (!lastCrmSyncAt && properties.length > 0) {
+    const feedIds = properties.map((p) => p.id);
+    const stale = await Property.find({ id: { $nin: feedIds } }, { id: 1 }).lean();
+    if (stale.length) console.warn(`[sync] la web tiene ${stale.length} fichas que el CRM no manda: ${stale.map((s) => s.id).join(', ')}`);
+    const dups = await Property.aggregate([{ $group: { _id: '$id', n: { $sum: 1 } } }, { $match: { n: { $gt: 1 } } }]);
+    if (dups.length) console.warn(`[sync] ids repetidos en la web: ${dups.map((d) => `${d._id} (${d.n})`).join(', ')}`);
+  }
+
+  // Se solapan 2 minutos con la vuelta anterior: un cambio que el CRM estaba guardando justo mientras
+  // se hacía la consulta (updatedAt anterior al pedido, pero todavía sin escribir) se perdía para
+  // siempre. Pasó con las versiones livianas de las fotos: algunas fichas quedaron con la foto vieja.
+  lastCrmSyncAt = new Date(syncStartedAt.getTime() - 2 * 60 * 1000);
 }
 
 export async function syncPropertiesFromCRM() {
