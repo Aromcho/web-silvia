@@ -13,7 +13,7 @@ import {
   slimPropertiesForSnapshot,
   useIsomorphicLayoutEffect,
 } from '../../helpers/listRestore'
-import './Properties.css'
+import './PropertiesSection.css'
 
 const HOME_PROPERTIES_CACHE_KEY = 'silvia-home-properties-cache-v2'
 const CACHE_TTL_MS = 60 * 1000 // 1 minuto

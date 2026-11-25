@@ -1,0 +1,266 @@
+/* Carruseles del home.
+   La tarjeta es la misma de todo el sitio (PropertyCard.css): acá solo se le fija el ancho.
+   El aire y los títulos usan los tokens --sf-* de globals.css. */
+.properties-section {
+  padding: var(--sf-section-y) 0;
+  background: var(--sf-tint);
+}
+
+.property-section + .property-section {
+  margin-top: var(--sf-block-gap);
+}
+
+/* Selección destacada: única fila con marco */
+.property-section--featured .section-surface {
+  position: relative;
+  overflow: hidden;
+  padding: 28px;
+  border: 1.5px solid transparent;
+  border-radius: 24px;
+  background:
+    linear-gradient(#fff, #fff) padding-box,
+    linear-gradient(135deg, #00815c 0%, #7bdcb5 48%, #00815c 100%) border-box;
+  box-shadow: 0 18px 45px rgba(0, 129, 92, 0.08);
+}
+
+.featured-stars {
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+  margin-bottom: 8px;
+  color: #c8a34a;
+  font-size: 0.95rem;
+}
+
+.properties-section .section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+/* Mismo título que .sf-title, alineado a la izquierda */
+.properties-section .section-title {
+  margin: 0;
+  color: var(--primary-color);
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+/* Carrusel */
+.carousel-shell {
+  position: relative;
+}
+
+.properties-scroll-container {
+  /* El ancho de las tarjetas se calcula sobre el carrusel (cqi) */
+  container-type: inline-size;
+  overflow-x: auto;
+  overflow-y: hidden;
+  /* Lugar para la sombra de las tarjetas (overflow la recortaba) sin mover el resto */
+  margin: -12px 0 -40px;
+  padding: 12px 0 40px;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+}
+
+.properties-scroll-container::-webkit-scrollbar {
+  display: none;
+}
+
+.featured-carousel {
+  overflow: hidden;
+}
+
+.properties-section .properties-grid {
+  display: flex;
+  flex-wrap: nowrap;
+  min-width: max-content;
+}
+
+.properties-group {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 16px;
+}
+
+/* Marquesina de destacadas: dos grupos iguales; cada uno lleva su separación a la derecha
+   para que el salto del -50% no se note */
+.featured-track {
+  width: max-content;
+  animation: featured-marquee 34s linear infinite;
+}
+
+.featured-track .properties-group {
+  padding-right: 16px;
+}
+
+.featured-carousel:hover .featured-track {
+  animation-play-state: paused;
+}
+
+@keyframes featured-marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+/* Tres tarjetas exactas por vista */
+.properties-section .modern-property-card {
+  flex: 0 0 auto;
+  width: 360px;
+  width: calc((100cqi - 32px) / 3);
+  height: auto;
+}
+
+.carousel-arrow {
+  position: absolute;
+  top: 110px;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid rgba(0, 129, 92, 0.22);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.95);
+  color: var(--primary-color);
+  box-shadow: 0 12px 28px rgba(0, 129, 92, 0.16);
+  transform: translateY(-50%);
+  cursor: pointer;
+  transition: background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.carousel-arrow--left {
+  left: 10px;
+}
+
+.carousel-arrow--right {
+  right: 10px;
+}
+
+.carousel-arrow:hover {
+  background: var(--white-color);
+  box-shadow: 0 16px 32px rgba(0, 129, 92, 0.2);
+}
+
+/* Carga y error */
+.properties-section .loading-state,
+.properties-section .error-state {
+  padding: 48px 20px;
+  text-align: center;
+}
+
+.properties-section .skeleton-loader {
+  display: flex;
+  gap: 16px;
+  overflow: hidden;
+}
+
+.properties-section .skeleton-card {
+  flex: 0 0 360px;
+  overflow: hidden;
+  border-radius: var(--sf-radius-card);
+  background: var(--white-color);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+}
+
+.properties-section .skeleton-image {
+  height: 220px;
+}
+
+.properties-section .skeleton-content {
+  padding: 24px;
+}
+
+.properties-section .skeleton-line {
+  height: 16px;
+  margin-bottom: 12px;
+  border-radius: 4px;
+}
+
+.properties-section .skeleton-image,
+.properties-section .skeleton-line {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: properties-skeleton 1.5s infinite;
+}
+
+.properties-section .skeleton-line.short {
+  width: 60%;
+}
+
+@keyframes properties-skeleton {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.properties-section .error-state button {
+  min-height: 44px;
+  margin-top: 16px;
+  padding: 0 24px;
+  border: none;
+  border-radius: 12px;
+  background: var(--primary-color);
+  color: var(--white-color);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* Tablet: dos tarjetas por vista */
+@media (max-width: 1024px) {
+  .properties-section .modern-property-card {
+    width: calc((100cqi - 16px) / 2);
+  }
+}
+
+/* Mobile: una tarjeta y se asoma la siguiente; el carrusel llega a los bordes de la pantalla */
+@media (max-width: 768px) {
+  .properties-section .section-header {
+    margin-bottom: 16px;
+  }
+
+  .properties-section .section-title {
+    font-size: 1.625rem;
+  }
+
+  .property-section--featured .section-surface {
+    padding: 20px 16px;
+    border-radius: 20px;
+  }
+
+  .properties-scroll-container {
+    margin-right: -16px;
+    margin-left: -16px;
+    scroll-snap-type: x mandatory;
+    scroll-padding-left: 16px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .properties-section .properties-grid {
+    padding: 0 16px;
+  }
+
+  .properties-section .properties-grid.featured-track {
+    padding: 0;
+  }
+
+  .properties-section .modern-property-card {
+    width: min(calc(100vw - 72px), 340px);
+    scroll-snap-align: start;
+  }
+
+  .carousel-arrow {
+    display: none;
+  }
+}

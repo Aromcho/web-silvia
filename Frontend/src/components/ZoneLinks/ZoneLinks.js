@@ -65,17 +65,19 @@ export function ZoneChips({ typeKey, standalone = true }) {
 
 export default function ZoneLinks() {
   return (
-    <section className="zone-links-section" aria-labelledby="zone-links-title">
+    <section className="sf-section" aria-labelledby="zone-links-title">
       <div className="container">
-        <h2 id="zone-links-title">Propiedades por <span className="underline">zona</span></h2>
-        <p className="zone-links-intro">
-          Silvia Fernández Propiedades es una inmobiliaria con oficina central en Mar Azul y sucursal boutique
-          en Mar de las Pampas. Trabajamos con casas, lotes, complejos y alquileres temporarios y anuales en
-          Mar Azul, Las Gaviotas, Mar de las Pampas y Villa Gesell.
-        </p>
+        <header className="sf-head">
+          <h2 className="sf-title" id="zone-links-title">Propiedades por <span className="sf-accent">zona</span></h2>
+          <p className="sf-subtitle">
+            Silvia Fernández Propiedades es una inmobiliaria con oficina central en Mar Azul y sucursal boutique
+            en Mar de las Pampas. Trabajamos con casas, lotes, complejos y alquileres temporarios y anuales en
+            Mar Azul, Las Gaviotas, Mar de las Pampas y Villa Gesell.
+          </p>
+        </header>
         <div className="zone-links-grid">
           {ZONE_SLUGS.map((zoneKey) => (
-            <div className="zone-links-card" key={zoneKey}>
+            <div className="sf-card zone-links-card" key={zoneKey}>
               <h3>{ZONES[zoneKey].name}</h3>
               <ul>
                 {LANDING_TYPE_SLUGS.map((typeKey) => (
