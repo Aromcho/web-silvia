@@ -1066,3 +1066,90 @@
     text-align: center;
   }
 }
+
+/* ── Mismo lenguaje que el resto de las páginas: franja verde arriba y contenido sobre fondo claro
+   (antes toda la página era verde y era la única distinta) ── */
+.search-page {
+  background: #f6faf8;
+}
+
+.search-page::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 250px;
+  background: linear-gradient(135deg, var(--primary-color) 0%, #006b4d 100%);
+}
+
+/* Título de la página: es el h1 y se ve también en mobile */
+.search-page .filters-title {
+  margin: 0 0 1.25rem;
+  line-height: 1.25;
+}
+
+/* El buscador de ubicación ocupa el resto de la fila (antes se cortaba a 400px) */
+.search-page .location-search {
+  max-width: none;
+}
+
+.search-page .view-btn {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+@media (max-width: 768px) {
+  .search-page::before {
+    height: 190px;
+  }
+
+  .search-page .filters-title {
+    display: block;
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+  }
+
+  /* Debajo del header fijo (74px) con aire */
+  .search-page .search-container {
+    margin-top: 90px;
+    padding: 0 0.75rem;
+  }
+
+  /* Dos columnas cuando entran (tablet vertical); una en el teléfono */
+  .search-page .properties-grid,
+  .search-page .properties-grid.list-view {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1rem;
+  }
+
+  /* En mobile la vista lista no aporta (ya va una tarjeta por fila) y cortaba las tarjetas:
+     se oculta el selector y las tarjetas quedan siempre en columna */
+  .search-page .results-header {
+    display: none;
+  }
+
+  .search-page .list-view .modern-property-card {
+    flex-direction: column;
+    height: 100%;
+  }
+
+  .search-page .list-view .property-image {
+    width: 100%;
+    height: 200px;
+  }
+
+  .search-page .list-view .property-content {
+    padding: 1rem;
+  }
+
+  .search-page .list-view .property-actions {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .search-page .list-view .btn-view {
+    flex: 1;
+    min-width: 0;
+  }
+}

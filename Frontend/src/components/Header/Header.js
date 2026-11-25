@@ -108,7 +108,8 @@ const Header = () => {
           <button 
             className={`mobile-menu-btn ${isMenuOpen ? 'active' : ''}`}
             onClick={toggleMenu}
-            aria-label="Toggle menu"
+            aria-label={isMenuOpen ? 'Cerrar menú' : 'Abrir menú'}
+            aria-expanded={isMenuOpen}
           >
             <span></span>
             <span></span>

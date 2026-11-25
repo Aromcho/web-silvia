@@ -239,8 +239,6 @@ const PropertiesGrid = ({ filters = {}, onCountChange, emptyState }) => {
         return;
       }
 
-      console.log('📦 PropertiesGrid response:', response);
-      console.log('✅ Properties loaded:', response?.objects?.length || 0);
       const nextProperties = response?.objects || [];
       const total = response?.meta?.total_count || 0;
       setPage(pageToLoad);
@@ -272,30 +270,6 @@ const PropertiesGrid = ({ filters = {}, onCountChange, emptyState }) => {
       }
     }
   };
-
-  useEffect(() => {
-    if (!loadMoreRef.current || loading || loadingMore || !hasMore) {
-      return undefined;
-    }
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const [entry] = entries;
-        if (entry.isIntersecting && !loading && !loadingMore && hasMore) {
-          loadProperties({ pageToLoad: page + 1, replace: false });
-        }
-      },
-      {
-        root: null,
-        rootMargin: '300px 0px',
-        threshold: 0.1,
-      }
-    );
-
-    observer.observe(loadMoreRef.current);
-
-    return () => observer.disconnect();
-  }, [hasMore, loading, loadingMore, page]);
 
   useEffect(() => {
     if (onCountChange) onCountChange(loading ? null : totalCount);
@@ -334,7 +308,19 @@ const PropertiesGrid = ({ filters = {}, onCountChange, emptyState }) => {
           )}
         </div>
 
-        <div ref={loadMoreRef} className="infinite-scroll-sentinel" aria-hidden="true" />
+        {/* "Ver más" en lugar de scroll infinito: el footer queda siempre al alcance */}
+        {hasMore && !loadingMore && properties.length > 0 && (
+          <div className="load-more">
+            <p className="load-more-count">Mostrando {properties.length} de {totalCount}</p>
+            <button
+              type="button"
+              className="load-more-btn"
+              onClick={() => loadProperties({ pageToLoad: page + 1, replace: false })}
+            >
+              Ver más propiedades
+            </button>
+          </div>
+        )}
 
         {loadingMore && (
           <div className="loading-grid loading-more-grid">

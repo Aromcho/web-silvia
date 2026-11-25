@@ -182,7 +182,7 @@ export default function NosotrosPage() {
                 <div className="office-info">
                   <h3>Central</h3>
                   <div className="office-location-row">
-                    <p className="office-location">📍 Calle 34, Mar del Plata & Mar Azul</p>
+                    <p className="office-location"><FaMapMarkerAlt aria-hidden="true" /> Calle 34, Mar del Plata & Mar Azul</p>
                     <a
                       className="office-map-btn"
                       href="https://maps.app.goo.gl/nRSsuL4ouVaqjUVd8"
@@ -199,9 +199,9 @@ export default function NosotrosPage() {
               <div className="office-card">
                 <div className="office-image" style={{backgroundImage: 'url(/assets/images/oficinas/boutique-portada.webp)'}}></div>
                 <div className="office-info">
-                  <h3>Sucursal</h3>
+                  <h3>Sucursal boutique</h3>
                   <div className="office-location-row">
-                    <p className="office-location">📍 Av del Plata y Uritorco - Mar de las Pampas</p>
+                    <p className="office-location"><FaMapMarkerAlt aria-hidden="true" /> Av del Plata y Uritorco - Mar de las Pampas</p>
                     <a
                       className="office-map-btn"
                       href="https://maps.app.goo.gl/F7tXnRHV1xBVK3qq6"

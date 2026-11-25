@@ -187,3 +187,71 @@ a:hover {
     padding: 0 16px;
   }
 }
+
+/* ── Base compartida ── */
+
+/* Los campos heredan la tipografía (el textarea del contacto salía en monospace) */
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
+}
+
+.btn {
+  border-radius: 12px;
+}
+
+/* Foco visible con teclado en todo el sitio */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid rgba(0, 129, 92, 0.45);
+  outline-offset: 2px;
+}
+
+/* "Ver más" de los listados (reemplaza al scroll infinito: el footer queda siempre al alcance) */
+.load-more {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 2.5rem;
+}
+
+.load-more-count {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+
+.load-more-btn {
+  min-height: 48px;
+  padding: 0.8rem 2rem;
+  border: 2px solid var(--primary-color);
+  border-radius: 12px;
+  background: var(--white-color);
+  color: var(--primary-color);
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.load-more-btn:hover:not(:disabled) {
+  background: var(--primary-color);
+  color: var(--white-color);
+}
+
+@media (max-width: 768px) {
+  .load-more-btn {
+    width: 100%;
+  }
+}
+
+/* Las anclas (#contacto) no quedan debajo del header fijo */
+html {
+  scroll-padding-top: 96px;
+}
