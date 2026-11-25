@@ -48,15 +48,27 @@ export function PropertyZoneLinks({ property }) {
 
 // Fila «¿En qué zona?» del panel de filtros de /lotes-terrenos y /alquiler-temporario.
 // Sola (standalone) trae su propio panel; dentro del panel de otra página va con standalone={false}.
-export function ZoneChips({ typeKey, standalone = true }) {
+// activeZone marca la zona en la que se está; allHref agrega «Todas» (vuelve al listado completo).
+export function ZoneChips({ typeKey, standalone = true, activeZone = null, allHref = null }) {
   const type = LANDING_TYPES[typeKey]
   if (!type) return null
+  const chipClass = (active) => `zone-chip${active ? ' is-active' : ''}`
   const row = (
     <nav className="zone-chips" aria-label={`${type.short} por zona`}>
       <span className="zone-chips-label"><FaMapMarkerAlt aria-hidden="true" /> ¿En qué zona?</span>
       <div className="zone-chips-list">
+        {allHref && (
+          <Link href={allHref} className={chipClass(!activeZone)} aria-current={!activeZone ? 'page' : undefined}>
+            Todas
+          </Link>
+        )}
         {ZONE_SLUGS.map((zoneKey) => (
-          <Link key={zoneKey} href={landingPath(typeKey, zoneKey)} className="zone-chip">
+          <Link
+            key={zoneKey}
+            href={landingPath(typeKey, zoneKey)}
+            className={chipClass(zoneKey === activeZone)}
+            aria-current={zoneKey === activeZone ? 'page' : undefined}
+          >
             {ZONES[zoneKey].name}
           </Link>
         ))}

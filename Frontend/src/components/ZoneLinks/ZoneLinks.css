@@ -267,6 +267,14 @@
   color: var(--primary-color);
 }
 
+/* Zona en la que se está (o «Todas» en el listado completo) */
+.zone-chip.is-active,
+.zone-chip.is-active:hover {
+  border-color: var(--primary-color);
+  background: var(--primary-color);
+  color: var(--white-color);
+}
+
 @media (max-width: 768px) {
   .zone-chips,
   .filter-panel > .zone-chips:only-child {

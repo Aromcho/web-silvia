@@ -17,6 +17,7 @@ import {
   buildSummary,
   buildFaq,
 } from '../../helpers/landings.js'
+import { ZoneChips } from '../ZoneLinks/ZoneLinks'
 import '../../app/lotes-terrenos/page.css'
 import '../PropertiesGrid/PropertiesGrid.css'
 import './ZoneLanding.css'
@@ -124,7 +125,7 @@ export default async function ZoneLanding({ typeKey, params, searchParams }) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }}
       />
 
-      <div className="page-hero">
+      <div className="page-hero page-hero--with-panel">
         <div className="container">
           <nav className="zl-breadcrumb" aria-label="Estás en">
             <Link href="/">Inicio</Link>
@@ -142,11 +143,8 @@ export default async function ZoneLanding({ typeKey, params, searchParams }) {
         </div>
       </div>
 
-      <section className="container zl-intro">
-        {summary && <p className="zl-summary">{summary}</p>}
-        <p>{zone.intro}</p>
-        <p>{type.lead}</p>
-      </section>
+      {/* Mismo panel de zonas que los listados, con esta zona marcada */}
+      <ZoneChips typeKey={typeKey} activeZone={zoneKey} allHref={type.parent.href} />
 
       {items.length > 0 ? (
         <div className="properties-grid-container zl-grid">
@@ -192,6 +190,29 @@ export default async function ZoneLanding({ typeKey, params, searchParams }) {
           </a>
         </section>
       )}
+
+      {/* Texto de la zona: va después del listado, no antes (arriba era un bloque de letras) */}
+      <section className="zl-about" aria-labelledby="zl-about-title">
+        <div className="container zl-about-grid">
+          <div className="zl-about-text">
+            <h2 id="zl-about-title">Sobre {zone.name}</h2>
+            <p>{zone.intro}</p>
+            <p>{type.lead}</p>
+          </div>
+          <aside className="sf-card zl-about-card">
+            <p className="zl-about-kicker">Hoy en {zone.name}</p>
+            {summary && <p className="zl-summary">{summary}</p>}
+            <a
+              className="zl-whatsapp"
+              href={`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(whatsappText)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Consultar por WhatsApp
+            </a>
+          </aside>
+        </div>
+      </section>
 
       {faq.length > 0 && (
         <section className="container zl-faq" aria-labelledby="zl-faq-title">

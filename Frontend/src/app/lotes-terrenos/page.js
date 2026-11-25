@@ -19,7 +19,7 @@ export default function LotesPage() {
           <p>Encontrá el terreno perfecto para construir tu proyecto</p>
         </div>
       </div>
-      <ZoneChips typeKey="lotes-terrenos" />
+      <ZoneChips typeKey="lotes-terrenos" allHref="/lotes-terrenos" />
       <PropertiesGrid filters={{ type: 'terreno' }} />
     </div>
   );

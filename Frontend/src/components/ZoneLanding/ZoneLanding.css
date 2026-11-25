@@ -14,24 +14,80 @@
   text-underline-offset: 2px;
 }
 
-/* Aire: del hero al texto, del texto al listado y entre bloques, con los tokens del sitio */
-.zone-landing .zl-intro {
-  max-width: 820px;
-  margin: 0 auto;
-  padding-top: var(--sf-list-top);
-  color: #475569;
-  font-size: 1.05rem;
-  line-height: 1.7;
-  text-align: center;
-}
-
-.zone-landing .zl-intro p + p {
-  margin-top: 0.75rem;
-}
-
+/* El listado va pegado al panel de zonas, como en Lotes y Alquileres */
 .zone-landing .zl-grid {
-  padding-top: var(--sf-list-top);
   min-height: 0;
+}
+
+/* Texto de la zona, después del listado: a la izquierda el texto, a la derecha los datos del día */
+.zone-landing .zl-about {
+  padding: var(--sf-section-y) 0;
+  background: var(--sf-tint);
+}
+
+.zone-landing .zl-about-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  gap: 48px;
+  align-items: center;
+}
+
+.zone-landing .zl-about h2 {
+  margin: 0 0 16px;
+  color: var(--primary-color);
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.zone-landing .zl-about-text p {
+  margin: 0;
+  color: #475569;
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+.zone-landing .zl-about-text p + p {
+  margin-top: 12px;
+}
+
+.zone-landing .zl-about-card {
+  padding: 28px;
+}
+
+.zone-landing .zl-about-kicker {
+  margin: 0 0 8px;
+  color: var(--primary-color);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.zone-landing .zl-about-card .zl-summary {
+  margin: 0 0 20px;
+  font-size: 1.0625rem;
+  line-height: 1.6;
+}
+
+.zone-landing .zl-about-card .zl-whatsapp {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  margin-top: 0;
+}
+
+.zone-landing .zl-about + .zl-faq,
+.zone-landing .zl-about + .zl-more {
+  padding-top: var(--sf-section-y);
+}
+
+@media (max-width: 900px) {
+  .zone-landing .zl-about-grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
 }
 
 .zone-landing .zl-pagination {
@@ -161,10 +217,15 @@
 }
 
 @media (max-width: 768px) {
-  .zone-landing .zl-intro {
-    font-size: 1rem;
+  .zone-landing .zl-about-card {
+    padding: 20px;
   }
 
+  .zone-landing .zl-about-card .zl-whatsapp {
+    display: flex;
+  }
+
+  .zone-landing .zl-about h2,
   .zone-landing .zl-faq h2,
   .zone-landing .zl-more h2 {
     font-size: 1.625rem;

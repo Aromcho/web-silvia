@@ -24,7 +24,7 @@ export default function AlquilerTemporarioPage() {
       {/* TemporaryRentalBrowser lee ?tipo y ?personas con useSearchParams: Next pide un Suspense.
           Las zonas van dentro de su panel de filtros (antes quedaban sueltas entre el hero y el filtro). */}
       <Suspense fallback={<PropertiesGridSkeleton />}>
-        <TemporaryRentalBrowser zoneChips={<ZoneChips typeKey="alquiler-temporario" standalone={false} />} />
+        <TemporaryRentalBrowser zoneChips={<ZoneChips typeKey="alquiler-temporario" standalone={false} allHref="/alquiler-temporario" />} />
       </Suspense>
     </div>
   );
