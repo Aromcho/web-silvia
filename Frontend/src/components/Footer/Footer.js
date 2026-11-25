@@ -65,22 +65,24 @@ const Footer = () => {
               <ul className="footer-links">
                 <li><Link href="/">Inicio</Link></li>
                 <li><Link href="/nosotros">Nosotros</Link></li>
-                <li><Link href="/#propiedades">Propiedades</Link></li>
+                <li><Link href="/propiedades">Propiedades</Link></li>
+                <li><Link href="/lotes-terrenos">Lotes y terrenos</Link></li>
+                <li><Link href="/alquiler-temporario">Alquileres</Link></li>
                 <li><Link href="/videos">Videos de propiedades</Link></li>
-                <li><Link href="/#servicios">Servicios</Link></li>
                 <li><Link href="/#contacto">Contacto</Link></li>
               </ul>
             </div>
 
-            {/* Servicios */}
+            {/* Por zona: links reales a las páginas de cada búsqueda (SEO) */}
             <div className="footer-section">
-              <h3 className="footer-title">Servicios</h3>
+              <h3 className="footer-title">Buscá por zona</h3>
               <ul className="footer-links">
-                <li><Link href="/#propiedades">Venta de Propiedades</Link></li>
-                <li><Link href="/#propiedades">Alquiler</Link></li>
-                <li><Link href="/#propiedades">Tasaciones</Link></li>
-                <li><Link href="/#servicios">Asesoramiento</Link></li>
-                <li><Link href="/#servicios">Inversiones</Link></li>
+                <li><Link href="/venta/mar-azul">Venta en Mar Azul</Link></li>
+                <li><Link href="/venta/mar-de-las-pampas">Venta en Mar de las Pampas</Link></li>
+                <li><Link href="/venta/las-gaviotas">Venta en Las Gaviotas</Link></li>
+                <li><Link href="/lotes-terrenos/mar-azul">Lotes en Mar Azul</Link></li>
+                <li><Link href="/alquiler-temporario/mar-azul">Alquiler temporario en Mar Azul</Link></li>
+                <li><Link href="/alquiler-temporario/mar-de-las-pampas">Alquiler temporario en Mar de las Pampas</Link></li>
               </ul>
             </div>
 
@@ -136,7 +138,6 @@ const Footer = () => {
             <p>&copy; {currentYear} Silvia Fernández Inmobiliaria. Todos los derechos reservados.</p>
             <div className="footer-bottom-links">
               <Link href="/privacidad">Política de Privacidad</Link>
-              <Link href="#terms">Términos y Condiciones</Link>
             </div>
           </div>
         </div>

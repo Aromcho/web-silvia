@@ -1,19 +1,68 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { usePathname } from 'next/navigation';
 import WhatsAppChat from '../WhatsAppChat/WhatsAppChat';
 import './Header.css';
+
+const NAV_LINKS = [
+  { href: '/propiedades', label: 'Propiedades' },
+  { href: '/lotes-terrenos', label: 'Lotes - Terrenos' },
+  { href: '/alquiler-temporario', label: 'Alquileres' },
+  { href: '/complejos', label: 'Complejos' },
+  { href: '/videos', label: 'Videos' },
+  { href: '/nosotros', label: 'Nosotros' },
+];
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(false);
 
+  const pathname = usePathname() || '/';
+
   const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
+    setIsMenuOpen((open) => !open);
   };
 
+  const closeMenu = () => setIsMenuOpen(false);
+
+  const openChat = () => {
+    setIsMenuOpen(false);
+    setIsChatOpen(true);
+  };
+
+  // El menú se cierra solo al cambiar de página
+  useEffect(() => {
+    setIsMenuOpen(false);
+  }, [pathname]);
+
+  // Con el menú abierto: Escape lo cierra y la página de atrás no scrollea
+  useEffect(() => {
+    if (!isMenuOpen) return undefined;
+    const onKey = (event) => {
+      if (event.key === 'Escape') setIsMenuOpen(false);
+    };
+    const root = document.documentElement;
+    const previousOverflow = root.style.overflow;
+    root.style.overflow = 'hidden';
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      root.style.overflow = previousOverflow;
+    };
+  }, [isMenuOpen]);
+
+  const isActive = (href) => pathname === href || pathname.startsWith(`${href}/`);
+  const linkClass = (href, base = '') => `${base}${isActive(href) ? ' active' : ''}`.trim();
+
   return (
+    <>
+    <div
+      className={`mobile-menu-backdrop ${isMenuOpen ? 'is-open' : ''}`}
+      onClick={closeMenu}
+      aria-hidden="true"
+    />
     <header className="header">
       <div className="container-hero">
         <div className="header-content">
@@ -31,27 +80,17 @@ const Header = () => {
           {/* Desktop Navigation */}
           <nav className={`nav ${isMenuOpen ? 'nav-open' : ''}`}>
             <ul className="nav-list">
-              <li className="nav-item">
-                <Link href="/propiedades" className="nav-link">Propiedades</Link>
-              </li>
-              <li className="nav-item">
-                <Link href="/lotes-terrenos" className="nav-link">Lotes - Terrenos</Link>
-              </li>
-              <li className="nav-item">
-                <Link href="/alquiler-temporario" className="nav-link">Alquileres</Link>
-              </li>
-              <li className="nav-item">
-                <Link href="/complejos" className="nav-link">Complejos</Link>
-              </li>
-              <li className="nav-item">
-                <Link href="/videos" className="nav-link">Videos</Link>
-              </li>
-              <li className="nav-item">
-                <Link href="/nosotros" className="nav-link">Nosotros</Link>
-              </li>
-              <li className="nav-item">
-                <Link href="/mapa" className="nav-link">Mapa</Link>
-              </li>
+              {NAV_LINKS.map((link) => (
+                <li className="nav-item" key={link.href}>
+                  <Link
+                    href={link.href}
+                    className={linkClass(link.href, 'nav-link')}
+                    aria-current={isActive(link.href) ? 'page' : undefined}
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </nav>
 
@@ -80,20 +119,31 @@ const Header = () => {
         {/* Mobile Menu */}
         <div className={`mobile-menu ${isMenuOpen ? 'mobile-menu-open' : ''}`}>
           <ul className="mobile-nav-list">
-            <li><Link href="/propiedades" onClick={toggleMenu}>Propiedades</Link></li>
-            <li><Link href="/lotes-terrenos" onClick={toggleMenu}>Lotes - Terrenos</Link></li>
-            <li><Link href="/alquiler-temporario" onClick={toggleMenu}>Alquileres</Link></li>
-            <li><Link href="/complejos" onClick={toggleMenu}>Complejos</Link></li>
-            <li><Link href="/videos" onClick={toggleMenu}>Videos</Link></li>
-            <li><Link href="/nosotros" onClick={toggleMenu}>Nosotros</Link></li>
-            <li><Link href="/mapa" onClick={toggleMenu}>Mapa</Link></li>
+            {NAV_LINKS.map((link) => (
+              <li key={link.href}>
+                <Link
+                  href={link.href}
+                  onClick={closeMenu}
+                  className={linkClass(link.href)}
+                  aria-current={isActive(link.href) ? 'page' : undefined}
+                >
+                  {link.label}
+                </Link>
+              </li>
+            ))}
           </ul>
+          <div className="mobile-menu-cta">
+            <button type="button" onClick={openChat} className="btn btn-primary">
+              Consultar Ahora
+            </button>
+          </div>
         </div>
       </div>
       
       {/* WhatsApp Chat Modal */}
       <WhatsAppChat isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} />
     </header>
+    </>
   );
 };
 

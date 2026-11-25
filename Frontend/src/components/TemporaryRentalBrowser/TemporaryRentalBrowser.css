@@ -4,6 +4,12 @@
   margin-top: -36px;
 }
 
+/* Con los chips "Por zona" entre el hero y la barra, la barra ya no se monta sobre nada:
+   va debajo de los chips (antes las pestañas los tapaban en mobile y tablet) */
+.zone-chips + .trb-bar-wrap {
+  margin-top: 1.25rem;
+}
+
 /* Barra flotante que se monta sobre el hero (el contenido viene de GuestsFilter) */
 .trb-bar {
   background: var(--white-color);

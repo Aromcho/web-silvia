@@ -1,5 +1,8 @@
 'use client';
 import { useEffect, useState } from 'react';
+import { FaBullseye, FaHandshake, FaStar, FaBriefcase, FaWhatsapp, FaEnvelope, FaMapMarkerAlt } from 'react-icons/fa';
+import { FcGoogle } from 'react-icons/fc';
+import '../lotes-terrenos/page.css';
 import './page.css';
 
 const FOTOS_OFICINAS = {
@@ -119,22 +122,22 @@ export default function NosotrosPage() {
             <h2>Nuestros Valores</h2>
             <div className="values-grid">
               <div className="value-card">
-                <div className="value-icon">🎯</div>
+                <div className="value-icon"><FaBullseye aria-hidden="true" /></div>
                 <h3>Profesionalismo</h3>
                 <p>Trabajamos con los más altos estándares de calidad y ética profesional.</p>
               </div>
               <div className="value-card">
-                <div className="value-icon">🤝</div>
+                <div className="value-icon"><FaHandshake aria-hidden="true" /></div>
                 <h3>Confianza</h3>
                 <p>Construimos relaciones duraderas basadas en la transparencia y honestidad.</p>
               </div>
               <div className="value-card">
-                <div className="value-icon">⭐</div>
+                <div className="value-icon"><FaStar aria-hidden="true" /></div>
                 <h3>Excelencia</h3>
                 <p>Buscamos la excelencia en cada operación y servicio que brindamos.</p>
               </div>
               <div className="value-card">
-                <div className="value-icon">💼</div>
+                <div className="value-icon"><FaBriefcase aria-hidden="true" /></div>
                 <h3>Experiencia</h3>
                 <p>Años de trayectoria nos respaldan en el mercado inmobiliario.</p>
               </div>
@@ -153,7 +156,7 @@ export default function NosotrosPage() {
                 </p>
                 <div className="testimonial-author">
                   <strong>Duby Alfonso</strong>
-                  <img src="/images/google_logo.png" alt="Google" className="testimonial-logo" />
+                  <span className="testimonial-source"><FcGoogle aria-hidden="true" /> Google</span>
                 </div>
               </div>
               <div className="testimonial-card">
@@ -165,7 +168,7 @@ export default function NosotrosPage() {
                 </p>
                 <div className="testimonial-author">
                   <strong>Valeria Deferrari</strong>
-                  <img src="/images/google_logo.png" alt="Google" className="testimonial-logo" />
+                  <span className="testimonial-source"><FcGoogle aria-hidden="true" /> Google</span>
                 </div>
               </div>
             </div>
@@ -220,25 +223,25 @@ export default function NosotrosPage() {
             <p>Estamos para ayudarte en lo que necesites</p>
             <div className="contact-info">
               <div className="contact-item">
-                <span className="icon">📞</span>
+                <span className="icon"><FaWhatsapp aria-hidden="true" /></span>
                 <div>
                   <strong>WhatsApp</strong>
                   <p><a href="https://wa.me/5492255626092?text=Hola, consulto por una propiedad" target="_blank" rel="noopener noreferrer">Fabiana: +54 9 2255 62-6092</a></p>
                 </div>
               </div>
               <div className="contact-item">
-                <span className="icon">📧</span>
+                <span className="icon"><FaEnvelope aria-hidden="true" /></span>
                 <div>
                   <strong>Email</strong>
                   <p><a href="mailto:braicesfernandez@gmail.com">braicesfernandez@gmail.com</a></p>
                 </div>
               </div>
               <div className="contact-item">
-                <span className="icon">📍</span>
+                <span className="icon"><FaMapMarkerAlt aria-hidden="true" /></span>
                 <div>
                   <strong>Direcciones</strong>
                   <p>Central: Calle 34 y Mar del Plata - Mar Azul</p>
-                  <p>Sucursal: Av del Plata y Uritorco - Mar de las Pampas</p>
+                  <p>Sucursal boutique: Av del Plata y Uritorco - Mar de las Pampas</p>
                 </div>
               </div>
             </div>

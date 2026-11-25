@@ -166,3 +166,88 @@
     gap: 0.75rem;
   }
 }
+
+/* ── Grilla fluida (reemplaza las tarjetas de 359px fijos centradas): llena el ancho
+   del contenedor, alinea con filtros y títulos y pasa sola de 3 a 2 a 1 columna ── */
+.properties-grid-container {
+  padding: 2.5rem 0 4rem;
+  min-height: 40vh;
+}
+
+.zone-chips + .properties-grid-container {
+  padding-top: 1.75rem;
+}
+
+.properties-grid-container .properties-grid,
+.properties-grid-container .loading-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.properties-grid-container .properties-grid > .modern-property-card,
+.properties-grid-container .property-skeleton {
+  flex: none;
+  width: auto;
+  min-width: 0;
+  max-width: none;
+}
+
+.properties-grid-container .no-results {
+  grid-column: 1 / -1;
+}
+
+/* "Ver más" en lugar de scroll infinito: el footer queda siempre al alcance */
+.load-more {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 2.5rem;
+}
+
+.load-more-count {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+
+.load-more-btn {
+  min-height: 48px;
+  padding: 0.8rem 2rem;
+  border: 2px solid var(--primary-color);
+  border-radius: 12px;
+  background: var(--white-color);
+  color: var(--primary-color);
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.load-more-btn:hover:not(:disabled) {
+  background: var(--primary-color);
+  color: var(--white-color);
+}
+
+.load-more-btn:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+@media (max-width: 768px) {
+  .properties-grid-container {
+    padding: 1.5rem 0 3rem;
+  }
+
+  .properties-grid-container .properties-grid,
+  .properties-grid-container .loading-grid {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1rem;
+  }
+
+  .load-more-btn {
+    width: 100%;
+  }
+}

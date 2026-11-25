@@ -96,7 +96,36 @@
 .chat-header {
   background: linear-gradient(135deg, #075E54 0%, #128C7E 100%);
   color: var(--white-color);
-  padding: 1rem;
+  padding: 1rem 3.5rem 1rem 1rem;
+  position: relative;
+}
+
+/* Cerrar el chat (antes no había forma de cerrarlo al abrirlo desde el header) */
+.chat-close {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.16);
+  color: var(--white-color);
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.chat-close:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.chat-close:focus-visible {
+  outline: 2px solid var(--white-color);
+  outline-offset: 2px;
 }
 
 .chat-header-info {
@@ -224,6 +253,19 @@
 
 .quick-action-btn.ventas {
   background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+}
+
+/* Tercer botón ("Ver todos"): antes quedaba blanco sobre gris claro */
+.quick-action-btn:not(.alquileres):not(.ventas) {
+  background: var(--white-color);
+  color: #075E54;
+  box-shadow: inset 0 0 0 1px rgba(18, 140, 126, 0.35);
+}
+
+/* El logo entra entero en el círculo */
+.chat-logo {
+  object-fit: contain;
+  background: var(--white-color);
 }
 
 .quick-action-btn:hover {

@@ -4,7 +4,9 @@
   --secondary-color: #7bdcb5;
   --white-color: #ffffff;
   --black-color: #000000;
-  --gray30-color: #b0b0b0;
+  /* Gris de textos secundarios: antes #b0b0b0 (2,2:1 sobre blanco, ilegible); ahora 4,8:1 */
+  --gray30-color: #6b7280;
+  --text-muted: #5b6770;
   
   /* Semantic colors */
   --background: var(--white-color);

@@ -2,23 +2,7 @@
   min-height: 100vh;
 }
 
-.page-hero {
-  padding: 120px 0 60px;
-  background: linear-gradient(135deg, var(--primary-color) 0%, #006b4d 100%);
-  color: var(--white-color);
-  text-align: center;
-}
-
-.page-hero h1 {
-  font-size: 2.5rem;
-  font-weight: 700;
-  margin-bottom: 1rem;
-}
-
-.page-hero p {
-  font-size: 1.2rem;
-  opacity: 0.9;
-}
+/* .page-hero vive en app/lotes-terrenos/page.css (una sola definición para todas las páginas) */
 
 .nosotros-content {
   padding: 4rem 0;
@@ -359,7 +343,8 @@
   margin-bottom: 2rem;
 }
 
-.contact-info {
+/* Con .nosotros-page adelante: estas clases también existen en el footer */
+.nosotros-page .contact-info {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 2rem;
@@ -367,41 +352,72 @@
   margin: 0 auto;
 }
 
-.contact-item {
+.nosotros-page .contact-item {
   display: flex;
   align-items: center;
   gap: 1rem;
   text-align: left;
 }
 
-.contact-item .icon {
-  font-size: 2rem;
+.nosotros-page .contact-item .icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: rgba(0, 129, 92, 0.1);
+  color: var(--primary-color);
+  font-size: 1.35rem;
 }
 
-.contact-item strong {
+.nosotros-page .contact-item strong {
   display: block;
   color: var(--primary-color);
   font-size: 1rem;
   margin-bottom: 0.25rem;
 }
 
-.contact-item p {
-  color: var(--gray30-color);
+.nosotros-page .contact-item p {
+  color: var(--text-muted);
   margin: 0;
 }
 
+/* Íconos de valores y fuente de las reseñas (antes eran emojis e imágenes rotas) */
+.nosotros-page .value-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: rgba(0, 129, 92, 0.1);
+  color: var(--primary-color);
+  font-size: 1.6rem;
+}
+
+.nosotros-page .testimonial-source {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.nosotros-page .office-location {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--primary-color);
+}
+
+.nosotros-page .about-text p {
+  text-align: left;
+}
+
 @media (max-width: 768px) {
-  .page-hero {
-    padding: 100px 0 40px;
-  }
-  
-  .page-hero h1 {
-    font-size: 2rem;
-  }
-  
-  .page-hero p {
-    font-size: 1rem;
-  }
   
   .team-section h2 {
     font-size: 1.5rem;

@@ -224,3 +224,93 @@
     gap: 0.5rem;
   }
 }
+
+/* ── Aislado del resto: Nosotros usa .contact-info / .contact-item con otro layout
+   y, al navegar desde esa página, rompía el footer en todo el sitio ── */
+.footer .contact-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  max-width: none;
+  margin: 0;
+}
+
+.footer .contact-item {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 0.75rem;
+  text-align: left;
+  line-height: 1.45;
+}
+
+.footer .contact-item svg {
+  margin-top: 1px;
+}
+
+/* El logo es un JPG con fondo propio: se muestra como placa */
+.footer-logo img {
+  display: block;
+  max-width: 170px;
+  border-radius: 12px;
+}
+
+.footer-links li {
+  margin-bottom: 0.3rem;
+}
+
+.footer-links a,
+.footer-bottom-links a {
+  display: inline-block;
+  padding: 5px 0;
+}
+
+@media (max-width: 768px) {
+  /* Mobile compacto: marca arriba, enlaces en dos columnas, contacto en lista */
+  .footer-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 1.75rem 1.25rem;
+    text-align: left;
+  }
+
+  .footer-grid .footer-section:first-child,
+  .footer-grid .footer-section:last-child {
+    grid-column: 1 / -1;
+    margin-top: 0;
+  }
+
+  .footer-logo {
+    margin-bottom: 1rem;
+  }
+
+  .footer-logo img {
+    max-width: 140px;
+  }
+
+  .footer-description {
+    margin-bottom: 1.25rem;
+  }
+
+  .footer-social {
+    justify-content: flex-start;
+  }
+
+  .footer-title {
+    margin-bottom: 0.75rem;
+  }
+
+  .footer .contact-info {
+    align-items: stretch;
+    gap: 0.15rem;
+  }
+
+  .footer .contact-item {
+    padding: 7px 0;
+    font-size: 0.9rem;
+  }
+
+  .footer-bottom-content {
+    align-items: flex-start;
+    text-align: left;
+  }
+}

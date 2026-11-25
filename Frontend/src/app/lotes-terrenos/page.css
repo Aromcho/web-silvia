@@ -1,5 +1,6 @@
 .page-hero {
-  padding: 120px 0 60px;
+  /* 80px de header + aire parejo arriba y abajo del título */
+  padding: 112px 0 44px;
   background: linear-gradient(135deg, var(--primary-color) 0%, #006b4d 100%);
   color: var(--white-color);
   text-align: center;
@@ -21,7 +22,7 @@
 
 @media (max-width: 768px) {
   .page-hero {
-    padding: 100px 0 40px;
+    padding: 96px 0 32px;
   }
   
   .page-hero h1 {
