@@ -367,3 +367,81 @@ html {
     padding: 0 0.75rem;
   }
 }
+
+/* ── Sistema de secciones: una sola definición de aire y de títulos para todo el sitio ──
+   Cualquier sección nueva usa .sf-section + .sf-head; no se definen paddings ni títulos
+   propios por página (de ahí venían los espacios distintos entre pantallas). */
+:root {
+  --sf-section-y: 72px;   /* aire arriba y abajo de cada sección */
+  --sf-head-gap: 40px;    /* del título de la sección a su contenido */
+  --sf-block-gap: 56px;   /* entre bloques de una misma sección (carruseles del home) */
+  --sf-list-top: 40px;    /* del hero al listado, en las páginas sin panel de filtros */
+  --sf-radius-card: 20px;
+  --sf-tint: #f6faf8;
+  --sf-ink: #0f172a;
+  --sf-line: #e2ece7;
+}
+
+@media (max-width: 768px) {
+  :root {
+    --sf-section-y: 48px;
+    --sf-head-gap: 28px;
+    --sf-block-gap: 40px;
+    --sf-list-top: 24px;
+  }
+}
+
+.sf-section {
+  padding: var(--sf-section-y) 0;
+  background: var(--white-color);
+}
+
+.sf-section--tint {
+  background: var(--sf-tint);
+}
+
+.sf-head {
+  max-width: 760px;
+  margin: 0 auto var(--sf-head-gap);
+  text-align: center;
+}
+
+.sf-title {
+  margin: 0;
+  color: var(--primary-color);
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.sf-accent {
+  text-decoration: underline;
+  text-decoration-color: var(--secondary-color);
+  text-decoration-thickness: 3px;
+  text-underline-offset: 6px;
+}
+
+.sf-subtitle {
+  margin: 12px 0 0;
+  color: var(--text-muted);
+  font-size: 1.0625rem;
+  line-height: 1.6;
+}
+
+/* Tarjeta base de contenido (valores, reseñas, zonas, oficinas) */
+.sf-card {
+  border: 1px solid var(--sf-line);
+  border-radius: var(--sf-radius-card);
+  background: var(--white-color);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+}
+
+@media (max-width: 768px) {
+  .sf-title {
+    font-size: 1.625rem;
+  }
+
+  .sf-subtitle {
+    font-size: 1rem;
+  }
+}

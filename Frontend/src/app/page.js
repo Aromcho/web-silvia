@@ -1,7 +1,7 @@
 import Hero from '../components/Hero/Hero';
-import Offices from '../components/Offices/Offices';
+import Offices from '../components/Sections/OfficesSection';
 import Properties from '../components/Properties/Properties';
-import Contact from '../components/Contact/Contact';
+import Contact from '../components/Sections/ContactSection';
 import ZoneLinks from '../components/ZoneLinks/ZoneLinks';
 
 const HOME_TITLE = 'Inmobiliaria en Mar Azul y Mar de las Pampas | Silvia Fernández';

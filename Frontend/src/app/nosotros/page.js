@@ -1,40 +1,29 @@
-'use client';
-import { useEffect, useState } from 'react';
-import { FaBullseye, FaHandshake, FaStar, FaBriefcase, FaWhatsapp, FaEnvelope, FaMapMarkerAlt } from 'react-icons/fa';
+import { FaBullseye, FaHandshake, FaStar, FaBriefcase } from 'react-icons/fa';
 import { FcGoogle } from 'react-icons/fc';
+import Offices from '../../components/Sections/OfficesSection';
+import Contact from '../../components/Sections/ContactSection';
 import '../lotes-terrenos/page.css';
-import './page.css';
+import './nosotros.css';
 
-const FOTOS_OFICINAS = {
-  central: [
-    { src: '/assets/images/oficinas/central-1.webp', alt: 'Frente de la oficina Central en Mar Azul' },
-    { src: '/assets/images/oficinas/central-2.webp', alt: 'Vidriera de la oficina Central en Mar Azul' },
-    { src: '/assets/images/oficinas/central-3.webp', alt: 'Lateral de la oficina Central en Mar Azul' },
-  ],
-  boutique: [
-    { src: '/assets/images/oficinas/boutique-1.webp', alt: 'Esquina e ingreso de la sucursal boutique en Mar de las Pampas' },
-    { src: '/assets/images/oficinas/boutique-2.webp', alt: 'Vidriera de la sucursal boutique en Mar de las Pampas' },
-    { src: '/assets/images/oficinas/boutique-3.webp', alt: 'Lateral de la sucursal boutique en Mar de las Pampas' },
-  ],
-};
+const VALORES = [
+  { icon: FaBullseye, title: 'Profesionalismo', text: 'Trabajamos con los más altos estándares de calidad y ética profesional.' },
+  { icon: FaHandshake, title: 'Confianza', text: 'Construimos relaciones duraderas basadas en la transparencia y honestidad.' },
+  { icon: FaStar, title: 'Excelencia', text: 'Buscamos la excelencia en cada operación y servicio que brindamos.' },
+  { icon: FaBriefcase, title: 'Experiencia', text: 'Años de trayectoria nos respaldan en el mercado inmobiliario.' },
+];
 
-function GaleriaOficina({ fotos, onAbrir }) {
-  return (
-    <div className="office-gallery">
-      {fotos.map((foto) => (
-        <button
-          key={foto.src}
-          type="button"
-          className="office-gallery-thumb"
-          onClick={() => onAbrir(foto)}
-          aria-label={`Ver foto: ${foto.alt}`}
-        >
-          <img src={foto.src} alt={foto.alt} loading="lazy" />
-        </button>
-      ))}
-    </div>
-  );
-}
+const RESENAS = [
+  {
+    stars: 4,
+    author: 'Duby Alfonso',
+    text: 'Agradecidos infinitamente a Silvia, por su amabilidad, cordialidad, siempre bien dispuesta a responder todas las inquietudes y haber podido cumplir nuestro sueño en Mar Azul, con el acompañamiento de Silvia y su equipo de trabajo, lo pudimos lograr, nos dieron mucha tranquilidad y confianza. Super recomendable.',
+  },
+  {
+    stars: 5,
+    author: 'Valeria Deferrari',
+    text: 'Excelente equipo de profesionales, con Silvia a la cabeza, nos sentimos acompañados y lograron los objetivos buscados. Capaces, comprometidos y buena gente. Super recomendables a la hora de hacer cualquier tipo de transacción sea administración, alquiler o venta.',
+  },
+];
 
 const EQUIPO = [
   { nombre: 'Valentin', foto: '/assets/images/equipo/valentin.png' },
@@ -46,23 +35,8 @@ const EQUIPO = [
 ];
 
 export default function NosotrosPage() {
-  const [fotoAbierta, setFotoAbierta] = useState(null);
-
-  useEffect(() => {
-    if (!fotoAbierta) return;
-    const cerrarConEsc = (e) => { if (e.key === 'Escape') setFotoAbierta(null); };
-    window.addEventListener('keydown', cerrarConEsc);
-    return () => window.removeEventListener('keydown', cerrarConEsc);
-  }, [fotoAbierta]);
-
   return (
     <div className="nosotros-page">
-      {fotoAbierta && (
-        <div className="office-lightbox" role="dialog" aria-modal="true" onClick={() => setFotoAbierta(null)}>
-          <button type="button" className="office-lightbox-close" aria-label="Cerrar">×</button>
-          <img src={fotoAbierta.src} alt={fotoAbierta.alt} onClick={(e) => e.stopPropagation()} />
-        </div>
-      )}
       <div className="page-hero">
         <div className="container">
           <h1>Sobre Nosotros</h1>
@@ -70,184 +44,97 @@ export default function NosotrosPage() {
         </div>
       </div>
       
-      <div className="nosotros-content">
+      <section className="sf-section" aria-labelledby="nos-team-title">
         <div className="container">
-          <section className="team-section">
-            <h2>Nuestro <span className="underline">Equipo</span></h2>
-            <p className="team-subtitle">Las personas que te acompañan en cada paso</p>
-            <div className="team-grid">
-              {EQUIPO.map((m) => (
-                <div className="team-card" key={m.nombre}>
-                  <div className="team-photo">
-                    <img src={m.foto} alt={m.nombre} />
-                  </div>
-                  <h3>{m.nombre}</h3>
+          <header className="sf-head">
+            <h2 className="sf-title" id="nos-team-title">Nuestro <span className="sf-accent">Equipo</span></h2>
+            <p className="sf-subtitle">Las personas que te acompañan en cada paso</p>
+          </header>
+          <div className="nos-team">
+            {EQUIPO.map((m) => (
+              <div className="nos-member" key={m.nombre}>
+                <div className="nos-member-photo">
+                  <img src={m.foto} alt={m.nombre} />
                 </div>
-              ))}
-            </div>
-          </section>
-
-          <section className="about-section">
-            <div className="about-grid">
-              <div className="about-image">
-                <img src="/assets/images/image.png" alt="Silvia Fernández" />
+                <h3>{m.nombre}</h3>
               </div>
-              <div className="about-text">
-                <h2>Silvia Fernández Inmobiliaria, una historia de éxito</h2>
-                <p>
-                  Silvia Fernández Inmobiliaria es sinónimo de compromiso, excelencia y confianza en el mercado inmobiliario. 
-                  Hemos logrado conectar a innumerables familias y empresas con la propiedad ideal, brindando un servicio 
-                  transparente y personalizado.
-                </p>
-                <p>
-                  Nuestra pasión por el sector nos impulsa a innovar constantemente, ofreciendo un asesoramiento integral 
-                  basado en un profundo conocimiento del mercado. Cada operación es gestionada con profesionalismo y dedicación, 
-                  asegurando que cada cliente reciba la atención que merece.
-                </p>
-                <p>
-                  En Silvia Fernández Inmobiliaria, no solo vendemos propiedades, creamos hogares, oportunidades y futuros. 
-                  Nuestra reputación se construye sobre valores sólidos: integridad, compromiso y una atención cercana que 
-                  marca la diferencia en cada transacción.
-                </p>
-                <p>
-                  Si buscás un equipo confiable, apasionado y altamente capacitado para guiarte en tu próxima inversión 
-                  inmobiliaria, Silvia Fernández Inmobiliaria es tu mejor elección. Descubrí la experiencia de trabajar 
-                  con expertos que ponen tu bienestar en el centro de todo.
-                </p>
-              </div>
-            </div>
-          </section>
-
-          <section className="values-section">
-            <h2>Nuestros Valores</h2>
-            <div className="values-grid">
-              <div className="value-card">
-                <div className="value-icon"><FaBullseye aria-hidden="true" /></div>
-                <h3>Profesionalismo</h3>
-                <p>Trabajamos con los más altos estándares de calidad y ética profesional.</p>
-              </div>
-              <div className="value-card">
-                <div className="value-icon"><FaHandshake aria-hidden="true" /></div>
-                <h3>Confianza</h3>
-                <p>Construimos relaciones duraderas basadas en la transparencia y honestidad.</p>
-              </div>
-              <div className="value-card">
-                <div className="value-icon"><FaStar aria-hidden="true" /></div>
-                <h3>Excelencia</h3>
-                <p>Buscamos la excelencia en cada operación y servicio que brindamos.</p>
-              </div>
-              <div className="value-card">
-                <div className="value-icon"><FaBriefcase aria-hidden="true" /></div>
-                <h3>Experiencia</h3>
-                <p>Años de trayectoria nos respaldan en el mercado inmobiliario.</p>
-              </div>
-            </div>
-          </section>
-
-          <section className="testimonials-section">
-            <h2>Lo que dicen nuestros clientes</h2>
-            <div className="testimonials-grid">
-              <div className="testimonial-card">
-                <div className="testimonial-rating">⭐⭐⭐⭐</div>
-                <p className="testimonial-text">
-                  "Agradecidos infinitamente a Silvia, por su amabilidad, cordialidad, siempre bien dispuesta a responder 
-                  todas las inquietudes y haber podido cumplir nuestro sueño en Mar Azul, con el acompañamiento de Silvia 
-                  y su equipo de trabajo, lo pudimos lograr, nos dieron mucha tranquilidad y confianza. Super recomendable."
-                </p>
-                <div className="testimonial-author">
-                  <strong>Duby Alfonso</strong>
-                  <span className="testimonial-source"><FcGoogle aria-hidden="true" /> Google</span>
-                </div>
-              </div>
-              <div className="testimonial-card">
-                <div className="testimonial-rating">⭐⭐⭐⭐⭐</div>
-                <p className="testimonial-text">
-                  "Excelente equipo de profesionales, con Silvia a la cabeza, nos sentimos acompañados y lograron los 
-                  objetivos buscados. Capaces, comprometidos y buena gente. Super recomendables a la hora de hacer 
-                  cualquier tipo de transacción sea administración, alquiler o venta."
-                </p>
-                <div className="testimonial-author">
-                  <strong>Valeria Deferrari</strong>
-                  <span className="testimonial-source"><FcGoogle aria-hidden="true" /> Google</span>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          <section className="offices-section">
-            <h2>Nuestras <span className="underline">Oficinas</span></h2>
-            <div className="offices-grid">
-              <div className="office-card">
-                <div className="office-image" style={{backgroundImage: 'url(/assets/images/oficinas/central-portada.webp)'}}></div>
-                <div className="office-info">
-                  <h3>Central</h3>
-                  <div className="office-location-row">
-                    <p className="office-location"><FaMapMarkerAlt aria-hidden="true" /> Calle 34, Mar del Plata & Mar Azul</p>
-                    <a
-                      className="office-map-btn"
-                      href="https://maps.app.goo.gl/nRSsuL4ouVaqjUVd8"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      Cómo llegar
-                    </a>
-                  </div>
-                  <p>En el centro Mar Azul ¡Vení a conocerla!</p>
-                  <GaleriaOficina fotos={FOTOS_OFICINAS.central} onAbrir={setFotoAbierta} />
-                </div>
-              </div>
-              <div className="office-card">
-                <div className="office-image" style={{backgroundImage: 'url(/assets/images/oficinas/boutique-portada.webp)'}}></div>
-                <div className="office-info">
-                  <h3>Sucursal boutique</h3>
-                  <div className="office-location-row">
-                    <p className="office-location"><FaMapMarkerAlt aria-hidden="true" /> Av del Plata y Uritorco - Mar de las Pampas</p>
-                    <a
-                      className="office-map-btn"
-                      href="https://maps.app.goo.gl/F7tXnRHV1xBVK3qq6"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      Cómo llegar
-                    </a>
-                  </div>
-                  <p>Te esperamos para asesorarte de forma personalizada.</p>
-                  <GaleriaOficina fotos={FOTOS_OFICINAS.boutique} onAbrir={setFotoAbierta} />
-                </div>
-              </div>
-            </div>
-          </section>
-
-          <section className="contact-section">
-            <h2>¿Tenés alguna consulta?</h2>
-            <p>Estamos para ayudarte en lo que necesites</p>
-            <div className="contact-info">
-              <div className="contact-item">
-                <span className="icon"><FaWhatsapp aria-hidden="true" /></span>
-                <div>
-                  <strong>WhatsApp</strong>
-                  <p><a href="https://wa.me/5492255626092?text=Hola, consulto por una propiedad" target="_blank" rel="noopener noreferrer">Fabiana: +54 9 2255 62-6092</a></p>
-                </div>
-              </div>
-              <div className="contact-item">
-                <span className="icon"><FaEnvelope aria-hidden="true" /></span>
-                <div>
-                  <strong>Email</strong>
-                  <p><a href="mailto:braicesfernandez@gmail.com">braicesfernandez@gmail.com</a></p>
-                </div>
-              </div>
-              <div className="contact-item">
-                <span className="icon"><FaMapMarkerAlt aria-hidden="true" /></span>
-                <div>
-                  <strong>Direcciones</strong>
-                  <p>Central: Calle 34 y Mar del Plata - Mar Azul</p>
-                  <p>Sucursal boutique: Av del Plata y Uritorco - Mar de las Pampas</p>
-                </div>
-              </div>
-            </div>
-          </section>
+            ))}
+          </div>
         </div>
-      </div>
+      </section>
+
+      <section className="sf-section sf-section--tint" aria-labelledby="nos-about-title">
+        <div className="container nos-about">
+          <div className="nos-about-image">
+            <img src="/assets/images/image.png" alt="Silvia Fernández en la oficina" />
+          </div>
+          <div className="nos-about-text">
+            <h2 className="sf-title" id="nos-about-title">Silvia Fernández Inmobiliaria, una historia de éxito</h2>
+            <p>
+              Silvia Fernández Inmobiliaria es sinónimo de compromiso, excelencia y confianza en el mercado inmobiliario.
+              Hemos logrado conectar a innumerables familias y empresas con la propiedad ideal, brindando un servicio
+              transparente y personalizado.
+            </p>
+            <p>
+              Nuestra pasión por el sector nos impulsa a innovar constantemente, ofreciendo un asesoramiento integral
+              basado en un profundo conocimiento del mercado. Cada operación es gestionada con profesionalismo y dedicación,
+              asegurando que cada cliente reciba la atención que merece.
+            </p>
+            <p>
+              En Silvia Fernández Inmobiliaria, no solo vendemos propiedades, creamos hogares, oportunidades y futuros.
+              Nuestra reputación se construye sobre valores sólidos: integridad, compromiso y una atención cercana que
+              marca la diferencia en cada transacción.
+            </p>
+            <p>
+              Si buscás un equipo confiable, apasionado y altamente capacitado para guiarte en tu próxima inversión
+              inmobiliaria, Silvia Fernández Inmobiliaria es tu mejor elección. Descubrí la experiencia de trabajar
+              con expertos que ponen tu bienestar en el centro de todo.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section className="sf-section" aria-labelledby="nos-values-title">
+        <div className="container">
+          <header className="sf-head">
+            <h2 className="sf-title" id="nos-values-title">Nuestros <span className="sf-accent">Valores</span></h2>
+          </header>
+          <div className="nos-values">
+            {VALORES.map((valor) => (
+              <div className="sf-card nos-value" key={valor.title}>
+                <div className="nos-value-icon"><valor.icon aria-hidden="true" /></div>
+                <h3>{valor.title}</h3>
+                <p>{valor.text}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="sf-section sf-section--tint" aria-labelledby="nos-reviews-title">
+        <div className="container">
+          <header className="sf-head">
+            <h2 className="sf-title" id="nos-reviews-title">Lo que dicen nuestros <span className="sf-accent">clientes</span></h2>
+          </header>
+          <div className="nos-reviews">
+            {RESENAS.map((resena) => (
+              <figure className="sf-card nos-review" key={resena.author}>
+                <div className="nos-review-stars" role="img" aria-label={`${resena.stars} de 5 estrellas`}>
+                  {Array.from({ length: resena.stars }, (_, i) => <FaStar key={i} aria-hidden="true" />)}
+                </div>
+                <blockquote className="nos-review-text">“{resena.text}”</blockquote>
+                <figcaption className="nos-review-author">
+                  <strong>{resena.author}</strong>
+                  <span className="nos-review-source"><FcGoogle aria-hidden="true" /> Google</span>
+                </figcaption>
+              </figure>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <Offices />
+      <Contact />
     </div>
   );
 }

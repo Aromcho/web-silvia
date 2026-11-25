@@ -1,0 +1,242 @@
+/* Sección de contacto: una sola para todo el sitio (home y Nosotros).
+   Tarjeta blanca con el formulario a la izquierda y los datos a la derecha.
+   El título y el aire de la sección salen de .sf-section / .sf-head (globals.css). */
+.sf-contact-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  overflow: hidden;
+  border: 1px solid rgba(0, 129, 92, 0.1);
+  border-radius: var(--sf-radius-card);
+  background: var(--white-color);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+}
+
+/* Formulario: la fila del mensaje (1fr) crece hasta igualar el alto de la columna de datos */
+.sf-contact-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: auto auto 1fr;
+  gap: 16px;
+  padding: 32px;
+}
+
+.sf-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.sf-field--full {
+  grid-column: 1 / -1;
+}
+
+.sf-field label {
+  color: #334155;
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.sf-field input,
+.sf-field textarea {
+  width: 100%;
+  min-height: 48px;
+  padding: 12px 14px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 12px;
+  background: var(--white-color);
+  color: var(--sf-ink);
+  font-size: 1rem;
+  line-height: 1.4;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.sf-field textarea {
+  flex: 1;
+  min-height: 132px;
+  resize: vertical;
+}
+
+.sf-field input::placeholder,
+.sf-field textarea::placeholder {
+  color: #94a3b8;
+}
+
+.sf-field input:focus,
+.sf-field textarea:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(0, 129, 92, 0.15);
+}
+
+.sf-contact-submit {
+  grid-column: 1 / -1;
+  justify-self: start;
+  min-height: 48px;
+  padding: 0 28px;
+  border: none;
+  border-radius: 12px;
+  background: var(--primary-color);
+  color: var(--white-color);
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.sf-contact-submit:hover:not(:disabled) {
+  background: #006b4d;
+}
+
+.sf-contact-submit:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+
+.sf-contact-status {
+  grid-column: 1 / -1;
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.sf-contact-status--ok {
+  color: #1a6b45;
+}
+
+.sf-contact-status--error {
+  color: #dc2626;
+}
+
+/* Datos de contacto */
+.sf-contact-info {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 32px;
+  border-left: 1px solid rgba(0, 129, 92, 0.1);
+  background: #f3faf7;
+}
+
+.sf-contact-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.sf-contact-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(0, 129, 92, 0.1);
+  color: var(--primary-color);
+  font-size: 1.2rem;
+}
+
+.sf-contact-item > div {
+  flex: 1;
+  min-width: 0;
+}
+
+.sf-contact-item h3 {
+  margin: 0 0 4px;
+  color: var(--sf-ink);
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.sf-contact-item p,
+.sf-contact-item a {
+  margin: 0;
+  color: #475569;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.sf-contact-item a:hover {
+  color: var(--primary-color);
+}
+
+.sf-contact-wa {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.sf-contact-wa a {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 4px 0;
+}
+
+.sf-contact-wa strong {
+  color: var(--sf-ink);
+  font-weight: 600;
+}
+
+.sf-contact-wa span {
+  color: var(--primary-color);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.sf-contact-socials {
+  display: flex;
+  gap: 12px;
+}
+
+.sf-contact-socials a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border: 1.5px solid #d7e5df;
+  border-radius: 50%;
+  background: var(--white-color);
+  color: var(--primary-color);
+  font-size: 1.1rem;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.sf-contact-socials a:hover {
+  border-color: var(--primary-color);
+  background: var(--primary-color);
+  color: var(--white-color);
+}
+
+@media (max-width: 900px) {
+  .sf-contact-panel {
+    grid-template-columns: 1fr;
+  }
+
+  .sf-contact-info {
+    border-top: 1px solid rgba(0, 129, 92, 0.1);
+    border-left: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .sf-contact-form,
+  .sf-contact-info {
+    padding: 20px;
+  }
+
+  .sf-contact-form {
+    grid-template-columns: 1fr;
+    grid-template-rows: none;
+  }
+
+  .sf-contact-submit {
+    justify-self: stretch;
+  }
+}
