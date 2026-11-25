@@ -151,3 +151,72 @@
   .contact-submit-btn { width: 100%; text-align: center; }
   .contact-socials { justify-content: center; }
 }
+
+/* ── Ajustes ── */
+.contact-home-section {
+  padding: 72px 0;
+}
+
+/* El título de la sección no puede ser más grande que el h1 de la página */
+.contact-home-header h2 {
+  font-size: 2rem;
+  line-height: 1.25;
+}
+
+/* Botón con los colores de la marca (antes era azul) */
+.contact-submit-btn {
+  min-height: 48px;
+  background: var(--white-color);
+  color: var(--primary-color);
+  font-size: 1rem;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.14);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.contact-submit-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.18);
+}
+
+.contact-info-block {
+  align-items: flex-start;
+}
+
+.contact-info-block svg {
+  margin-top: 2px;
+}
+
+.contact-whatsapp-list a {
+  padding: 3px 0;
+}
+
+@media (max-width: 768px) {
+  .contact-home-section {
+    padding: 48px 0;
+  }
+
+  .contact-home-header h2 {
+    font-size: 1.6rem;
+  }
+
+  /* Menos relleno: los teléfonos entran en una línea */
+  .contact-info-block {
+    gap: 10px;
+    padding: 12px;
+  }
+
+  .contact-info-block svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  .contact-socials {
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 360px) {
+  .contact-whatsapp-list a {
+    font-size: 0.86rem;
+  }
+}

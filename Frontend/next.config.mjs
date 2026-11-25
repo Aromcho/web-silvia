@@ -13,6 +13,10 @@ const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+  // En producción no quedan console.log de desarrollo (errores y avisos sí)
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production' ? { exclude: ['error', 'warn', 'info'] } : false,
+  },
 
   // Fotos livianas (C10/W6): las fotos del CRM se sirven achicadas y en WebP desde /_next/image
   // (ver imgUrl en helpers). La primera vez se generan (con sharp, ~0,1-0,3 s) y después salen de
@@ -41,6 +45,12 @@ const nextConfig = {
       {
         source: '/about',
         destination: '/nosotros',
+        permanent: true,
+      },
+      // El mapa se sacó de la web: su URL lleva al listado
+      {
+        source: '/mapa',
+        destination: '/propiedades',
         permanent: true,
       },
     ]

@@ -1,13 +1,30 @@
-.home-offices-section {
-  margin-top: 2.75rem;
-  margin-bottom: 2.5rem;
+/* Con las dos clases: Nosotros también define .offices-section y no debe pisar esto */
+.offices-section.home-offices-section {
+  margin: 0;
+  padding: 72px 0;
   text-align: center;
 }
 
-.home-offices-section h2 {
+.offices-section.home-offices-section h2 {
   font-size: 2rem;
+  line-height: 1.25;
   color: var(--primary-color);
-  margin-bottom: 3rem;
+  margin-bottom: 2rem;
+}
+
+.home-offices-section .office-location {
+  color: var(--text-muted);
+}
+
+@media (max-width: 768px) {
+  .offices-section.home-offices-section {
+    padding: 48px 0;
+  }
+
+  .offices-section.home-offices-section h2 {
+    font-size: 1.6rem;
+    margin-bottom: 1.5rem;
+  }
 }
 
 .home-offices-section .underline {

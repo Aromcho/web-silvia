@@ -202,7 +202,7 @@ const Hero = () => {
                       <input
                         type="text"
                         name="location"
-                        placeholder="Ubicación (ciudad, barrio, dirección...)"
+                        placeholder="Ciudad, barrio o dirección"
                         value={searchForm.location}
                         onChange={handleInputChange}
                         className="search-input search-input--with-icon"

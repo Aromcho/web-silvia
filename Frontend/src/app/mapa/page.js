@@ -1,4 +1,4 @@
-import MapaClient from './MapaClient'
+import { redirect } from 'next/navigation'
 
 export const metadata = {
   title: 'Mapa de Propiedades | Silvia Fernández Inmobiliaria',
@@ -21,6 +21,6 @@ async function getLocations() {
 }
 
 export default async function MapaPage() {
-  const locations = await getLocations()
-  return <MapaClient initialLocations={locations} />
+  // El mapa se sacó de la web: la URL vieja lleva al listado de propiedades
+  redirect('/propiedades')
 }

@@ -381,31 +381,6 @@ export default function PropertiesSearchNew() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [appliedFilters])
 
-  useEffect(() => {
-    if (!loadMoreRef.current || loading || loadingMore || !hasMore) {
-      return undefined
-    }
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const [entry] = entries
-
-        if (entry.isIntersecting && !loading && !loadingMore && hasMore) {
-          loadProperties({ pageToLoad: page + 1, replace: false, filtersSnapshot: appliedFilters })
-        }
-      },
-      {
-        root: null,
-        rootMargin: '300px 0px',
-        threshold: 0.1,
-      }
-    )
-
-    observer.observe(loadMoreRef.current)
-
-    return () => observer.disconnect()
-  }, [appliedFilters, hasMore, loading, loadingMore, page])
-
   const handleFilterChange = (key, value) => {
     setFilters(prev => ({
       ...prev,
@@ -490,7 +465,7 @@ export default function PropertiesSearchNew() {
       <div className="search-container">
         {/* Filtros modernos */}
         <div className="filters-section">
-          <h2 className="filters-title">Encontrá tu propiedad ideal</h2>
+          <h1 className="filters-title">Propiedades en Mar Azul y Mar de las Pampas</h1>
           
           {/* Filtros de operación y ubicación */}
           <div className="operation-and-location">
@@ -648,6 +623,8 @@ export default function PropertiesSearchNew() {
               <button 
                 className={`view-btn ${viewMode === 'grid' ? 'active' : ''}`}
                 onClick={() => setViewMode('grid')}
+                aria-label="Ver en grilla"
+                aria-pressed={viewMode === 'grid'}
               >
                 <FaTh />
               </button>
@@ -698,7 +675,18 @@ export default function PropertiesSearchNew() {
                 )}
               </div>
 
-              <div ref={loadMoreRef} className="infinite-scroll-sentinel" aria-hidden="true" />
+              {/* "Ver más" en lugar de scroll infinito: el footer queda siempre al alcance */}
+              {hasMore && !loadingMore && properties.length > 0 && (
+                <div className="load-more">
+                  <button
+                    type="button"
+                    className="load-more-btn"
+                    onClick={() => loadProperties({ pageToLoad: page + 1, replace: false, filtersSnapshot: appliedFilters })}
+                  >
+                    Ver más propiedades
+                  </button>
+                </div>
+              )}
 
               {loadingMore && (
                 <div className="loading-more-state">
@@ -712,7 +700,7 @@ export default function PropertiesSearchNew() {
                   padding: '1rem 0 0',
                   color: '#64748b'
                 }}>
-                  <p>No hay mas propiedades para cargar</p>
+                  <p>Ya viste todas las propiedades de esta búsqueda</p>
                 </div>
               )}
             </>

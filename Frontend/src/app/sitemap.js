@@ -54,7 +54,6 @@ export default async function sitemap() {
     { url: `${baseUrl}/lotes-terrenos`, lastModified: now, changeFrequency: 'weekly', priority: 0.7 },
     { url: `${baseUrl}/complejos`, lastModified: now, changeFrequency: 'weekly', priority: 0.7 },
     { url: `${baseUrl}/videos`, lastModified: now, changeFrequency: 'weekly', priority: 0.6 },
-    { url: `${baseUrl}/mapa`, lastModified: now, changeFrequency: 'weekly', priority: 0.5 },
     { url: `${baseUrl}/nosotros`, lastModified: now, changeFrequency: 'monthly', priority: 0.4 },
   ]
   const [landings, properties] = await Promise.all([landingEntries(), propertyEntries()])

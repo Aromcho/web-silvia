@@ -162,3 +162,16 @@
     justify-content: center;
   }
 }
+
+/* Áreas táctiles de 44px en tablet y celular */
+@media (max-width: 1024px) {
+  .gf-step-btn {
+    width: 44px;
+    height: 44px;
+  }
+
+  .gf-chip {
+    min-width: 52px;
+    min-height: 44px;
+  }
+}

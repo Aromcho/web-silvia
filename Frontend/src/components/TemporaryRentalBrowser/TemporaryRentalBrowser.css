@@ -117,3 +117,10 @@
     padding: 1rem;
   }
 }
+
+/* Área táctil de 44px en tablet y celular */
+@media (max-width: 1024px) {
+  .trb-tab {
+    min-height: 44px;
+  }
+}

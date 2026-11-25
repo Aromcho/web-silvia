@@ -376,3 +376,43 @@
   .vt-card, .vt-thumb img, .vt-play { transition: none; }
   .vt-card--skeleton .vt-thumb { animation: none; }
 }
+
+/* Los botones no parten el texto en dos líneas: "Enviar" ocupa lo justo y "Copiar link" el resto */
+.vt-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.vt-btn {
+  min-height: 44px;
+  white-space: nowrap;
+}
+
+.vt-actions .vt-btn--whatsapp {
+  flex: 0 0 auto;
+  padding: 0 0.9rem;
+}
+
+.vt-actions .vt-btn--ghost {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* Etiquetas de la miniatura: mínimo 12px */
+.vt-badge {
+  font-size: 0.75rem;
+}
+
+@media (max-width: 720px) {
+  /* Zona y búsqueda una debajo de la otra, a todo el ancho (antes se cortaban los textos) */
+  .vt-filters {
+    flex-direction: column;
+  }
+
+  .vt-field,
+  .vt-field--search {
+    flex: 1 1 auto;
+    width: 100%;
+    height: 44px;
+  }
+}

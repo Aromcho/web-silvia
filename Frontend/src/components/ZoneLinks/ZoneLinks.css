@@ -121,3 +121,42 @@
     font-size: 1.6rem;
   }
 }
+
+/* Mismo ritmo vertical que el resto de las secciones y áreas táctiles cómodas */
+.zone-links-section {
+  padding: 72px 0;
+}
+
+.zone-links-card a {
+  display: inline-block;
+  padding: 3px 0;
+}
+
+.zone-chips {
+  padding-top: 1.25rem;
+}
+
+.zone-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+}
+
+@media (max-width: 768px) {
+  .zone-links-section {
+    padding: 48px 0;
+  }
+
+  .zone-links-intro {
+    margin-bottom: 1.75rem;
+    text-align: left;
+  }
+
+  .zone-links-card a {
+    padding: 5px 0;
+  }
+
+  .zone-chip {
+    min-height: 44px;
+  }
+}

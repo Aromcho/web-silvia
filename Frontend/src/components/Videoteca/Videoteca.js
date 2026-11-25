@@ -127,7 +127,7 @@ export default function Videoteca() {
   }
 
   return (
-    <main className="vt-page">
+    <div className="vt-page">
       <div className="page-hero">
         <div className="container">
           <h1>Videos de propiedades</h1>
@@ -252,6 +252,6 @@ export default function Videoteca() {
           </>
         )}
       </section>
-    </main>
+    </div>
   )
 }

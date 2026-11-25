@@ -641,3 +641,78 @@
     font-size: 1.2rem;
   }
 }
+
+/* ── Ritmo vertical y navegación de los carruseles ── */
+.properties-section {
+  padding: 72px 0;
+}
+
+.properties-section .container {
+  padding: 0 20px;
+}
+
+.property-section:last-child {
+  margin-bottom: 0;
+}
+
+/* Un solo estilo de título de sección en el home */
+.properties-section .section-title {
+  font-weight: 700;
+  line-height: 1.25;
+  color: #0f172a;
+}
+
+/* Las flechas van a la altura de la foto (antes tapaban el título de la primera tarjeta)
+   y se oculta la barra de scroll nativa: ya están las flechas y el deslizado */
+.carousel-arrow {
+  top: 110px;
+}
+
+.properties-scroll-container {
+  padding-bottom: 0;
+  scrollbar-width: none;
+}
+
+.properties-scroll-container::-webkit-scrollbar {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .properties-section {
+    padding: 48px 0;
+  }
+
+  .properties-section .container {
+    padding: 0 16px;
+  }
+
+  .properties-scroll-container {
+    margin: 0 -16px;
+    padding-bottom: 0;
+  }
+
+  .properties-section .properties-grid {
+    padding: 0 16px;
+  }
+
+  .property-section {
+    margin-bottom: 40px;
+  }
+
+  .section-nav-button {
+    width: 44px;
+    height: 44px;
+  }
+}
+
+@media (max-width: 480px) {
+  .properties-scroll-container {
+    margin: 0 -16px;
+    padding: 0;
+  }
+
+  .featured-carousel {
+    margin: 0 -16px;
+    padding: 0 16px;
+  }
+}

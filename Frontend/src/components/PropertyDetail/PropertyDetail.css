@@ -1890,6 +1890,63 @@
   transform: scale(1.03);
 }
 
+/* ── Mismo ancho de contenido que el resto del sitio (1200px): la ficha alinea con el header ── */
+.title-desktop {
+  max-width: 1200px;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+.property-detail-page .property-detail-container {
+  max-width: 1200px;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+.property-detail-page .property-main-address {
+  color: #475569;
+}
+
+/* Renglones de lectura cómoda en la descripción */
+.property-detail-page .description-text {
+  max-width: 72ch;
+}
+
+@media (max-width: 768px) {
+  .property-detail-page .property-detail-container {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  /* Dirección arriba y precio abajo: antes iban 70/30 en una fila y el precio se montaba sobre la dirección */
+  .direction-price {
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    gap: 0.6rem;
+  }
+
+  .property-detail-page .property-main-address {
+    flex: none;
+    max-width: 100%;
+    align-items: flex-start;
+    font-size: 0.95rem;
+    line-height: 1.4;
+  }
+
+  .property-detail-page .property-price-row {
+    flex: none;
+    max-width: 100%;
+    margin-left: 0;
+    justify-content: space-between;
+    text-align: left;
+  }
+
+  .property-detail-page .feature-label {
+    font-size: 0.75rem;
+  }
+}
+
 @media (max-width: 768px) {
   .property-detail-page .ai-remodel-btn {
     padding: 8px 14px;

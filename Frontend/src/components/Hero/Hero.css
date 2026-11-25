@@ -558,3 +558,118 @@ width: 40%;
 .autocomplete-item:hover strong {
   color: var(--primary-color);
 }
+
+/* ── Hero en flujo normal ──
+   Antes el contenido y los accesos rápidos iban en posición absoluta con paddings fijos:
+   en pantallas chicas el header tapaba el título y, con el celular horizontal, los accesos
+   tapaban el buscador. Ahora el hero crece lo que haga falta y nada se monta sobre nada. */
+.hero {
+  min-height: 100vh;
+  min-height: 100svh;
+}
+
+/* Capa más oscura: el título (sobre todo la parte en verde claro) se lee sobre cualquier cuadro del video */
+.hero-overlay {
+  background: linear-gradient(
+    180deg,
+    rgba(0, 40, 28, 0.62) 0%,
+    rgba(0, 40, 28, 0.42) 45%,
+    rgba(0, 40, 28, 0.6) 100%
+  );
+}
+
+.hero-content {
+  position: relative;
+  inset: auto;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.hero-content .container {
+  flex: 1;
+  width: 100%;
+  height: auto;
+  padding: 104px 20px 24px;
+}
+
+.hero-title {
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.55);
+}
+
+.quick-access-section {
+  position: relative;
+  left: auto;
+  right: auto;
+  bottom: auto;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto 20px;
+  padding: 0 20px;
+}
+
+.quick-access-cards {
+  padding: 0;
+}
+
+@media (max-width: 1024px) {
+  .hero-content .container {
+    padding: 96px 20px 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero {
+    height: auto;
+    min-height: 100vh;
+    min-height: 100svh;
+  }
+
+  .hero-content .container {
+    padding: 92px 0 16px;
+  }
+
+  .hero-text {
+    padding: 1rem 0;
+  }
+
+  .quick-access-section {
+    margin-bottom: 12px;
+    padding: 0 10px;
+  }
+
+  .quick-access-cards {
+    padding: 0 6px;
+  }
+
+  .card-title {
+    font-size: 0.82rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-content .container {
+    padding: 88px 0 14px;
+  }
+
+  .quick-access-card {
+    flex: 0 0 128px;
+    min-width: 128px;
+  }
+
+  .card-title {
+    font-size: 0.8rem;
+  }
+}
+
+/* Pantallas bajas (celular apaisado) */
+@media (max-height: 520px) {
+  .hero-title {
+    font-size: 1.5rem;
+    margin-bottom: 0.6rem;
+  }
+
+  .hero-text {
+    padding: 0.5rem 0;
+  }
+}

@@ -11,15 +11,9 @@ export default function NotFound() {
       <div className="error-bg" />
 
       <div className="error-content">
-        <div className="error-logo">
-          <img src="/assets/images/logo.jpg" alt="Silvia Fernández" />
-        </div>
-
         <div className="error-code">404</div>
 
-        <div className="error-house">🏠</div>
-
-        <h1 className="error-title">Esta propiedad no existe</h1>
+        <h1 className="error-title">No encontramos esta página</h1>
         <p className="error-subtitle">
           La página que buscás no fue encontrada. Puede que haya sido removida
           o que la dirección sea incorrecta.
