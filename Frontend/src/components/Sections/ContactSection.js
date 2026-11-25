@@ -57,7 +57,57 @@ export default function ContactSection() {
         </header>
 
         <div className="sf-contact-panel">
+          {/* Lado verde: el WhatsApp de cada persona del equipo, correo y oficinas */}
+          <aside className="sf-contact-info" aria-label="Datos de contacto">
+            <h3 className="sf-contact-info-title">Hablá directo por WhatsApp</h3>
+            <p className="sf-contact-info-text">Elegí a quién escribirle de nuestro equipo.</p>
+            <ul className="sf-contact-wa">
+              {contacts.map((contact) => (
+                <li key={contact.name}>
+                  <a
+                    href={makeWhatsAppLink(contact.phone, `Hola ${contact.name}, consulto por una propiedad`)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => logWhatsAppClick({
+                      name: contact.name,
+                      phone: contact.phone,
+                      source: 'contact-page',
+                      assigned: false,
+                    })}
+                  >
+                    <span className="sf-contact-wa-icon"><FaWhatsapp aria-hidden="true" /></span>
+                    <span className="sf-contact-wa-text">
+                      <strong>{contact.name}</strong>
+                      <span>{formatDisplayPhone(contact.phone)}</span>
+                    </span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+
+            <div className="sf-contact-rows">
+              <a className="sf-contact-row" href="mailto:braicesfernandez@gmail.com">
+                <FaEnvelope aria-hidden="true" />
+                <span>braicesfernandez@gmail.com</span>
+              </a>
+              <p className="sf-contact-row">
+                <FaMapMarkerAlt aria-hidden="true" />
+                <span><strong>Central:</strong> Calle 34 y Mar del Plata - Mar Azul</span>
+              </p>
+              <p className="sf-contact-row">
+                <FaMapMarkerAlt aria-hidden="true" />
+                <span><strong>Sucursal boutique:</strong> Av del Plata y Uritorco - Mar de las Pampas</span>
+              </p>
+            </div>
+
+            <div className="sf-contact-socials">
+              <a href="https://www.facebook.com/Silviafernadezpropiedades/" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><FaFacebookF aria-hidden="true" /></a>
+              <a href="https://www.instagram.com/silviafernandezpropiedades/" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><FaInstagram aria-hidden="true" /></a>
+            </div>
+          </aside>
+
           <form className="sf-contact-form" onSubmit={handleSubmit}>
+            <h3 className="sf-contact-form-title">O dejanos tu mensaje</h3>
             <div className="sf-field sf-field--full">
               <label htmlFor="contact-name">Nombre completo</label>
               <input id="contact-name" type="text" name="name" value={form.name} onChange={handleChange} autoComplete="name" required />
@@ -97,56 +147,6 @@ export default function ContactSection() {
             )}
           </form>
 
-          <aside className="sf-contact-info" aria-label="Datos de contacto">
-            <div className="sf-contact-item">
-              <span className="sf-contact-icon"><FaWhatsapp aria-hidden="true" /></span>
-              <div>
-                <h3>WhatsApp</h3>
-                <ul className="sf-contact-wa">
-                  {contacts.map((contact) => (
-                    <li key={contact.name}>
-                      <a
-                        href={makeWhatsAppLink(contact.phone, `Hola ${contact.name}, consulto por una propiedad`)}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        onClick={() => logWhatsAppClick({
-                          name: contact.name,
-                          phone: contact.phone,
-                          source: 'contact-page',
-                          assigned: false,
-                        })}
-                      >
-                        <strong>{contact.name}</strong>
-                        <span>{formatDisplayPhone(contact.phone)}</span>
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-
-            <div className="sf-contact-item">
-              <span className="sf-contact-icon"><FaEnvelope aria-hidden="true" /></span>
-              <div>
-                <h3>Correo</h3>
-                <a href="mailto:braicesfernandez@gmail.com">braicesfernandez@gmail.com</a>
-              </div>
-            </div>
-
-            <div className="sf-contact-item">
-              <span className="sf-contact-icon"><FaMapMarkerAlt aria-hidden="true" /></span>
-              <div>
-                <h3>Oficinas</h3>
-                <p>Central: Calle 34 y Mar del Plata - Mar Azul</p>
-                <p>Sucursal boutique: Av del Plata y Uritorco - Mar de las Pampas</p>
-              </div>
-            </div>
-
-            <div className="sf-contact-socials">
-              <a href="https://www.facebook.com/Silviafernadezpropiedades/" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><FaFacebookF aria-hidden="true" /></a>
-              <a href="https://www.instagram.com/silviafernandezpropiedades/" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><FaInstagram aria-hidden="true" /></a>
-            </div>
-          </aside>
         </div>
       </div>
     </section>

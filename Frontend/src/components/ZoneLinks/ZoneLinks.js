@@ -1,8 +1,18 @@
 // Home: texto de la inmobiliaria y links a las páginas por zona (Google llega a ellas desde acá)
 import Link from 'next/link'
-import { FaMapMarkerAlt } from 'react-icons/fa'
+import { FaMapMarkerAlt, FaArrowRight, FaChevronRight, FaHome, FaTree, FaUmbrellaBeach, FaBuilding, FaKey } from 'react-icons/fa'
 import { ZONES, ZONE_SLUGS, LANDING_TYPES, LANDING_TYPE_SLUGS, landingPath } from '../../helpers/landings.js'
 import './ZoneLinks.css'
+
+// Tarjetas por zona del home: la primera página (venta) va en la cabecera y el resto, en la lista
+const [MAIN_TYPE, ...OTHER_TYPES] = LANDING_TYPE_SLUGS
+const TYPE_ICONS = {
+  'casas-en-venta': FaHome,
+  'lotes-terrenos': FaTree,
+  'alquiler-temporario': FaUmbrellaBeach,
+  'departamentos-en-venta': FaBuilding,
+  'alquiler-anual': FaKey,
+}
 
 // Zona de la ficha según su localidad (para enlazar la ficha con las páginas de su zona)
 const zoneOfProperty = (property) => {
@@ -75,21 +85,41 @@ export default function ZoneLinks() {
             Mar Azul, Las Gaviotas, Mar de las Pampas y Villa Gesell.
           </p>
         </header>
-        <div className="zone-links-grid">
-          {ZONE_SLUGS.map((zoneKey) => (
-            <div className="sf-card zone-links-card" key={zoneKey}>
-              <h3>{ZONES[zoneKey].name}</h3>
-              <ul>
-                {LANDING_TYPE_SLUGS.map((typeKey) => (
-                  <li key={typeKey}>
-                    <Link href={landingPath(typeKey, zoneKey)}>
-                      {LANDING_TYPES[typeKey].short} en {ZONES[zoneKey].name}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+        <div className="zone-cards">
+          {ZONE_SLUGS.map((zoneKey) => {
+            const zone = ZONES[zoneKey]
+            return (
+              <article className="sf-card zone-card" key={zoneKey}>
+                {/* Cabecera verde: la zona y su página principal */}
+                <Link href={landingPath(MAIN_TYPE, zoneKey)} className="zone-card-head">
+                  <FaMapMarkerAlt className="zone-card-pin" aria-hidden="true" />
+                  <h3>{zone.name}</h3>
+                  <span className="zone-card-all">
+                    {LANDING_TYPES[MAIN_TYPE].short}
+                    <span className="sr-only"> en {zone.name}</span>
+                    <FaArrowRight aria-hidden="true" />
+                  </span>
+                </Link>
+                <ul className="zone-card-list">
+                  {OTHER_TYPES.map((typeKey) => {
+                    const Icon = TYPE_ICONS[typeKey] || FaHome
+                    return (
+                      <li key={typeKey}>
+                        <Link href={landingPath(typeKey, zoneKey)}>
+                          <Icon className="zone-card-icon" aria-hidden="true" />
+                          <span className="zone-card-label">
+                            {LANDING_TYPES[typeKey].short}
+                            <span className="sr-only"> en {zone.name}</span>
+                          </span>
+                          <FaChevronRight className="zone-card-chevron" aria-hidden="true" />
+                        </Link>
+                      </li>
+                    )
+                  })}
+                </ul>
+              </article>
+            )
+          })}
         </div>
       </div>
     </section>
