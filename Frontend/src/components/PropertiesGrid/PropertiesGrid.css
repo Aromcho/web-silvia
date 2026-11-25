@@ -22,24 +22,6 @@
   gap: 1rem;
 }
 
-.properties-grid-container .properties-grid > .modern-property-card {
-  flex: 0 0 359px;
-  width: 359px;
-  min-width: 359px;
-  max-width: 359px;
-}
-
-.properties-grid-container .properties-grid > .modern-property-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 15px 40px rgba(0, 129, 92, 0.15);
-}
-
-.properties-grid-container .properties-grid > .modern-property-card .property-image {
-  position: relative;
-  height: 220px;
-  overflow: hidden;
-}
-
 /* Loading Skeleton */
 .properties-grid-container .loading-grid {
   display: flex;
@@ -170,12 +152,9 @@
 /* ── Grilla fluida (reemplaza las tarjetas de 359px fijos centradas): llena el ancho
    del contenedor, alinea con filtros y títulos y pasa sola de 3 a 2 a 1 columna ── */
 .properties-grid-container {
-  padding: 2.5rem 0 4rem;
+  /* Mismo aire en todos los listados: del hero al listado y del listado al footer */
+  padding: var(--sf-list-top) 0 var(--sf-section-y);
   min-height: 40vh;
-}
-
-.zone-chips + .properties-grid-container {
-  padding-top: 1.75rem;
 }
 
 .properties-grid-container .properties-grid,
@@ -237,10 +216,6 @@
 }
 
 @media (max-width: 768px) {
-  .properties-grid-container {
-    padding: 1.5rem 0 3rem;
-  }
-
   .properties-grid-container .properties-grid,
   .properties-grid-container .loading-grid {
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));

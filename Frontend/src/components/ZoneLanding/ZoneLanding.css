@@ -14,10 +14,11 @@
   text-underline-offset: 2px;
 }
 
+/* Aire: del hero al texto, del texto al listado y entre bloques, con los tokens del sitio */
 .zone-landing .zl-intro {
   max-width: 820px;
   margin: 0 auto;
-  padding: 2.5rem 1rem 0;
+  padding-top: var(--sf-list-top);
   color: #475569;
   font-size: 1.05rem;
   line-height: 1.7;
@@ -29,7 +30,7 @@
 }
 
 .zone-landing .zl-grid {
-  padding-top: 2.5rem;
+  padding-top: var(--sf-list-top);
   min-height: 0;
 }
 
@@ -87,14 +88,22 @@
 .zone-landing .zl-faq {
   max-width: 820px;
   margin: 0 auto;
-  padding: 1rem 1rem 2.5rem;
+  padding-bottom: var(--sf-section-y);
 }
 
-.zone-landing .zl-faq h2 {
-  margin-bottom: 1.25rem;
-  color: #0f172a;
-  font-size: 1.5rem;
+/* Mismo título de sección que el resto del sitio (.sf-title) */
+.zone-landing .zl-faq h2,
+.zone-landing .zl-more h2 {
+  margin: 0 0 var(--sf-head-gap);
+  color: var(--primary-color);
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.25;
   text-align: center;
+}
+
+.zone-landing .zl-faq-item:first-of-type {
+  padding-top: 0;
 }
 
 .zone-landing .zl-faq-item {
@@ -114,14 +123,7 @@
 }
 
 .zone-landing .zl-more {
-  padding: 1rem 1rem 4rem;
-}
-
-.zone-landing .zl-more h2 {
-  margin-bottom: 1.5rem;
-  color: #0f172a;
-  font-size: 1.6rem;
-  text-align: center;
+  padding-bottom: var(--sf-section-y);
 }
 
 .zone-landing .zl-more-grid {
@@ -160,7 +162,11 @@
 
 @media (max-width: 768px) {
   .zone-landing .zl-intro {
-    padding-top: 1.75rem;
     font-size: 1rem;
+  }
+
+  .zone-landing .zl-faq h2,
+  .zone-landing .zl-more h2 {
+    font-size: 1.625rem;
   }
 }

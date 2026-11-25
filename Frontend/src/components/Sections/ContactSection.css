@@ -186,6 +186,8 @@
 .sf-contact-wa span {
   color: var(--primary-color);
   font-weight: 600;
+  /* Cifras del mismo ancho: los teléfonos quedan encolumnados */
+  font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
 

@@ -69,12 +69,13 @@
 }
 
 .property-zone-links {
-  padding: 1rem 1rem 3rem;
+  padding-top: 0;
+  padding-bottom: var(--sf-section-y);
   text-align: center;
 }
 
 .property-zone-links h2 {
-  margin-bottom: 1rem;
+  margin-bottom: 20px;
   color: #0f172a;
   font-size: 1.3rem;
 }

@@ -52,16 +52,17 @@
   color: var(--white-color);
 }
 
+/* Resumen: 24px debajo del panel, alineado con su borde, y 16px sobre el listado */
 .trb-summary {
-  margin: 0.9rem 0.25rem 0;
+  margin: 24px 0 0;
   font-size: 0.95rem;
   font-weight: 600;
+  line-height: 1.5;
   color: #475569;
 }
 
-/* El grid ya trae su propio padding superior grande; acá queda pegado al filtro */
-.trb-bar-wrap + .properties-grid-container {
-  padding-top: 1.5rem;
+.filter-panel-wrap:has(.trb-summary) + .properties-grid-container {
+  padding-top: 16px;
 }
 
 .trb-empty {

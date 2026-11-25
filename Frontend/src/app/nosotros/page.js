@@ -133,7 +133,7 @@ export default function NosotrosPage() {
         </div>
       </section>
 
-      <Offices />
+      <Offices gallery />
       <Contact />
     </div>
   );

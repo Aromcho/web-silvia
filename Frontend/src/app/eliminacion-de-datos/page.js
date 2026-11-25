@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import '../lotes-terrenos/page.css';
 import '../privacidad/legal.css';
 
 export const metadata = {

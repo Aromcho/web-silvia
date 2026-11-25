@@ -184,7 +184,8 @@
   }
 }
 
-@media (max-width: 768px) {
+/* Teléfono: el equipo en dos filas de tres */
+@media (max-width: 560px) {
   .nos-team {
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 20px 12px;
@@ -202,7 +203,9 @@
   .nos-member h3 {
     font-size: 0.9rem;
   }
+}
 
+@media (max-width: 768px) {
   .nos-about {
     grid-template-columns: 1fr;
     gap: 24px;

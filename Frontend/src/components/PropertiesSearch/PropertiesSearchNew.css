@@ -876,6 +876,8 @@
    Hero verde con el título, panel de filtros montado sobre el hero (clases compartidas de globals.css)
    y resultados directamente sobre el fondo blanco, sin tarjeta contenedora. */
 .search-page {
+  /* Aire antes del footer (el botón «Ver más» quedaba pegado) */
+  padding-bottom: var(--sf-section-y);
   background: var(--white-color);
 }
 
@@ -889,7 +891,7 @@
 }
 
 .search-page .filters-section {
-  margin-bottom: 1.25rem;
+  margin-bottom: 24px;
   padding: 1.25rem 1.5rem;
   border: 1px solid rgba(0, 129, 92, 0.08);
 }
@@ -924,12 +926,14 @@
     padding: 0 16px;
   }
 
+  /* Del panel al listado: 24px, igual que en Lotes */
   .search-page .filters-section {
-    margin-bottom: 1rem;
+    margin-bottom: 24px;
     padding: 1rem;
   }
 
   .search-page .results-section {
+    margin-bottom: 0;
     padding: 0;
   }
 }

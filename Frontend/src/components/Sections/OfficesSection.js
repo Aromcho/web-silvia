@@ -13,6 +13,7 @@ const OFFICES = [
     location: 'Calle 34 y Mar del Plata - Mar Azul',
     description: 'En el centro de Mar Azul. ¡Vení a conocerla!',
     image: '/assets/images/oficinas/central-portada.webp',
+    homeImage: '/assets/images/oficina-central.png',
     mapsUrl: 'https://maps.app.goo.gl/nRSsuL4ouVaqjUVd8',
     mapsEmbedUrl: 'https://www.google.com/maps?q=Calle+34,+Mar+del+Plata,+Mar+Azul&output=embed',
     photos: [
@@ -37,7 +38,8 @@ const OFFICES = [
   },
 ]
 
-export default function OfficesSection() {
+// gallery: en Nosotros se muestran las fotos de cada oficina; en el home va la tarjeta sola, con su foto de siempre
+export default function OfficesSection({ gallery = false }) {
   const [openPhoto, setOpenPhoto] = useState(null)
   // El mapa de Google recién se carga la primera vez que se pasa el mouse por la tarjeta
   const [mapsLoaded, setMapsLoaded] = useState({})
@@ -62,7 +64,11 @@ export default function OfficesSection() {
           {OFFICES.map((office) => (
             <article key={office.key} className="sf-card sf-office-card" onMouseEnter={() => loadMap(office.key)}>
               <div className="sf-office-media">
-                <img src={office.image} alt={`Oficina ${office.title} de Silvia Fernández Propiedades`} loading="lazy" />
+                <img
+                  src={gallery ? office.image : (office.homeImage || office.image)}
+                  alt={`Oficina ${office.title} de Silvia Fernández Propiedades`}
+                  loading="lazy"
+                />
                 <div className="sf-office-map" aria-hidden="true">
                   {mapsLoaded[office.key] && (
                     <iframe src={office.mapsEmbedUrl} title={`Mapa de la oficina ${office.title}`} tabIndex={-1}></iframe>
@@ -78,19 +84,21 @@ export default function OfficesSection() {
                   </a>
                 </div>
                 <p className="sf-office-text">{office.description}</p>
-                <div className="sf-office-gallery">
-                  {office.photos.map((photo) => (
-                    <button
-                      key={photo.src}
-                      type="button"
-                      className="sf-office-thumb"
-                      onClick={() => setOpenPhoto(photo)}
-                      aria-label={`Ver foto: ${photo.alt}`}
-                    >
-                      <img src={photo.src} alt={photo.alt} loading="lazy" />
-                    </button>
-                  ))}
-                </div>
+                {gallery && (
+                  <div className="sf-office-gallery">
+                    {office.photos.map((photo) => (
+                      <button
+                        key={photo.src}
+                        type="button"
+                        className="sf-office-thumb"
+                        onClick={() => setOpenPhoto(photo)}
+                        aria-label={`Ver foto: ${photo.alt}`}
+                      >
+                        <img src={photo.src} alt={photo.alt} loading="lazy" />
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
             </article>
           ))}

@@ -128,7 +128,7 @@ export default function Videoteca() {
 
   return (
     <div className="vt-page">
-      <div className="page-hero">
+      <div className="page-hero page-hero--with-panel">
         <div className="container">
           <h1>Videos de propiedades</h1>
           <p>Recorré las propiedades en video antes de visitarlas</p>

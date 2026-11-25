@@ -41,7 +41,8 @@
 
 .property-image {
   position: relative;
-  height: 240px;
+  /* Un solo alto de foto en todo el sitio (home, listados y landings) */
+  height: 220px;
   overflow: hidden;
   background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
 }
@@ -526,10 +527,17 @@
 
 /* ID de propiedad en card */
 .property-id {
+  /* Siempre 12px sobre los botones (en la tarjeta más alta de la fila quedaba pegado) */
+  margin-bottom: 12px;
   font-size: 0.85rem;
   color: #1a1a1a;
   font-weight: 600;
   text-align: right;
+}
+
+/* Sin ambientes ni metros (lotes): la fila vacía no deja un hueco entre el precio y la zona */
+.property-details:empty {
+  display: none;
 }
 /* Capacidad de personas (alquiler temporario) */
 .modern-property-card .detail-item--guests,
@@ -560,9 +568,10 @@
   height: 44px;
 }
 
+/* Mismo alto en los dos botones (el borde de "Contactar" lo dejaba 2px más alto al apilarse) */
 .btn-view,
 .btn-contact {
-  min-height: 44px;
+  min-height: 46px;
 }
 
 /* En pantallas táctiles no queda el hover "pegado" después de tocar */
