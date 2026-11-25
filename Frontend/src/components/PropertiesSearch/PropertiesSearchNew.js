@@ -21,6 +21,7 @@ import {
   FaTh,
   FaList
 } from 'react-icons/fa'
+import '../../app/lotes-terrenos/page.css'
 import './PropertiesSearchNew.css'
 
 const PAGE_SIZE = 12
@@ -462,26 +463,30 @@ export default function PropertiesSearchNew() {
   return (
     <div className="search-page">
 
-      <div className="search-container">
-        {/* Filtros modernos */}
-        <div className="filters-section">
-          <h1 className="filters-title">Propiedades en Mar Azul y Mar de las Pampas</h1>
+      {/* Misma estructura que Alquileres y Lotes: hero + panel de filtros montado + resultados */}
+      <div className="page-hero page-hero--with-panel">
+        <div className="container">
+          <h1>Propiedades en Mar Azul y Mar de las Pampas</h1>
+          <p>Casas, departamentos, lotes y complejos en venta y alquiler</p>
+        </div>
+      </div>
+
+      <div className="search-container filter-panel-wrap">
+        <div className="filters-section filter-panel">
           
           {/* Filtros de operación y ubicación */}
           <div className="operation-and-location">
-            <div className="operation-filters">
+            <div className="seg operation-filters" role="group" aria-label="Operación">
               <button 
-                className={`operation-btn ${filters.operation === 'venta' ? 'active' : ''}`}
+                className={`seg-btn ${filters.operation === 'venta' ? 'active' : ''}`}
                 onClick={() => handleFilterChange('operation', 'venta')}
               >
-                <FaHome className="operation-icon" />
                 Comprar
               </button>
               <button 
-                className={`operation-btn ${filters.operation === 'alquiler' ? 'active' : ''}`}
+                className={`seg-btn ${filters.operation === 'alquiler' ? 'active' : ''}`}
                 onClick={() => handleFilterChange('operation', 'alquiler')}
               >
-                <FaHome className="operation-icon" />
                 Alquilar
               </button>
             </div>

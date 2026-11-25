@@ -13,7 +13,7 @@ export const metadata = {
 export default function LotesPage() {
   return (
     <div className="lotes-page">
-      <div className="page-hero">
+      <div className="page-hero page-hero--with-panel">
         <div className="container">
           <h1>Lotes y Terrenos</h1>
           <p>Encontrá el terreno perfecto para construir tu proyecto</p>

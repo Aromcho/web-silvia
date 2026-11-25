@@ -15,16 +15,16 @@ export const metadata = {
 export default function AlquilerTemporarioPage() {
   return (
     <div className="alquiler-temporario-page">
-      <div className="page-hero">
+      <div className="page-hero page-hero--with-panel">
         <div className="container">
           <h1>Alquileres</h1>
           <p>Alquileres temporarios y anuales en las mejores ubicaciones</p>
         </div>
       </div>
-      <ZoneChips typeKey="alquiler-temporario" />
-      {/* TemporaryRentalBrowser lee ?tipo y ?personas con useSearchParams: Next pide un Suspense */}
+      {/* TemporaryRentalBrowser lee ?tipo y ?personas con useSearchParams: Next pide un Suspense.
+          Las zonas van dentro de su panel de filtros (antes quedaban sueltas entre el hero y el filtro). */}
       <Suspense fallback={<PropertiesGridSkeleton />}>
-        <TemporaryRentalBrowser />
+        <TemporaryRentalBrowser zoneChips={<ZoneChips typeKey="alquiler-temporario" standalone={false} />} />
       </Suspense>
     </div>
   );

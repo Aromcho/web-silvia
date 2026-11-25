@@ -1,5 +1,6 @@
 // Home: texto de la inmobiliaria y links a las páginas por zona (Google llega a ellas desde acá)
 import Link from 'next/link'
+import { FaMapMarkerAlt } from 'react-icons/fa'
 import { ZONES, ZONE_SLUGS, LANDING_TYPES, LANDING_TYPE_SLUGS, landingPath } from '../../helpers/landings.js'
 import './ZoneLinks.css'
 
@@ -35,19 +36,30 @@ export function PropertyZoneLinks({ property }) {
   )
 }
 
-// Fila de links «por zona» debajo del encabezado de /lotes-terrenos y /alquiler-temporario
-export function ZoneChips({ typeKey }) {
+// Fila «¿En qué zona?» del panel de filtros de /lotes-terrenos y /alquiler-temporario.
+// Sola (standalone) trae su propio panel; dentro del panel de otra página va con standalone={false}.
+export function ZoneChips({ typeKey, standalone = true }) {
   const type = LANDING_TYPES[typeKey]
   if (!type) return null
-  return (
-    <nav className="zone-chips container" aria-label={`${type.short} por zona`}>
-      <span className="zone-chips-label">Por zona:</span>
-      {ZONE_SLUGS.map((zoneKey) => (
-        <Link key={zoneKey} href={landingPath(typeKey, zoneKey)} className="zone-chip">
-          {ZONES[zoneKey].name}
-        </Link>
-      ))}
+  const row = (
+    <nav className="zone-chips" aria-label={`${type.short} por zona`}>
+      <span className="zone-chips-label"><FaMapMarkerAlt aria-hidden="true" /> ¿En qué zona?</span>
+      <div className="zone-chips-list">
+        {ZONE_SLUGS.map((zoneKey) => (
+          <Link key={zoneKey} href={landingPath(typeKey, zoneKey)} className="zone-chip">
+            {ZONES[zoneKey].name}
+          </Link>
+        ))}
+      </div>
     </nav>
+  )
+  if (!standalone) return row
+  return (
+    <div className="filter-panel-wrap">
+      <div className="container">
+        <div className="filter-panel">{row}</div>
+      </div>
+    </div>
   )
 }
 

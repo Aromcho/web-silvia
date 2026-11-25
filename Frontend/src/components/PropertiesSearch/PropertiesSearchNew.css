@@ -1103,6 +1103,68 @@
   white-space: nowrap;
 }
 
+/* ── Misma estructura y mismas piezas que Alquileres y Lotes ──
+   Hero verde con el título, panel de filtros montado sobre el hero (clases compartidas de globals.css)
+   y resultados directamente sobre el fondo blanco, sin tarjeta contenedora. */
+.search-page {
+  background: var(--white-color);
+}
+
+.search-page::before {
+  display: none;
+}
+
+.search-page .search-container {
+  margin-top: -40px;
+  padding: 0 20px;
+}
+
+.search-page .filters-section {
+  margin-bottom: 1.25rem;
+  padding: 1.25rem 1.5rem;
+  border: 1px solid rgba(0, 129, 92, 0.08);
+}
+
+.search-page .operation-filters {
+  gap: 4px;
+}
+
+.search-page .guests-filter-row {
+  margin-bottom: 0;
+}
+
+.search-page .property-types {
+  margin-bottom: 1.25rem;
+}
+
+.search-page .results-section {
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.search-page .results-header {
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+@media (max-width: 768px) {
+  .search-page .search-container {
+    margin-top: -28px;
+    padding: 0 16px;
+  }
+
+  .search-page .filters-section {
+    margin-bottom: 1rem;
+    padding: 1rem;
+  }
+
+  .search-page .results-section {
+    padding: 0;
+  }
+}
+
 @media (max-width: 768px) {
   .search-page::before {
     height: 190px;
@@ -1116,8 +1178,8 @@
 
   /* Debajo del header fijo (74px) con aire */
   .search-page .search-container {
-    margin-top: 90px;
-    padding: 0 0.75rem;
+    margin-top: -28px;
+    padding: 0 16px;
   }
 
   /* Dos columnas cuando entran (tablet vertical); una en el teléfono */

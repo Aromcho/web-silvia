@@ -24,7 +24,7 @@ const guestsFromParams = (params) => {
 
 const tabFromParams = (params) => (params.get('tipo') === 'anual' ? 'anual' : 'temporario')
 
-export default function TemporaryRentalBrowser() {
+export default function TemporaryRentalBrowser({ zoneChips = null }) {
   const searchParams = useSearchParams()
   const [guests, setGuests] = useState(() => guestsFromParams(searchParams))
   const [count, setCount] = useState(null)
@@ -67,23 +67,29 @@ export default function TemporaryRentalBrowser() {
 
   return (
     <>
-      <div className="trb-bar-wrap">
+      {/* Mismo panel de filtros que /propiedades: control segmentado, zonas y personas en una sola tarjeta */}
+      <div className="filter-panel-wrap">
         <div className="container">
-          <div className="trb-tabs" role="tablist" aria-label="Tipo de alquiler">
+          <div className="filter-panel">
+            <div className="filter-panel-row">
+          <div className="seg" role="tablist" aria-label="Tipo de alquiler">
             {TABS.map((t) => (
               <button
                 key={t.key}
                 type="button"
                 role="tab"
                 aria-selected={tab === t.key}
-                className={`trb-tab${tab === t.key ? ' is-active' : ''}`}
+                className={`seg-btn${tab === t.key ? ' is-active' : ''}`}
                 onClick={() => changeTab(t.key)}
               >
                 {t.label}
               </button>
             ))}
           </div>
-          {!isAnnual && <GuestsFilter value={guests} onChange={updateGuests} className="trb-bar" />}
+              {zoneChips}
+            </div>
+            {!isAnnual && <GuestsFilter value={guests} onChange={updateGuests} className="filter-panel-inner" />}
+          </div>
           <p className="trb-summary" aria-live="polite">{summary || ' '}</p>
         </div>
       </div>

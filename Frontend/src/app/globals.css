@@ -255,3 +255,115 @@ textarea:focus-visible {
 html {
   scroll-padding-top: 96px;
 }
+
+/* ── Panel de filtros compartido (Propiedades, Alquileres y Lotes) ──
+   Una sola tarjeta blanca montada sobre el hero, con las mismas piezas en todas las páginas:
+   control segmentado, fila de zonas y fila de personas. */
+.page-hero.page-hero--with-panel {
+  padding-bottom: 84px;
+}
+
+.filter-panel-wrap {
+  position: relative;
+  z-index: 2;
+  margin-top: -40px;
+}
+
+.filter-panel {
+  padding: 1.25rem 1.5rem;
+  border: 1px solid rgba(0, 129, 92, 0.08);
+  border-radius: 20px;
+  background: var(--white-color);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+}
+
+.filter-panel-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem 1.5rem;
+}
+
+/* Fila interior (personas): fondo verde muy claro dentro del panel */
+.filter-panel-inner {
+  padding: 0.85rem 1rem;
+  border: 1px solid rgba(0, 129, 92, 0.12);
+  border-radius: 16px;
+  background: #f6fbf9;
+}
+
+.filter-panel-row + .filter-panel-inner {
+  margin-top: 1rem;
+}
+
+.filter-panel-wrap + .properties-grid-container {
+  padding-top: 1.5rem;
+}
+
+/* Control segmentado: Comprar / Alquilar y Temporario / Anual */
+.seg {
+  display: inline-flex;
+  flex-shrink: 0;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid rgba(0, 129, 92, 0.1);
+  border-radius: 999px;
+  background: #eef4f1;
+}
+
+.seg-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 1.4rem;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: #475569;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.seg-btn:hover {
+  color: var(--primary-color);
+}
+
+.seg-btn.is-active,
+.seg-btn.active {
+  background: var(--primary-color);
+  color: var(--white-color);
+  box-shadow: 0 2px 8px rgba(0, 129, 92, 0.25);
+}
+
+@media (max-width: 768px) {
+  .page-hero.page-hero--with-panel {
+    padding-bottom: 60px;
+  }
+
+  .filter-panel-wrap {
+    margin-top: -28px;
+  }
+
+  .filter-panel {
+    padding: 1rem;
+    border-radius: 18px;
+  }
+
+  .filter-panel-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .seg {
+    display: flex;
+  }
+
+  .seg-btn {
+    flex: 1;
+    padding: 0 0.75rem;
+  }
+}
