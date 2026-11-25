@@ -262,6 +262,16 @@
   box-shadow: inset 0 0 0 1px rgba(18, 140, 126, 0.35);
 }
 
+/* Los tres botones en una línea cada uno */
+.quick-actions {
+  gap: 0.5rem;
+}
+
+.quick-action-btn {
+  padding: 10px 8px;
+  white-space: nowrap;
+}
+
 /* El logo entra entero en el círculo */
 .chat-logo {
   object-fit: contain;

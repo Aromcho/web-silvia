@@ -1099,6 +1099,10 @@
   min-height: 44px;
 }
 
+.search-page .sort-label {
+  white-space: nowrap;
+}
+
 @media (max-width: 768px) {
   .search-page::before {
     height: 190px;
