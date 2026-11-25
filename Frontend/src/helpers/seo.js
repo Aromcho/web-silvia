@@ -20,6 +20,38 @@ const operationWord = (property) => {
   return ''
 }
 
+export function buildSearchTitle(property) {
+  if (!property) return ''
+  const rawType = String(property.type?.name || '').trim()
+  const type = /terreno|lote/i.test(rawType) ? 'Lote' : /hotel|complejo/i.test(rawType) ? 'Complejo' : tidyPlaceName(rawType) || 'Propiedad'
+  const ops = (property.operations || []).map((op) => String(op?.operation_type || '').toLowerCase())
+  const hasSale = ops.some((t) => t.includes('venta') || t === 'sale')
+  const hasTemp = ops.some((t) => t.includes('tempor'))
+  const hasRent = ops.some((t) => (t.includes('alquiler') || t === 'rent') && !t.includes('tempor'))
+  const opPhrase = hasSale && hasTemp ? 'en venta y alquiler temporario'
+    : hasSale && hasRent ? 'en venta y alquiler'
+    : hasSale ? 'en venta'
+    : hasTemp ? 'en alquiler temporario'
+    : hasRent ? 'en alquiler'
+    : ''
+  const place = tidyPlaceName(property.location?.name || property.address?.city)
+  const base = [type, opPhrase, place ? `en ${place}` : ''].filter(Boolean).join(' ')
+
+  const facts = []
+  const dorms = Number(property.suite_amount) || 0
+  const land = Number(property.total_surface || property.surface) || 0
+  if (type === 'Lote' && land > 0) facts.push(`${Math.round(land)} m²`)
+  else if (dorms > 0) facts.push(`${dorms} dorm.`)
+  if (hasTemp && property.guests_capacity_label) facts.push(String(property.guests_capacity_label).toLowerCase())
+  const sea = formatDistanceToSea(property.distanciaMar)
+  if (sea) facts.push(`${sea} del mar`)
+  if (hasSale) {
+    const price = formatPropertyPrice(property)
+    if (price && price !== CONSULTAR_PRECIO && /venta|sale/i.test(property.operations?.[0]?.operation_type || '')) facts.push(price)
+  }
+  return `${base}${facts.length ? ` · ${facts.slice(0, 3).join(' · ')}` : ''}`
+}
+
 export function buildPropertyMetadata(property) {
   const title = stripHtml(property?.publication_title) || property?.type?.name || 'Propiedad'
   const place = tidyPlaceName(property?.location?.name || property?.address?.city) || 'Mar de las Pampas'
@@ -35,7 +67,14 @@ export function buildPropertyMetadata(property) {
   const description = clip(body ? `${facts}. ${body}` : `${facts}. Consultá esta propiedad con Silvia Fernández Inmobiliaria.`, 158)
   const cover = getCoverPhoto(property)
   const url = `/propiedad/${property?.id || ''}`
-  const fullTitle = `${title} | Silvia Fernández Inmobiliaria`
+  // La localidad va en el título que ve Google (si la publicación no la menciona ya)
+  const realPlace = tidyPlaceName(property?.location?.name || property?.address?.city)
+  const norm = (v) => String(v || '').toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '')
+  const titleWithPlace = realPlace && !norm(title).includes(norm(realPlace)) ? `${title} en ${realPlace}` : title
+  // Título para Google armado con los datos, como busca la gente: «Casa en alquiler temporario en
+  // Mar Azul · 3 dorm. · 200 m del mar». Los títulos cargados («VENTA CASA EN MAR AZUL») se repiten
+  // entre fichas y no dicen dormitorios, precio ni distancia al mar.
+  const fullTitle = `${buildSearchTitle(property) || titleWithPlace} | Silvia Fernández`
 
   return {
     title: fullTitle,

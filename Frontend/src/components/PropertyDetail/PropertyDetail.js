@@ -46,33 +46,17 @@ import {
   VIDEO_KIND_LABEL,
   imgUrl,
 } from '../../helpers/index.js'
+import { buildSearchTitle } from '../../helpers/seo.js'
 import './PropertyDetail.css'
 
-// Foto de la galería. Las fotos originales pesan 2–3 MB: al pasar a la siguiente, el navegador
-// seguía mostrando la anterior hasta terminar de bajar la nueva, y en el celular parecía que la
-// galería repetía siempre la misma foto. Ahora la foto anterior desaparece al instante, se ve
-// «Cargando foto…» hasta que llega la nueva, y la siguiente y la anterior se bajan de antemano.
-function GalleryImage({ src, preload = [], className = '', ...rest }) {
-  const [loadedSrc, setLoadedSrc] = useState(null)
-  const loaded = loadedSrc === src
+// Foto de la galería: una <img> común. Además baja de antemano la foto siguiente y la anterior,
+// así al tocar la flecha ya está en el celular y cambia al instante.
+function GalleryImage({ src, preload = [], ...rest }) {
   useEffect(() => {
     preload.filter((u) => u && u !== src).forEach((u) => { const img = new Image(); img.src = u })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [src, preload.join('|')])
-  return (
-    <>
-      {!loaded && <span className="gallery-loading" aria-hidden="true">Cargando foto…</span>}
-      <img
-        key={src}
-        src={src}
-        ref={(el) => { if (el && el.complete && el.naturalWidth && loadedSrc !== src) setLoadedSrc(src) }}
-        onLoad={() => setLoadedSrc(src)}
-        onError={() => setLoadedSrc(src)}
-        className={`${className}${loaded ? '' : ' is-loading'}`.trim() || undefined}
-        {...rest}
-      />
-    </>
-  )
+  return <img src={src} {...rest} />
 }
 
 // Espejo del seed de WhatsAppContact en el backend, solo para el fallback cuando
@@ -598,15 +582,19 @@ export default function PropertyDetail({ property }) {
     }
   }
 
-  // Contenido reutilizable del título (dirección + precio)
-  const titleBlock = (
+  // Contenido reutilizable del título (dirección + precio). Se dibuja dos veces (desktop y mobile):
+  // la de desktop es el <h1> de la ficha para Google (con el título de la publicación para lectores
+  // de pantalla), la de mobile queda como <p> para que haya un solo h1.
+  const headingTitle = (buildSearchTitle(property) || String(property.publication_title || propertyTypeName || '')).replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim()
+  const renderTitleBlock = (AddressTag = 'p') => (
     <div className="direction-price">
-      <p className="property-main-address">
+      <AddressTag className="property-main-address">
         <FaMapMarkerAlt className="address-pin-icon" />
         <span>
+          {AddressTag === 'h1' && headingTitle && <span className="sr-only">{headingTitle} · </span>}
           {[formatPropertyLocation(property), String(propertyAddress || '').trim()].filter(Boolean).join(', ') || 'Ubicación a confirmar'}
         </span>
-      </p>
+      </AddressTag>
       <div className="property-price-row">
         <div className="property-price-group">
           {operationsToShow.map((op, index) => {
@@ -666,7 +654,7 @@ export default function PropertyDetail({ property }) {
 
       {/* ── DESKTOP: título full-width encima del grid ── */}
       <div className="property-title-section title-desktop">
-        {titleBlock}
+        {renderTitleBlock('h1')}
       </div>
 
       <div className="container property-detail-container">
@@ -801,7 +789,7 @@ export default function PropertyDetail({ property }) {
                         <img
                           key={item.index}
                           src={imgUrl(item.photo.thumb || item.photo.image, 256)}
-                          alt={`Imagen ${item.index + 1}`}
+                          alt={`${headingTitle || 'Propiedad'} - foto ${item.index + 1}`}
                           loading="lazy"
                           className={currentMediaIndex === index ? "active" : ""}
                           onClick={() => setCurrentMediaIndex(index)}
@@ -841,7 +829,7 @@ export default function PropertyDetail({ property }) {
 
           {/* ── MOBILE ONLY: título debajo de la galería ── */}
           <div className="property-title-section title-mobile">
-            {titleBlock}
+            {renderTitleBlock('p')}
           </div>
 
           {/* ── MOBILE ONLY: características debajo del título ── */}

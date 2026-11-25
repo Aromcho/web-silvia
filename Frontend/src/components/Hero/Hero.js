@@ -157,8 +157,8 @@ const Hero = () => {
         <div className="container">
           <div className="hero-text">
             <h1 className="hero-title">
-              Encontrá tu hogar ideal con 
-              <span className="hero-highlight"> Silvia Fernández</span>
+              Tu inmobiliaria en 
+              <span className="hero-highlight"> Mar Azul y Mar de las Pampas</span>
             </h1>
             
             {/* Search Form */}

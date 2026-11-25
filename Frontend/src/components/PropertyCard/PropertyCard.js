@@ -1,3 +1,5 @@
+'use client'
+// Cliente: tiene estado (mapa sobre la foto) y botones. Las páginas por zona la usan desde el servidor.
 import React, { useState } from 'react'
 import Link from 'next/link'
 import {

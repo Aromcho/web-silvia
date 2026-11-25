@@ -32,6 +32,17 @@ const nextConfig = {
         destination: '/propiedad/:id',
         permanent: true,
       },
+      // SEO: una sola URL por página (las otras quedaban duplicadas)
+      {
+        source: '/propiedades/:id(\\d+)',
+        destination: '/propiedad/:id',
+        permanent: true,
+      },
+      {
+        source: '/about',
+        destination: '/nosotros',
+        permanent: true,
+      },
     ]
   },
 

@@ -4,38 +4,108 @@ import Footer from "../components/Footer/Footer";
 import Script from "next/script";
 import AttributionCapture from "../components/Attribution/AttributionCapture";
 
+const SITE = "https://www.silviafernandezpropiedades.com.ar";
+const DEFAULT_TITLE = "Silvia Fernández Propiedades - Inmobiliaria en Mar Azul y Mar de las Pampas";
+const DEFAULT_DESCRIPTION = "Inmobiliaria con oficinas en Mar Azul y Mar de las Pampas: casas, lotes, complejos y alquileres temporarios en Mar Azul, Las Gaviotas, Mar de las Pampas y Villa Gesell.";
+
 export const metadata = {
-  title: "Silvia Fernández - Inmobiliaria",
-  description: "Más de 15 años de experiencia en el mercado inmobiliario. Encontrá tu hogar ideal con Silvia Fernández.",
-  keywords: "inmobiliaria, propiedades, casas, departamentos, venta, alquiler, Silvia Fernández",
-  author: "Silvia Fernández",
-  viewport: "width=device-width, initial-scale=1",
-  metadataBase: new URL("https://www.silviafernandezpropiedades.com.ar"),
+  title: DEFAULT_TITLE,
+  description: DEFAULT_DESCRIPTION,
+  keywords: "inmobiliaria Mar Azul, inmobiliaria Mar de las Pampas, casas en venta Mar Azul, lotes Mar de las Pampas, alquiler temporario Mar Azul, Las Gaviotas, Villa Gesell, Silvia Fernández",
+  authors: [{ name: "Silvia Fernández Propiedades" }],
+  metadataBase: new URL(SITE),
   icons: {
     icon: "/assets/images/logo.jpg",
   },
   openGraph: {
-    title: "Silvia Fernández - Inmobiliaria",
-    description: "Más de 15 años de experiencia en el mercado inmobiliario. Encontrá tu hogar ideal con Silvia Fernández.",
-    url: "https://www.silviafernandezpropiedades.com.ar",
-    siteName: "Silvia Fernández Inmobiliaria",
+    title: DEFAULT_TITLE,
+    description: DEFAULT_DESCRIPTION,
+    url: SITE,
+    siteName: "Silvia Fernández Propiedades",
     locale: "es_AR",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Silvia Fernández - Inmobiliaria",
-    description: "Más de 15 años de experiencia en el mercado inmobiliario. Encontrá tu hogar ideal con Silvia Fernández.",
+    title: DEFAULT_TITLE,
+    description: DEFAULT_DESCRIPTION,
   },
+  // Search Console: el código de la etiqueta HTML va en GOOGLE_SITE_VERIFICATION (.env del VPS)
+  ...(process.env.GOOGLE_SITE_VERIFICATION
+    ? { verification: { google: process.env.GOOGLE_SITE_VERIFICATION } }
+    : {}),
   other: {
     "facebook-domain-verification": "44lai038bjh2b1wjogfzl4mdvkir56",
   },
 };
 
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+};
+
+// La inmobiliaria para Google (ficha de empresa, zonas, oficinas, redes) y el sitio
+const ORGANIZATION_JSON_LD = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "RealEstateAgent",
+      "@id": `${SITE}/#inmobiliaria`,
+      name: "Silvia Fernández Propiedades",
+      alternateName: "Silvia Fernández Inmobiliaria",
+      url: SITE,
+      logo: `${SITE}/assets/images/logo.jpg`,
+      image: `${SITE}/assets/images/oficinas/central-portada.webp`,
+      telephone: "+54 9 2255 50-9408",
+      email: "braicesfernandez@gmail.com",
+      address: {
+        "@type": "PostalAddress",
+        streetAddress: "Calle 34 y Mar del Plata",
+        addressLocality: "Mar Azul",
+        addressRegion: "Buenos Aires",
+        addressCountry: "AR",
+      },
+      areaServed: ["Mar Azul", "Las Gaviotas", "Mar de las Pampas", "Villa Gesell"].map((name) => ({ "@type": "Place", name })),
+      sameAs: [
+        "https://www.facebook.com/Silviafernadezpropiedades/",
+        "https://www.instagram.com/silviafernandezpropiedades/",
+      ],
+      department: {
+        "@type": "RealEstateAgent",
+        "@id": `${SITE}/#sucursal-mar-de-las-pampas`,
+        name: "Silvia Fernández Propiedades - Sucursal boutique Mar de las Pampas",
+        url: SITE,
+        image: `${SITE}/assets/images/oficinas/boutique-portada.webp`,
+        telephone: "+54 9 2255 50-9408",
+        address: {
+          "@type": "PostalAddress",
+          streetAddress: "Av. del Plata y Uritorco",
+          addressLocality: "Mar de las Pampas",
+          addressRegion: "Buenos Aires",
+          addressCountry: "AR",
+        },
+        geo: { "@type": "GeoCoordinates", latitude: -37.3187797, longitude: -57.0311899 },
+      },
+    },
+    {
+      "@type": "WebSite",
+      "@id": `${SITE}/#sitio`,
+      url: SITE,
+      name: "Silvia Fernández Propiedades",
+      inLanguage: "es-AR",
+      publisher: { "@id": `${SITE}/#inmobiliaria` },
+    },
+  ],
+};
+
 export default function RootLayout({ children }) {
   return (
-    <html lang="es">
+    <html lang="es-AR">
       <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(ORGANIZATION_JSON_LD) }}
+        />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="true" />
         <link 

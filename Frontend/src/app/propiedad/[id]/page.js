@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation'
 import { getPropertyById } from '../../../services/propertyService'
 import PropertyDetail from '../../../components/PropertyDetail/PropertyDetail'
 import { buildPropertyMetadata, buildPropertyJsonLd } from '../../../helpers/seo.js'
+import { PropertyZoneLinks } from '../../../components/ZoneLinks/ZoneLinks'
 
 export async function generateMetadata({ params }) {
   try {
@@ -55,6 +56,7 @@ export default async function PropertyPage({ params }) {
         />
       )}
       <PropertyDetail property={property} />
+      <PropertyZoneLinks property={property} />
     </>
   )
 }

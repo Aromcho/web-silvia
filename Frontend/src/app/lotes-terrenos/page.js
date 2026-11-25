@@ -1,8 +1,9 @@
 import PropertiesGrid from '../../components/PropertiesGrid/PropertiesGrid';
+import { ZoneChips } from '../../components/ZoneLinks/ZoneLinks';
 import './page.css';
 
 export const metadata = {
-  title: 'Lotes y Terrenos | Silvia Fernández Inmobiliaria',
+  title: 'Lotes y terrenos en venta en Mar Azul y Mar de las Pampas | Silvia Fernández',
   description: 'Encontrá lotes y terrenos en venta en Mar de las Pampas, Mar Azul y alrededores con asesoramiento inmobiliario profesional.',
   alternates: {
     canonical: '/lotes-terrenos',
@@ -18,6 +19,7 @@ export default function LotesPage() {
           <p>Encontrá el terreno perfecto para construir tu proyecto</p>
         </div>
       </div>
+      <ZoneChips typeKey="lotes-terrenos" />
       <PropertiesGrid filters={{ type: 'terreno' }} />
     </div>
   );

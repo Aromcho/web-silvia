@@ -1,7 +1,32 @@
-// Sitemap con las secciones y TODAS las fichas disponibles (W6). Se rearma cada hora.
+// Sitemap con las secciones, las páginas por zona con resultados y TODAS las fichas disponibles (W6).
+// Se rearma cada hora.
+import { ZONE_SLUGS, LANDING_TYPE_SLUGS, fetchLanding, landingPath } from '../helpers/landings.js'
+
 export const revalidate = 3600
 
 const baseUrl = 'https://www.silviafernandezpropiedades.com.ar'
+
+// Solo las combinaciones tipo + zona que tienen propiedades (las vacías no se indexan)
+async function landingEntries() {
+  const combos = LANDING_TYPE_SLUGS.flatMap((typeKey) => ZONE_SLUGS.map((zoneKey) => ({ typeKey, zoneKey })))
+  const results = await Promise.all(
+    combos.map(async ({ typeKey, zoneKey }) => {
+      try {
+        const { total } = await fetchLanding(typeKey, zoneKey, { limit: 1 })
+        return total > 0 ? { typeKey, zoneKey } : null
+      } catch {
+        return null
+      }
+    })
+  )
+  const now = new Date()
+  return results.filter(Boolean).map(({ typeKey, zoneKey }) => ({
+    url: `${baseUrl}${landingPath(typeKey, zoneKey)}`,
+    lastModified: now,
+    changeFrequency: 'daily',
+    priority: 0.85,
+  }))
+}
 const API = process.env.PROPERTY_API_INTERNAL_URL || 'http://localhost:3001/api/property'
 
 async function propertyEntries() {
@@ -32,5 +57,6 @@ export default async function sitemap() {
     { url: `${baseUrl}/mapa`, lastModified: now, changeFrequency: 'weekly', priority: 0.5 },
     { url: `${baseUrl}/nosotros`, lastModified: now, changeFrequency: 'monthly', priority: 0.4 },
   ]
-  return [...sections, ...(await propertyEntries())]
+  const [landings, properties] = await Promise.all([landingEntries(), propertyEntries()])
+  return [...sections, ...landings, ...properties]
 }
