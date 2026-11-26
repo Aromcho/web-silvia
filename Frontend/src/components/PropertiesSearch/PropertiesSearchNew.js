@@ -576,29 +576,30 @@ export default function PropertiesSearchNew() {
                 </ul>
               )}
             </div>
-          </div>
 
-          {/* Zona: el mismo filtro para comprar y para alquilar */}
-          <div className="zone-chips search-zone-row" role="group" aria-label="Zona">
-            <span className="zone-chips-label"><FaMapMarkerAlt aria-hidden="true" /> ¿En qué zona?</span>
-            <div className="zone-chips-list">
-              <button
-                type="button"
-                className={`zone-chip${filters.zona ? '' : ' is-active'}`}
-                onClick={() => handleFilterChange('zona', '')}
-              >
-                Todas
-              </button>
-              {ZONE_OPTIONS.map((zone) => (
+            {/* Zona: el mismo filtro para comprar y para alquilar. En desktop entra en esta misma
+                fila, al lado del buscador; si no entra (tablet), baja sola a la línea siguiente. */}
+            <div className="zone-chips search-zone-row" role="group" aria-label="Zona">
+              <span className="zone-chips-label"><FaMapMarkerAlt aria-hidden="true" /> ¿En qué zona?</span>
+              <div className="zone-chips-list">
                 <button
-                  key={zone.key}
                   type="button"
-                  className={`zone-chip${filters.zona === zone.key ? ' is-active' : ''}`}
-                  onClick={() => handleFilterChange('zona', zone.key)}
+                  className={`zone-chip${filters.zona ? '' : ' is-active'}`}
+                  onClick={() => handleFilterChange('zona', '')}
                 >
-                  {zone.label}
+                  Todas
                 </button>
-              ))}
+                {ZONE_OPTIONS.map((zone) => (
+                  <button
+                    key={zone.key}
+                    type="button"
+                    className={`zone-chip${filters.zona === zone.key ? ' is-active' : ''}`}
+                    onClick={() => handleFilterChange('zona', zone.key)}
+                  >
+                    {zone.label}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
 

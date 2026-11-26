@@ -137,6 +137,7 @@
 }
 
 .search-page .location-input-icon {
+  flex-shrink: 0;
   color: var(--primary-color);
   font-size: 1.1rem;
   margin-right: 0.75rem;
@@ -144,6 +145,7 @@
 
 .search-page .location-input {
   flex: 1;
+  min-width: 0;
   border: none;
   background: transparent;
   padding: 14px 0;
@@ -285,25 +287,30 @@
   font-size: 1.2rem;
 }
 
-/* Filtros de tipo de propiedad */
+/* Filtros de tipo de propiedad: botones en línea (ícono + texto) para que el panel no sea tan alto.
+   Todos del mismo ancho mientras entren; si no (tablet), cada uno ocupa lo que pide su texto. */
 .search-page .property-types {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
   margin-bottom: 2rem;
 }
 
 .search-page .property-type-btn {
   display: flex;
-  flex-direction: column;
+  flex: 1 1 0;
   align-items: center;
-  gap: 0.5rem;
-  padding: 1.5rem 1rem;
-  border: 2px solid #e2e8f0;
-  border-radius: 16px;
+  justify-content: center;
+  gap: 0.6rem;
+  min-width: max-content;
+  min-height: 48px;
+  padding: 0.5rem 0.75rem;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 14px;
   background: var(--white-color);
+  font-family: inherit;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
   position: relative;
   overflow: hidden;
 }
@@ -330,46 +337,59 @@
 }
 
 .search-page .property-type-btn:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.15);
+  border-color: var(--primary-color);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
 }
 
+/* Elegido: verde de la marca, sin el pulso de sombra violeta que heredaba de la plantilla */
 .search-page .property-type-btn.active {
   border-color: var(--primary-color);
-  transform: translateY(-4px);
-  box-shadow: 0 12px 35px rgba(0, 129, 92, 0.3);
+  box-shadow: 0 4px 12px rgba(0, 129, 92, 0.25);
+  animation: none;
 }
 
 .search-page .property-type-icon {
-  font-size: 2rem;
+  flex-shrink: 0;
+  font-size: 1.15rem;
   color: var(--primary-color);
   position: relative;
   z-index: 2;
-  transition: all 0.3s ease;
+  transition: color 0.2s ease;
 }
 
 .search-page .property-type-btn.active .property-type-icon {
   color: var(--white-color);
-  transform: scale(1.1);
 }
 
 .search-page .property-type-label {
+  font-size: 0.95rem;
   font-weight: 600;
   color: var(--primary-color);
+  white-space: nowrap;
   position: relative;
   z-index: 2;
-  transition: color 0.3s ease;
+  transition: color 0.2s ease;
 }
 
 .search-page .property-type-btn.active .property-type-label {
   color: var(--white-color);
 }
 
-/* Filtro de orden */
+@media (max-width: 1024px) {
+  .search-page .property-types {
+    gap: 0.5rem;
+  }
+
+  .search-page .property-type-btn {
+    padding: 0.5rem;
+  }
+}
+
+/* Filtro de orden: pegado a la derecha del panel */
 .search-page .sort-filter {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-end;
   gap: 1rem;
   margin-bottom: 0;
 }
@@ -904,9 +924,23 @@
   margin-bottom: 16px;
 }
 
-/* Zona: mismos chips que en las páginas por zona, acá como botones */
+/* Zona: mismos chips que en las páginas por zona, acá como botones. Va en la fila de
+   Comprar / Alquilar y el buscador: en desktop entra al lado; si no entra (tablet), baja sola
+   a la línea siguiente y el buscador ocupa el resto de la primera. */
 .search-page .search-zone-row {
-  margin-bottom: 16px;
+  flex: 0 1 auto;
+  max-width: 100%;
+}
+
+@media (min-width: 769px) {
+  .search-page .operation-and-location {
+    flex-wrap: wrap;
+  }
+
+  .search-page .location-search {
+    flex: 1 1 220px;
+    min-width: 220px;
+  }
 }
 
 .search-page .zone-chip {

@@ -4,14 +4,13 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname, useSearchParams } from 'next/navigation';
 import WhatsAppChat from '../WhatsAppChat/WhatsAppChat';
-import { normalizeOperation } from '../../helpers/searchFilters';
 import './Header.css';
 
-// Un solo buscador: Lotes, Alquileres y Complejos abren /propiedades con su filtro puesto
+// Un solo buscador: Lotes y Complejos abren /propiedades con su filtro puesto.
+// Los alquileres no tienen entrada propia: se eligen dentro del buscador (Comprar / Alquilar).
 const NAV_LINKS = [
   { href: '/propiedades', label: 'Propiedades', search: 'propiedades' },
   { href: '/propiedades?type=Terreno', label: 'Lotes - Terrenos', search: 'lotes' },
-  { href: '/propiedades?operation=alquiler', label: 'Alquileres', search: 'alquileres' },
   { href: '/propiedades?type=Complejo', label: 'Complejos', search: 'complejos' },
   { href: '/videos', label: 'Videos' },
   { href: '/nosotros', label: 'Nosotros' },
@@ -19,11 +18,10 @@ const NAV_LINKS = [
 
 // A qué entrada del menú corresponde la búsqueda que se está viendo
 const searchSection = (search) => {
-  const params = new URLSearchParams(search);
-  const type = params.get('type') || '';
+  const type = new URLSearchParams(search).get('type') || '';
   if (type === 'Terreno') return 'lotes';
   if (type === 'Complejo') return 'complejos';
-  return normalizeOperation(params.get('operation')) === 'venta' ? 'propiedades' : 'alquileres';
+  return 'propiedades';
 };
 
 // Las páginas por zona marcan la misma entrada que su búsqueda
@@ -32,8 +30,8 @@ const LANDING_SECTION = {
   'casas-en-venta': 'propiedades',
   'departamentos-en-venta': 'propiedades',
   'lotes-terrenos': 'lotes',
-  'alquiler-temporario': 'alquileres',
-  'alquiler-anual': 'alquileres',
+  'alquiler-temporario': 'propiedades',
+  'alquiler-anual': 'propiedades',
 };
 
 // Avisa los filtros de la URL al header. Va aparte y dentro de un Suspense porque useSearchParams
