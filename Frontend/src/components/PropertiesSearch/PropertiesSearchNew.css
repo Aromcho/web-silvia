@@ -937,9 +937,27 @@
     flex-wrap: wrap;
   }
 
+  /* El buscador ocupa lo que sobra de la fila, con tope: más ancho no aporta nada */
   .search-page .location-search {
     flex: 1 1 220px;
     min-width: 220px;
+    max-width: 420px;
+  }
+}
+
+/* En desktops angostos (1270–1339px) con «¿En qué zona?» las zonas no entran en la fila del
+   buscador: ahí la etiqueta se acorta a «Zona» y entran */
+.search-page .zone-label-short {
+  display: none;
+}
+
+@media (min-width: 1270px) and (max-width: 1339px) {
+  .search-page .zone-label-long {
+    display: none;
+  }
+
+  .search-page .zone-label-short {
+    display: inline;
   }
 }
 
@@ -974,6 +992,12 @@
   .search-page .search-zone-mobile {
     display: block;
     margin-bottom: 1rem;
+  }
+
+  /* «Ordenar por» ocupa el ancho del panel (con el select fijo en 200px se salía por la izquierda) */
+  .search-page .sort-select {
+    flex: 1 1 auto;
+    min-width: 0;
   }
 }
 

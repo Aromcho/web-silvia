@@ -5,7 +5,7 @@ import { useSearchParams } from 'next/navigation'
 import { getProperties, autocompleteProperties } from '../../services/propertyService'
 import PropertyCard from '../PropertyCard/PropertyCard'
 import GuestsFilter, { MAX_GUESTS, guestsText } from '../GuestsFilter/GuestsFilter'
-import { ZONE_OPTIONS, LOCAL_TYPE, normalizeOperation, rentExcludesLocals, searchTitle } from '../../helpers/searchFilters'
+import { ZONE_OPTIONS, LOCAL_TYPE, normalizeOperation, rentExcludesLocals, searchMetadata, searchTitle } from '../../helpers/searchFilters'
 import {
   getListSnapshot,
   isPropertyCardClick,
@@ -255,6 +255,8 @@ export default function PropertiesSearchNew() {
       return
     }
     lastSearchRef.current = writeFiltersToUrl(appliedFilters)
+    // El título de la pestaña acompaña a la búsqueda (el del servidor es el de la URL con la que se entró)
+    document.title = searchMetadata(appliedFilters).title
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [appliedFilters])
 
@@ -580,7 +582,12 @@ export default function PropertiesSearchNew() {
             {/* Zona: el mismo filtro para comprar y para alquilar. En desktop entra en esta misma
                 fila, al lado del buscador; si no entra (tablet), baja sola a la línea siguiente. */}
             <div className="zone-chips search-zone-row" role="group" aria-label="Zona">
-              <span className="zone-chips-label"><FaMapMarkerAlt aria-hidden="true" /> ¿En qué zona?</span>
+              <span className="zone-chips-label">
+                <FaMapMarkerAlt aria-hidden="true" />
+                <span className="zone-label-long">¿En qué zona?</span>
+                {/* Etiqueta corta: en desktops angostos deja entrar las zonas en esta fila */}
+                <span className="zone-label-short">Zona</span>
+              </span>
               <div className="zone-chips-list">
                 <button
                   type="button"
