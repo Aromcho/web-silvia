@@ -31,10 +31,11 @@ const CACHE_TTL_MS = 60 * 1000 // 1 minuto
 
 let cachedSearchResults = null
 
+// Tres operaciones, sin mezclar: antes «Alquilar» juntaba temporarios y anuales y escondía los locales
 const OPERATION_QUERY_MAP = {
   venta: ['Venta', 'Sale'],
-  alquiler: ['Alquiler', 'Rent', 'Alquiler temporal', 'Alquiler Temporario'],
-  alquiler_temporal: ['Alquiler', 'Alquiler temporal', 'Alquiler Temporario', 'Temporary Rent'],
+  temporario: ['Alquiler temporal', 'Alquiler Temporario', 'Alquiler temporario'],
+  anual: ['Alquiler anual'],
 }
 
 const PROPERTY_TYPE_QUERY_MAP = {
@@ -136,19 +137,22 @@ const readSearchCache = (cacheKey) => {
 
 const SORT_OPTIONS = ['recent', 'price_desc', 'price_asc']
 
-// Filtros a partir de la URL (?operation=alquiler&type=Casa&location=...&personas=4&orden=price_asc)
+// Filtros a partir de la URL (?operation=temporario&type=Casa&zona=mar-azul&location=...&personas=4&orden=price_asc).
+// Todo el sitio entra al buscador por acá: menú, hero, accesos rápidos, footer y páginas por zona.
 const filtersFromParams = (params) => {
-  const operation = params.get('operation') || 'venta'
+  const type = params.get('type') || ''
+  const operation = resolveOperation(normalizeOperation(params.get('operation')), type)
   const sort = params.get('orden')
+  const zona = params.get('zona') || ''
   return {
     operation,
-    // En alquiler no hay filtro por tipo (solo por personas)
-    type: operation === 'alquiler' ? '' : (params.get('type') || ''),
+    type,
+    zona: ZONE_OPTIONS.some((zone) => zone.key === zona) ? zona : '',
     location: params.get('location') || '',
-    // En alquiler no hay precios: sin orden por precio
-    sort: operation !== 'alquiler' && SORT_OPTIONS.includes(sort) ? sort : 'recent',
-    // Cantidad de personas: solo aplica con la operación "alquiler"
-    guests: operation === 'alquiler' ? Math.min(parseInt(params.get('personas'), 10) || 0, MAX_GUESTS) : 0,
+    // Solo la venta tiene precios publicados para ordenar
+    sort: operation === 'venta' && SORT_OPTIONS.includes(sort) ? sort : 'recent',
+    // Cantidad de personas: solo en alquiler temporario
+    guests: operation === 'temporario' ? Math.min(parseInt(params.get('personas'), 10) || 0, MAX_GUESTS) : 0,
   }
 }
 
@@ -160,16 +164,19 @@ const writeFiltersToUrl = (filtersSnapshot) => {
     else url.searchParams.delete(key)
   }
 
-  setParam('operation', filtersSnapshot.operation)
+  setParam('operation', filtersSnapshot.operation !== 'venta' ? filtersSnapshot.operation : '')
   setParam('type', filtersSnapshot.type)
+  setParam('zona', filtersSnapshot.zona)
   setParam('location', filtersSnapshot.location.trim())
-  setParam('personas', filtersSnapshot.operation === 'alquiler' && filtersSnapshot.guests > 0 ? String(filtersSnapshot.guests) : '')
+  setParam('personas', filtersSnapshot.operation === 'temporario' && filtersSnapshot.guests > 0 ? String(filtersSnapshot.guests) : '')
   setParam('orden', filtersSnapshot.sort !== 'recent' ? filtersSnapshot.sort : '')
 
   const nextSearch = url.searchParams.toString()
   if (url.search !== window.location.search) {
     window.history.replaceState(null, '', url)
   }
+  // El menú marca la sección según estos filtros
+  window.dispatchEvent(new Event('sf:search-filters'))
   return nextSearch
 }
 
@@ -288,12 +295,13 @@ export default function PropertiesSearchNew() {
       apiFilters.searchQuery = filtersSnapshot.location.trim()
     }
 
-    if (filtersSnapshot.operation === 'alquiler') {
-      // Los locales (alquiler anual) no se muestran en "Alquilar"
-      apiFilters.exclude_property_type = ['Local']
-      if (filtersSnapshot.guests > 0) {
-        apiFilters.minGuests = filtersSnapshot.guests
-      }
+    const zone = ZONE_OPTIONS.find((item) => item.key === filtersSnapshot.zona)
+    if (zone) {
+      apiFilters.barrio = zone.barrio
+    }
+
+    if (filtersSnapshot.operation === 'temporario' && filtersSnapshot.guests > 0) {
+      apiFilters.minGuests = filtersSnapshot.guests
     }
 
     return apiFilters
@@ -383,14 +391,19 @@ export default function PropertiesSearchNew() {
   }, [appliedFilters])
 
   const handleFilterChange = (key, value) => {
-    setFilters(prev => ({
-      ...prev,
-      [key]: value,
-      // El filtro de personas no aplica a venta: se limpia al cambiar de operación
-      ...(key === 'operation' && value !== 'alquiler' ? { guests: 0 } : {}),
-      // En alquiler no hay filtro por tipo ni orden por precio: se limpian al pasar a "Alquilar"
-      ...(key === 'operation' && value === 'alquiler' ? { type: '', sort: 'recent' } : {})
-    }))
+    setFilters(prev => {
+      const next = { ...prev, [key]: value }
+      // Al elegir «Temporario» con un tipo que solo existe en anual (local), se suelta el tipo
+      if (key === 'operation' && value === 'temporario' && resolveOperation('temporario', next.type) !== 'temporario') {
+        next.type = ''
+      }
+      // Un local se alquila por año: «Alquilar» + «Local» es alquiler anual
+      next.operation = resolveOperation(next.operation, next.type)
+      // Personas: solo en temporario. Orden por precio: solo en venta
+      if (next.operation !== 'temporario') next.guests = 0
+      if (next.operation !== 'venta') next.sort = 'recent'
+      return next
+    })
 
     // Autocompletado para ubicación
     if (key === 'location' && value.length > 2) {
