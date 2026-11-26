@@ -5,7 +5,7 @@ import { useSearchParams } from 'next/navigation'
 import { getProperties, autocompleteProperties } from '../../services/propertyService'
 import PropertyCard from '../PropertyCard/PropertyCard'
 import GuestsFilter, { MAX_GUESTS, guestsText } from '../GuestsFilter/GuestsFilter'
-import { ZONE_OPTIONS, normalizeOperation, resolveOperation, searchTitle } from '../../helpers/searchFilters'
+import { ZONE_OPTIONS, LOCAL_TYPE, normalizeOperation, rentExcludesLocals, searchTitle } from '../../helpers/searchFilters'
 import {
   getListSnapshot,
   isPropertyCardClick,
@@ -33,11 +33,10 @@ const CACHE_TTL_MS = 60 * 1000 // 1 minuto
 
 let cachedSearchResults = null
 
-// Tres operaciones, sin mezclar: antes «Alquilar» juntaba temporarios y anuales y escondía los locales
+// «Alquilar» trae todos los alquileres; los locales se apartan en buildApiFilters
 const OPERATION_QUERY_MAP = {
   venta: ['Venta', 'Sale'],
-  temporario: ['Alquiler temporal', 'Alquiler Temporario', 'Alquiler temporario'],
-  anual: ['Alquiler anual'],
+  alquiler: ['Alquiler', 'Rent', 'Alquiler temporal', 'Alquiler Temporario', 'Alquiler temporario'],
 }
 
 const PROPERTY_TYPE_QUERY_MAP = {
@@ -140,11 +139,11 @@ const readSearchCache = (cacheKey) => {
 
 const SORT_OPTIONS = ['recent', 'price_desc', 'price_asc']
 
-// Filtros a partir de la URL (?operation=temporario&type=Casa&zona=mar-azul&location=...&personas=4&orden=price_asc).
+// Filtros a partir de la URL (?operation=alquiler&type=Casa&zona=mar-azul&location=...&personas=4&orden=price_asc).
 // Todo el sitio entra al buscador por acá: menú, hero, accesos rápidos, footer y páginas por zona.
 const filtersFromParams = (params) => {
   const type = params.get('type') || ''
-  const operation = resolveOperation(normalizeOperation(params.get('operation')), type)
+  const operation = normalizeOperation(params.get('operation'))
   const sort = params.get('orden')
   const zona = params.get('zona') || ''
   return {
@@ -154,8 +153,8 @@ const filtersFromParams = (params) => {
     location: params.get('location') || '',
     // Solo la venta tiene precios publicados para ordenar
     sort: operation === 'venta' && SORT_OPTIONS.includes(sort) ? sort : 'recent',
-    // Cantidad de personas: solo en alquiler temporario
-    guests: operation === 'temporario' ? Math.min(parseInt(params.get('personas'), 10) || 0, MAX_GUESTS) : 0,
+    // Cantidad de personas: solo al alquilar para alojarse (no aplica a los locales)
+    guests: rentExcludesLocals({ operation, type }) ? Math.min(parseInt(params.get('personas'), 10) || 0, MAX_GUESTS) : 0,
   }
 }
 
@@ -171,7 +170,7 @@ const writeFiltersToUrl = (filtersSnapshot) => {
   setParam('type', filtersSnapshot.type)
   setParam('zona', filtersSnapshot.zona)
   setParam('location', filtersSnapshot.location.trim())
-  setParam('personas', filtersSnapshot.operation === 'temporario' && filtersSnapshot.guests > 0 ? String(filtersSnapshot.guests) : '')
+  setParam('personas', filtersSnapshot.guests > 0 ? String(filtersSnapshot.guests) : '')
   setParam('orden', filtersSnapshot.sort !== 'recent' ? filtersSnapshot.sort : '')
   // Parámetro del listado viejo de alquileres (llega por la redirección de /alquiler-temporario?tipo=anual)
   url.searchParams.delete('tipo')
@@ -305,8 +304,13 @@ export default function PropertiesSearchNew() {
       apiFilters.barrio = zone.barrio
     }
 
-    if (filtersSnapshot.operation === 'temporario' && filtersSnapshot.guests > 0) {
-      apiFilters.minGuests = filtersSnapshot.guests
+    // «Alquilar» no mezcla los locales con los alquileres para alojarse:
+    // aparecen solo cuando se elige el tipo «Local»
+    if (rentExcludesLocals(filtersSnapshot)) {
+      apiFilters.exclude_property_type = [LOCAL_TYPE]
+      if (filtersSnapshot.guests > 0) {
+        apiFilters.minGuests = filtersSnapshot.guests
+      }
     }
 
     return apiFilters
@@ -398,14 +402,8 @@ export default function PropertiesSearchNew() {
   const handleFilterChange = (key, value) => {
     setFilters(prev => {
       const next = { ...prev, [key]: value }
-      // Al elegir «Temporario» con un tipo que solo existe en anual (local), se suelta el tipo
-      if (key === 'operation' && value === 'temporario' && resolveOperation('temporario', next.type) !== 'temporario') {
-        next.type = ''
-      }
-      // Un local se alquila por año: «Alquilar» + «Local» es alquiler anual
-      next.operation = resolveOperation(next.operation, next.type)
-      // Personas: solo en temporario. Orden por precio: solo en venta
-      if (next.operation !== 'temporario') next.guests = 0
+      // Personas: solo al alquilar para alojarse (no en locales). Orden por precio: solo en venta
+      if (!rentExcludesLocals(next)) next.guests = 0
       if (next.operation !== 'venta') next.sort = 'recent'
       return next
     })
@@ -484,7 +482,7 @@ export default function PropertiesSearchNew() {
 
   // Sin resultados: se dice qué búsqueda quedó vacía y se ofrece aflojar el filtro que la vació
   const locationText = filters.location.trim()
-  const hasGuestsFilter = filters.operation === 'temporario' && filters.guests > 0
+  const hasGuestsFilter = filters.guests > 0
   const currentTitle = searchTitle(filters)
   const emptyTitle = locationText
     ? `No encontramos resultados para «${locationText}»`
@@ -494,7 +492,6 @@ export default function PropertiesSearchNew() {
   const emptyActions = [
     locationText && { label: 'Borrar la ubicación', run: () => handleFilterChange('location', '') },
     hasGuestsFilter && { label: 'Quitar filtro de personas', run: () => handleFilterChange('guests', 0) },
-    filters.operation === 'anual' && { label: 'Ver alquiler temporario', run: () => handleFilterChange('operation', 'temporario') },
     filters.zona && { label: 'Ver todas las zonas', run: () => handleFilterChange('zona', '') },
     filters.type && { label: 'Ver todos los tipos', run: () => handleFilterChange('type', '') },
   ].filter(Boolean)
@@ -530,8 +527,8 @@ export default function PropertiesSearchNew() {
                 Comprar
               </button>
               <button 
-                className={`seg-btn ${filters.operation !== 'venta' ? 'active' : ''}`}
-                onClick={() => handleFilterChange('operation', resolveOperation(filters.operation === 'anual' ? 'anual' : 'temporario', filters.type))}
+                className={`seg-btn ${filters.operation === 'alquiler' ? 'active' : ''}`}
+                onClick={() => handleFilterChange('operation', 'alquiler')}
               >
                 Alquilar
               </button>
@@ -581,29 +578,6 @@ export default function PropertiesSearchNew() {
             </div>
           </div>
 
-          {/* Alquilar: temporario (vacaciones) o anual */}
-          {filters.operation !== 'venta' && (
-            <div className="rent-mode-row">
-              <span className="rent-mode-label">Tipo de alquiler</span>
-              <div className="seg" role="group" aria-label="Tipo de alquiler">
-                <button
-                  type="button"
-                  className={`seg-btn ${filters.operation === 'temporario' ? 'active' : ''}`}
-                  onClick={() => handleFilterChange('operation', 'temporario')}
-                >
-                  Temporario
-                </button>
-                <button
-                  type="button"
-                  className={`seg-btn ${filters.operation === 'anual' ? 'active' : ''}`}
-                  onClick={() => handleFilterChange('operation', 'anual')}
-                >
-                  Anual
-                </button>
-              </div>
-            </div>
-          )}
-
           {/* Zona: el mismo filtro para comprar y para alquilar */}
           <div className="zone-chips search-zone-row" role="group" aria-label="Zona">
             <span className="zone-chips-label"><FaMapMarkerAlt aria-hidden="true" /> ¿En qué zona?</span>
@@ -643,8 +617,8 @@ export default function PropertiesSearchNew() {
             </select>
           </div>
 
-          {/* Cantidad de personas — solo en alquiler temporario */}
-          {filters.operation === 'temporario' && (
+          {/* Cantidad de personas — al alquilar para alojarse (no en locales) */}
+          {rentExcludesLocals(filters) && (
             <div className="guests-filter-row">
               <GuestsFilter value={filters.guests} onChange={(n) => handleFilterChange('guests', n)} />
               {filters.guests > 0 && (

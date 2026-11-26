@@ -60,16 +60,16 @@ const nextConfig = {
         destination: '/propiedades?type=Terreno',
         permanent: true,
       },
-      // El listado viejo de alquileres tenía la pestaña «Anual» en ?tipo=anual
+      // El listado viejo de alquileres tenía la pestaña «Anual» en ?tipo=anual (hoy son todos locales)
       {
         source: '/alquiler-temporario',
         has: [{ type: 'query', key: 'tipo', value: 'anual' }],
-        destination: '/propiedades?operation=anual',
+        destination: '/propiedades?operation=alquiler&type=Local',
         permanent: true,
       },
       {
         source: '/alquiler-temporario',
-        destination: '/propiedades?operation=temporario',
+        destination: '/propiedades?operation=alquiler',
         permanent: true,
       },
       {

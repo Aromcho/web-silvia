@@ -67,7 +67,7 @@ const Footer = () => {
                 <li><Link href="/nosotros">Nosotros</Link></li>
                 <li><Link href="/propiedades">Propiedades</Link></li>
                 <li><Link href="/propiedades?type=Terreno">Lotes y terrenos</Link></li>
-                <li><Link href="/propiedades?operation=temporario">Alquileres</Link></li>
+                <li><Link href="/propiedades?operation=alquiler">Alquileres</Link></li>
                 <li><Link href="/videos">Videos de propiedades</Link></li>
                 <li><Link href="/#contacto">Contacto</Link></li>
               </ul>

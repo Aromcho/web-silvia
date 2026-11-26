@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { autocompleteProperties } from '../../services/propertyService';
 import { FaHome, FaMapMarkerAlt, FaUmbrellaBeach, FaTree } from 'react-icons/fa';
-import { searchHref, resolveOperation } from '../../helpers/searchFilters';
+import { searchHref } from '../../helpers/searchFilters';
 import './Hero.css';
 
 const Hero = () => {
@@ -56,10 +56,10 @@ const Hero = () => {
   const handleSearch = (e) => {
     e.preventDefault();
 
-    // Al único buscador, con lo elegido ya filtrado. «Alquiler» + «Local» es alquiler anual
-    // (los locales no se alquilan por temporada: antes esta búsqueda no devolvía nada).
+    // Al único buscador, con lo elegido ya filtrado («Alquiler» + «Local» antes no devolvía nada:
+    // ahora el buscador muestra los locales cuando se elige ese tipo).
     router.push(searchHref({
-      operation: resolveOperation(searchForm.operation, searchForm.type),
+      operation: searchForm.operation,
       type: searchForm.type,
       location: searchForm.location.trim(),
     }));
@@ -107,7 +107,7 @@ const Hero = () => {
 
   // Cada acceso rápido abre el buscador con su filtro puesto
   const QUICK_ACCESS_FILTERS = {
-    alquiler: { operation: 'temporario' },
+    alquiler: { operation: 'alquiler' },
     lotes: { type: 'Terreno' },
     casas: { type: 'Casa' },
     'mar-azul': { zona: 'mar-azul' },
@@ -159,8 +159,8 @@ const Hero = () => {
                     Venta
                   </button>
                   <button 
-                    className={`operation-tab ${searchForm.operation === 'temporario' ? 'active' : ''}`}
-                    onClick={() => setSearchForm(prev => ({ ...prev, operation: 'temporario' }))}
+                    className={`operation-tab ${searchForm.operation === 'alquiler' ? 'active' : ''}`}
+                    onClick={() => setSearchForm(prev => ({ ...prev, operation: 'alquiler' }))}
                   >
                     Alquiler
                   </button>

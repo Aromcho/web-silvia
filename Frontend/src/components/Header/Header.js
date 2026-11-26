@@ -11,7 +11,7 @@ import './Header.css';
 const NAV_LINKS = [
   { href: '/propiedades', label: 'Propiedades', search: 'propiedades' },
   { href: '/propiedades?type=Terreno', label: 'Lotes - Terrenos', search: 'lotes' },
-  { href: '/propiedades?operation=temporario', label: 'Alquileres', search: 'alquileres' },
+  { href: '/propiedades?operation=alquiler', label: 'Alquileres', search: 'alquileres' },
   { href: '/propiedades?type=Complejo', label: 'Complejos', search: 'complejos' },
   { href: '/videos', label: 'Videos' },
   { href: '/nosotros', label: 'Nosotros' },

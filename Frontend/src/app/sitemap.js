@@ -51,7 +51,7 @@ export default async function sitemap() {
     { url: `${baseUrl}/`, lastModified: now, changeFrequency: 'daily', priority: 1 },
     { url: `${baseUrl}/propiedades`, lastModified: now, changeFrequency: 'daily', priority: 0.9 },
     // Alquileres, lotes y complejos son el mismo buscador con su filtro (las URLs viejas redirigen acá)
-    { url: `${baseUrl}/propiedades?operation=temporario`, lastModified: now, changeFrequency: 'daily', priority: 0.9 },
+    { url: `${baseUrl}/propiedades?operation=alquiler`, lastModified: now, changeFrequency: 'daily', priority: 0.9 },
     { url: `${baseUrl}/propiedades?type=Terreno`, lastModified: now, changeFrequency: 'weekly', priority: 0.7 },
     { url: `${baseUrl}/propiedades?type=Complejo`, lastModified: now, changeFrequency: 'weekly', priority: 0.7 },
     { url: `${baseUrl}/videos`, lastModified: now, changeFrequency: 'weekly', priority: 0.6 },

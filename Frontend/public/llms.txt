@@ -27,9 +27,10 @@
 ## Secciones
 
 - [Todas las propiedades con buscador](https://www.silviafernandezpropiedades.com.ar/propiedades)
-- [Alquileres temporarios y anuales](https://www.silviafernandezpropiedades.com.ar/alquiler-temporario)
-- [Lotes y terrenos](https://www.silviafernandezpropiedades.com.ar/lotes-terrenos)
-- [Complejos y emprendimientos](https://www.silviafernandezpropiedades.com.ar/complejos)
+- [Alquileres temporarios](https://www.silviafernandezpropiedades.com.ar/propiedades?operation=alquiler)
+- [Locales en alquiler](https://www.silviafernandezpropiedades.com.ar/propiedades?operation=alquiler&type=Local)
+- [Lotes y terrenos](https://www.silviafernandezpropiedades.com.ar/propiedades?type=Terreno)
+- [Complejos y emprendimientos](https://www.silviafernandezpropiedades.com.ar/propiedades?type=Complejo)
 - [Videos de propiedades](https://www.silviafernandezpropiedades.com.ar/videos)
 - [Nosotros y oficinas](https://www.silviafernandezpropiedades.com.ar/nosotros)
 - [Sitemap con todas las fichas](https://www.silviafernandezpropiedades.com.ar/sitemap.xml)
