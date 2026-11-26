@@ -5,6 +5,7 @@ import { useSearchParams } from 'next/navigation'
 import { getProperties, autocompleteProperties } from '../../services/propertyService'
 import PropertyCard from '../PropertyCard/PropertyCard'
 import GuestsFilter, { MAX_GUESTS, guestsText } from '../GuestsFilter/GuestsFilter'
+import { ZONE_OPTIONS, normalizeOperation, resolveOperation, searchTitle } from '../../helpers/searchFilters'
 import {
   getListSnapshot,
   isPropertyCardClick,
@@ -22,6 +23,7 @@ import {
   FaList
 } from 'react-icons/fa'
 import '../../app/lotes-terrenos/page.css'
+import '../ZoneLinks/ZoneLinks.css'
 import './PropertiesSearchNew.css'
 
 const PAGE_SIZE = 12
@@ -103,6 +105,7 @@ const buildSearchCacheKey = (filtersSnapshot) => {
   return `${SEARCH_CACHE_KEY_PREFIX}:${JSON.stringify({
     operation: filtersSnapshot.operation || '',
     type: filtersSnapshot.type || '',
+    zona: filtersSnapshot.zona || '',
     location: filtersSnapshot.location || '',
     sort: filtersSnapshot.sort || 'recent',
     guests: filtersSnapshot.guests || 0,
@@ -479,8 +482,13 @@ export default function PropertiesSearchNew() {
       {/* Misma estructura que Alquileres y Lotes: hero + panel de filtros montado + resultados */}
       <div className="page-hero page-hero--with-panel">
         <div className="container">
-          <h1>Propiedades en Mar Azul y Mar de las Pampas</h1>
-          <p>Casas, departamentos, lotes y complejos en venta y alquiler</p>
+          {/* El título dice siempre lo que se está viendo: «Casas en venta en Mar Azul» */}
+          <h1>{searchTitle(filters)}</h1>
+          <p>
+            {loading && properties.length === 0
+              ? 'Buscando propiedades…'
+              : `${totalCount} ${totalCount === 1 ? 'propiedad disponible' : 'propiedades disponibles'}`}
+          </p>
         </div>
       </div>
 
@@ -497,8 +505,8 @@ export default function PropertiesSearchNew() {
                 Comprar
               </button>
               <button 
-                className={`seg-btn ${filters.operation === 'alquiler' ? 'active' : ''}`}
-                onClick={() => handleFilterChange('operation', 'alquiler')}
+                className={`seg-btn ${filters.operation !== 'venta' ? 'active' : ''}`}
+                onClick={() => handleFilterChange('operation', filters.operation === 'anual' ? 'anual' : 'temporario')}
               >
                 Alquilar
               </button>
@@ -548,8 +556,55 @@ export default function PropertiesSearchNew() {
             </div>
           </div>
 
-          {/* Cantidad de personas — solo para alquiler */}
-          {filters.operation === 'alquiler' && (
+          {/* Alquilar: temporario (vacaciones) o anual */}
+          {filters.operation !== 'venta' && (
+            <div className="rent-mode-row">
+              <span className="rent-mode-label">Tipo de alquiler</span>
+              <div className="seg" role="group" aria-label="Tipo de alquiler">
+                <button
+                  type="button"
+                  className={`seg-btn ${filters.operation === 'temporario' ? 'active' : ''}`}
+                  onClick={() => handleFilterChange('operation', 'temporario')}
+                >
+                  Temporario
+                </button>
+                <button
+                  type="button"
+                  className={`seg-btn ${filters.operation === 'anual' ? 'active' : ''}`}
+                  onClick={() => handleFilterChange('operation', 'anual')}
+                >
+                  Anual
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Zona: el mismo filtro para comprar y para alquilar */}
+          <div className="zone-chips search-zone-row" role="group" aria-label="Zona">
+            <span className="zone-chips-label"><FaMapMarkerAlt aria-hidden="true" /> ¿En qué zona?</span>
+            <div className="zone-chips-list">
+              <button
+                type="button"
+                className={`zone-chip${filters.zona ? '' : ' is-active'}`}
+                onClick={() => handleFilterChange('zona', '')}
+              >
+                Todas
+              </button>
+              {ZONE_OPTIONS.map((zone) => (
+                <button
+                  key={zone.key}
+                  type="button"
+                  className={`zone-chip${filters.zona === zone.key ? ' is-active' : ''}`}
+                  onClick={() => handleFilterChange('zona', zone.key)}
+                >
+                  {zone.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Cantidad de personas — solo en alquiler temporario */}
+          {filters.operation === 'temporario' && (
             <div className="guests-filter-row">
               <GuestsFilter value={filters.guests} onChange={(n) => handleFilterChange('guests', n)} />
               {filters.guests > 0 && (
@@ -560,8 +615,8 @@ export default function PropertiesSearchNew() {
             </div>
           )}
 
-          {/* Tipos de propiedad — solo en "Comprar" (en alquiler se filtra por personas) */}
-          {filters.operation !== 'alquiler' && (<>
+          {/* Tipos de propiedad — en comprar y en alquilar */}
+          <>
           <div className="property-types">
             <button 
               className={`property-type-btn ${filters.type === 'Casa' ? 'active' : ''}`}
@@ -615,10 +670,10 @@ export default function PropertiesSearchNew() {
               <option value="Complejo">Complejo</option>
             </select>
           </div>
-          </>)}
+          </>
 
           {/* Filtro de orden — solo en "Comprar" (los alquileres no tienen precio) */}
-          {filters.operation !== 'alquiler' && (
+          {filters.operation === 'venta' && (
           <div className="sort-filter">
             <label className="sort-label">Ordenar por:</label>
             <select 
@@ -679,12 +734,12 @@ export default function PropertiesSearchNew() {
                     color: '#64748b'
                   }}>
                     <p style={{ fontSize: '1.2rem', marginBottom: '0.5rem' }}>
-                      {filters.operation === 'alquiler' && filters.guests > 0
+                      {filters.operation === 'temporario' && filters.guests > 0
                         ? `No encontramos alquileres para ${guestsText(filters.guests)} o más`
                         : 'No se encontraron propiedades con los filtros seleccionados'}
                     </p>
                     <p>Intenta ajustar los filtros para obtener más resultados</p>
-                    {filters.operation === 'alquiler' && filters.guests > 0 && (
+                    {filters.operation === 'temporario' && filters.guests > 0 && (
                       <button type="button" className="guests-filter-reset" onClick={() => handleFilterChange('guests', 0)}>
                         Quitar filtro de personas
                       </button>
