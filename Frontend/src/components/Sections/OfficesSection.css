@@ -12,11 +12,14 @@
 
 .sf-office-media {
   position: relative;
-  height: 250px;
+  /* Proporción fija: la foto no se achata cuando la tarjeta es más ancha */
+  aspect-ratio: 16 / 7;
   background: #e5ebe8;
 }
 
 .sf-office-media > img {
+  position: absolute;
+  inset: 0;
   display: block;
   width: 100%;
   height: 100%;
@@ -181,6 +184,7 @@
   }
 
   .sf-office-media {
+    aspect-ratio: auto;
     height: 200px;
   }
 

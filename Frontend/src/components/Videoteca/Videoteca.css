@@ -8,7 +8,7 @@
 
 .vt-container {
   width: 100%;
-  max-width: 1200px;
+  max-width: var(--sf-container);
   margin: 0 auto;
   padding: 0 20px;
 }

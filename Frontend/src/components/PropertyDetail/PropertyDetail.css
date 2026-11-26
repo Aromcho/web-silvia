@@ -902,7 +902,10 @@
 .property-detail-page .sidebar-fixed {
   position: fixed;
   top: 6.5rem;
-  right: max(1rem, calc((100vw - 1400px) / 2 + 2rem));
+  /* Misma posición que en el flujo: borde derecho del contenedor menos sus 20px de relleno.
+     100% (no 100vw) para no contar la barra de scroll. Antes usaba un ancho de 1400px fijo
+     y al scrollear la tarjeta se corría y dejaba un hueco al lado de las fotos. */
+  right: max(20px, calc((100% - var(--sf-container)) / 2 + 20px));
   width: 380px;
   z-index: 20;
 }
@@ -911,7 +914,8 @@
 .property-detail-page .sidebar-bottom {
   position: absolute;
   bottom: 0;
-  right: 0;
+  /* 20px = relleno del contenedor: con 0 la tarjeta saltaba 20px a la derecha al llegar al final */
+  right: 20px;
   width: 380px;
 }
 
@@ -1890,15 +1894,15 @@
   transform: scale(1.03);
 }
 
-/* ── Mismo ancho de contenido que el resto del sitio (1200px): la ficha alinea con el header ── */
+/* ── Mismo ancho de contenido que el resto del sitio (--sf-container): la ficha alinea con el header ── */
 .title-desktop {
-  max-width: 1200px;
+  max-width: var(--sf-container);
   padding-left: 20px;
   padding-right: 20px;
 }
 
 .property-detail-page .property-detail-container {
-  max-width: 1200px;
+  max-width: var(--sf-container);
   padding-left: 20px;
   padding-right: 20px;
 }

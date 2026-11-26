@@ -118,6 +118,13 @@
   height: auto;
 }
 
+/* Con el contenido ancho entran cuatro, del mismo tamaño que en los listados */
+@container (min-width: 1240px) {
+  .properties-section .modern-property-card {
+    width: calc((100cqi - 48px) / 4);
+  }
+}
+
 .carousel-arrow {
   position: absolute;
   top: 110px;

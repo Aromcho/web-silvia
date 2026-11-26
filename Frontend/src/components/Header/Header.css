@@ -4,7 +4,7 @@
   left: 20px;
   right: 20px;
   /* Mismo ancho que .container: el header alinea con el contenido en cualquier pantalla */
-  max-width: 1200px;
+  max-width: var(--sf-container);
   margin: 0 auto;
   border-radius: 50px;
   background-color: var(--white-color);

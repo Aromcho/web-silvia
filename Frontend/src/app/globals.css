@@ -88,7 +88,8 @@ a:hover {
 
 /* Utility classes */
 .container {
-  max-width: 1200px;
+  /* Ancho del contenido de todo el sitio: se cambia en un solo lugar (--sf-container) */
+  max-width: var(--sf-container);
   margin: 0 auto;
   padding: 0 20px;
 }
@@ -372,6 +373,7 @@ html {
    Cualquier sección nueva usa .sf-section + .sf-head; no se definen paddings ni títulos
    propios por página (de ahí venían los espacios distintos entre pantallas). */
 :root {
+  --sf-container: 1400px; /* ancho máximo del contenido: header, secciones, listados y ficha */
   --sf-section-y: 72px;   /* aire arriba y abajo de cada sección */
   --sf-head-gap: 40px;    /* del título de la sección a su contenido */
   --sf-block-gap: 56px;   /* entre bloques de una misma sección (carruseles del home) */

@@ -63,7 +63,7 @@
 
 /* Contenedor principal */
 .search-page .search-container {
-  max-width: 1200px;
+  max-width: var(--sf-container);
   margin: 0 auto;
   margin-top: 100px;
   padding: 0 1rem;

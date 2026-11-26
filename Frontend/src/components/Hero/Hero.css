@@ -603,7 +603,7 @@ width: 40%;
   right: auto;
   bottom: auto;
   width: 100%;
-  max-width: 1200px;
+  max-width: var(--sf-container);
   margin: 0 auto 20px;
   padding: 0 20px;
 }
