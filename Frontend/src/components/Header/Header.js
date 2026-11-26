@@ -6,32 +6,30 @@ import { usePathname, useSearchParams } from 'next/navigation';
 import WhatsAppChat from '../WhatsAppChat/WhatsAppChat';
 import './Header.css';
 
-// Un solo buscador: Lotes y Complejos abren /propiedades con su filtro puesto.
-// Los alquileres no tienen entrada propia: se eligen dentro del buscador (Comprar / Alquilar).
+// Un solo buscador: Departamentos, Locales y Complejos abren /propiedades con su filtro puesto.
+// Los alquileres para alojarse no tienen entrada propia: se eligen dentro del buscador
+// (Comprar / Alquilar). Los locales sí, porque en «Alquilar» solo aparecen al elegir ese tipo.
 const NAV_LINKS = [
   { href: '/propiedades', label: 'Propiedades', search: 'propiedades' },
-  { href: '/propiedades?type=Terreno', label: 'Lotes - Terrenos', search: 'lotes' },
+  { href: '/propiedades?type=Departamento', label: 'Departamentos', search: 'departamentos' },
+  { href: '/propiedades?operation=alquiler&type=Local', label: 'Locales', search: 'locales' },
   { href: '/propiedades?type=Complejo', label: 'Complejos', search: 'complejos' },
   { href: '/videos', label: 'Videos' },
   { href: '/nosotros', label: 'Nosotros' },
 ];
 
 // A qué entrada del menú corresponde la búsqueda que se está viendo
-const searchSection = (search) => {
-  const type = new URLSearchParams(search).get('type') || '';
-  if (type === 'Terreno') return 'lotes';
-  if (type === 'Complejo') return 'complejos';
-  return 'propiedades';
-};
+const TYPE_SECTION = { Departamento: 'departamentos', Local: 'locales', Complejo: 'complejos' };
+const searchSection = (search) => TYPE_SECTION[new URLSearchParams(search).get('type')] || 'propiedades';
 
 // Las páginas por zona marcan la misma entrada que su búsqueda
 const LANDING_SECTION = {
   venta: 'propiedades',
   'casas-en-venta': 'propiedades',
-  'departamentos-en-venta': 'propiedades',
-  'lotes-terrenos': 'lotes',
+  'departamentos-en-venta': 'departamentos',
+  'lotes-terrenos': 'propiedades',
   'alquiler-temporario': 'propiedades',
-  'alquiler-anual': 'propiedades',
+  'alquiler-anual': 'locales',
 };
 
 // Avisa los filtros de la URL al header. Va aparte y dentro de un Suspense porque useSearchParams
