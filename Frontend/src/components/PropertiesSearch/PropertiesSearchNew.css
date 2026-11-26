@@ -901,6 +901,76 @@
 }
 
 .search-page .guests-filter-row {
+  margin-bottom: 16px;
+}
+
+/* Alquilar: temporario o anual */
+.search-page .rent-mode-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.search-page .rent-mode-label {
+  color: #1e293b;
+  font-weight: 700;
+}
+
+/* Zona: mismos chips que en las páginas por zona, acá como botones */
+.search-page .search-zone-row {
+  margin-bottom: 16px;
+}
+
+.search-page .zone-chip {
+  cursor: pointer;
+  font-family: inherit;
+}
+
+/* En mobile la zona es un select (como los tipos de propiedad) */
+.search-page .search-zone-mobile {
+  display: none;
+}
+
+/* Sin resultados: botones para aflojar el filtro que dejó la búsqueda vacía */
+.search-page .search-empty-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.search-page .search-empty-actions .guests-filter-reset {
+  margin-top: 0;
+}
+
+@media (max-width: 768px) {
+  .search-page .search-zone-row {
+    display: none;
+  }
+
+  .search-page .search-zone-mobile {
+    display: block;
+    margin-bottom: 1rem;
+  }
+
+  /* Igual que Comprar / Alquilar: etiqueta arriba y control a todo el ancho */
+  .search-page .rent-mode-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .search-page .rent-mode-row .seg {
+    justify-content: center;
+  }
+}
+
+/* Sin el orden por precio (alquileres), los tipos son la última fila del panel */
+.search-page .filters-section:not(:has(.sort-filter)) .property-types,
+.search-page .filters-section:not(:has(.sort-filter)) .property-types-mobile {
   margin-bottom: 0;
 }
 

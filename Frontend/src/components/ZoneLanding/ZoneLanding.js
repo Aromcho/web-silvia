@@ -17,7 +17,9 @@ import {
   buildSummary,
   buildFaq,
 } from '../../helpers/landings.js'
-import { ZoneChips } from '../ZoneLinks/ZoneLinks'
+import { FaMapMarkerAlt } from 'react-icons/fa'
+import { LANDING_TO_SEARCH, searchHref } from '../../helpers/searchFilters'
+import '../ZoneLinks/ZoneLinks.css'
 import '../../app/lotes-terrenos/page.css'
 import '../PropertiesGrid/PropertiesGrid.css'
 import './ZoneLanding.css'
@@ -117,6 +119,8 @@ export default async function ZoneLanding({ typeKey, params, searchParams }) {
   const otherZones = ZONE_SLUGS.filter((key) => key !== zoneKey)
   const otherTypes = LANDING_TYPE_SLUGS.filter((key) => key !== typeKey)
   const whatsappText = `Hola, busco ${type.short.toLowerCase()} en ${zone.name}`
+  // Filtros del buscador que equivalen a esta página (operación y tipo)
+  const searchFilters = LANDING_TO_SEARCH[typeKey] || {}
 
   return (
     <div className="zone-landing">
@@ -143,8 +147,29 @@ export default async function ZoneLanding({ typeKey, params, searchParams }) {
         </div>
       </div>
 
-      {/* Mismo panel de zonas que los listados, con esta zona marcada */}
-      <ZoneChips typeKey={typeKey} activeZone={zoneKey} allHref={type.parent.href} />
+      {/* Panel de zonas con esta zona marcada. Cada zona abre el buscador (/propiedades) con el
+          filtro ya puesto: ahí están todos los filtros y es el único lugar donde se busca. */}
+      <div className="filter-panel-wrap">
+        <div className="container">
+          <div className="filter-panel">
+            <nav className="zone-chips" aria-label={`${type.short} por zona`}>
+              <span className="zone-chips-label"><FaMapMarkerAlt aria-hidden="true" /> ¿En qué zona?</span>
+              <div className="zone-chips-list">
+                <Link href={searchHref(searchFilters)} className="zone-chip">Todas</Link>
+                {ZONE_SLUGS.map((key) => (
+                  <Link
+                    key={key}
+                    href={searchHref({ ...searchFilters, zona: key })}
+                    className={`zone-chip${key === zoneKey ? ' is-active' : ''}`}
+                  >
+                    {ZONES[key].name}
+                  </Link>
+                ))}
+              </div>
+            </nav>
+          </div>
+        </div>
+      </div>
 
       {items.length > 0 ? (
         <div className="properties-grid-container zl-grid">

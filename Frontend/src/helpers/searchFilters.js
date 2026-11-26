@@ -6,11 +6,10 @@
 
 export const SEARCH_PATH = '/propiedades'
 
-// operation: 'venta' | 'temporario' | 'anual'
+// operation: 'venta' | 'alquiler'
 export const OPERATION_LABELS = {
   venta: 'en venta',
-  temporario: 'en alquiler temporario',
-  anual: 'en alquiler anual',
+  alquiler: 'en alquiler',
 }
 
 export const ZONE_OPTIONS = [
@@ -28,21 +27,16 @@ export const PROPERTY_TYPE_PLURALS = {
   Complejo: 'Complejos',
 }
 
-// Tipos que solo se alquilan por año: con «Alquilar» se muestran en alquiler anual
-const ANNUAL_ONLY_TYPES = ['Local']
+// Los locales no se mezclan con los alquileres para alojarse: en «Alquilar» no aparecen,
+// salvo que se elija el tipo «Local» (ahí se muestran solo los locales en alquiler).
+export const LOCAL_TYPE = 'Local'
+export const rentExcludesLocals = ({ operation, type } = {}) => operation === 'alquiler' && type !== LOCAL_TYPE
 
-// Valores viejos de ?operation= que siguen llegando por links guardados o compartidos
+// Valores de ?operation= que siguen llegando por links viejos, guardados o compartidos
 export const normalizeOperation = (value) => {
   const v = String(value || '').toLowerCase().trim()
-  if (['alquiler', 'temporario', 'alquiler_temporal', 'alquiler-temporario', 'alquiler temporario'].includes(v)) return 'temporario'
-  if (['anual', 'alquiler-anual', 'alquiler anual'].includes(v)) return 'anual'
-  return 'venta'
+  return v.includes('alquil') || ['temporario', 'anual', 'rent'].includes(v) ? 'alquiler' : 'venta'
 }
-
-// «Alquilar un local» es alquiler anual: no existe en temporario y antes no devolvía nada
-export const resolveOperation = (operation, type) => (
-  operation === 'temporario' && ANNUAL_ONLY_TYPES.includes(type) ? 'anual' : operation
-)
 
 export const zoneLabel = (zona) => ZONE_OPTIONS.find((z) => z.key === zona)?.label || ''
 
@@ -71,8 +65,26 @@ export const LANDING_TO_SEARCH = {
   'casas-en-venta': { operation: 'venta', type: 'Casa' },
   'departamentos-en-venta': { operation: 'venta', type: 'Departamento' },
   'lotes-terrenos': { operation: 'venta', type: 'Terreno' },
-  'alquiler-temporario': { operation: 'temporario' },
-  'alquiler-anual': { operation: 'anual' },
+  'alquiler-temporario': { operation: 'alquiler' },
+  // Hoy todo el alquiler anual son locales
+  'alquiler-anual': { operation: 'alquiler', type: 'Local' },
+}
+
+// Las secciones que antes tenían página propia (Alquileres, Lotes, Complejos) conservan
+// su título y descripción en Google: ahora son el buscador con ese filtro.
+const SECTION_META = {
+  'alquiler|': {
+    title: 'Alquiler temporario en Mar Azul y Mar de las Pampas | Silvia Fernández',
+    description: 'Casas, cabañas y departamentos en alquiler temporario en Mar Azul, Las Gaviotas, Mar de las Pampas y Villa Gesell, con fotos, capacidad y contacto directo.',
+  },
+  'venta|Terreno': {
+    title: 'Lotes y terrenos en venta en Mar Azul y Mar de las Pampas | Silvia Fernández',
+    description: 'Encontrá lotes y terrenos en venta en Mar de las Pampas, Mar Azul y alrededores con asesoramiento inmobiliario profesional.',
+  },
+  'venta|Complejo': {
+    title: 'Complejos y emprendimientos en venta en Mar Azul y Mar de las Pampas | Silvia Fernández',
+    description: 'Explorá complejos y emprendimientos en venta en Mar de las Pampas, Mar Azul y zonas cercanas con Silvia Fernández Propiedades.',
+  },
 }
 
 // Página por zona que corresponde a una búsqueda (para el canonical), o null
@@ -92,20 +104,21 @@ export const searchMetadata = (searchParams = {}) => {
     return Array.isArray(value) ? value[0] : (value || '')
   }
   const type = PROPERTY_TYPE_PLURALS[pick('type')] ? pick('type') : ''
-  const operation = resolveOperation(normalizeOperation(pick('operation')), type)
+  const operation = normalizeOperation(pick('operation'))
   const zona = zoneLabel(pick('zona')) ? pick('zona') : ''
   const filters = { operation, type, zona }
   const where = zoneLabel(zona) || 'Mar Azul y Mar de las Pampas'
   const base = searchTitle({ operation, type })
   const hasFilters = operation !== 'venta' || type || zona
+  const section = zona ? null : SECTION_META[`${operation}|${type}`]
 
   return {
-    title: hasFilters
+    title: section?.title || (hasFilters
       ? `${base} en ${where} | Silvia Fernández`
-      : 'Propiedades en venta y alquiler en Mar Azul y Mar de las Pampas | Silvia Fernández',
-    description: hasFilters
+      : 'Propiedades en venta y alquiler en Mar Azul y Mar de las Pampas | Silvia Fernández'),
+    description: section?.description || (hasFilters
       ? `${base} en ${where}: fotos, ubicación y contacto directo con Silvia Fernández Propiedades.`
-      : 'Buscá casas, departamentos, lotes y complejos en venta y alquiler en Mar Azul, Las Gaviotas, Mar de las Pampas y Villa Gesell, con filtros por tipo, operación y zona.',
+      : 'Buscá casas, departamentos, lotes y complejos en venta y alquiler en Mar Azul, Las Gaviotas, Mar de las Pampas y Villa Gesell, con filtros por tipo, operación y zona.'),
     // Con zona, Google toma la página de esa zona; sin zona, la búsqueda por operación y tipo
     alternates: { canonical: landingPathForSearch(filters) || searchHref({ operation, type }) },
   }

@@ -173,6 +173,8 @@ const writeFiltersToUrl = (filtersSnapshot) => {
   setParam('location', filtersSnapshot.location.trim())
   setParam('personas', filtersSnapshot.operation === 'temporario' && filtersSnapshot.guests > 0 ? String(filtersSnapshot.guests) : '')
   setParam('orden', filtersSnapshot.sort !== 'recent' ? filtersSnapshot.sort : '')
+  // Parámetro del listado viejo de alquileres (llega por la redirección de /alquiler-temporario?tipo=anual)
+  url.searchParams.delete('tipo')
 
   const nextSearch = url.searchParams.toString()
   if (url.search !== window.location.search) {
@@ -476,18 +478,41 @@ export default function PropertiesSearchNew() {
     </div>
   )
 
+  // Mientras se aplica un filtro recién tocado, el contador de arriba todavía es el de la búsqueda anterior
+  const isSearching = (loading && properties.length === 0)
+    || buildSearchCacheKey(filters) !== buildSearchCacheKey(appliedFilters)
+
+  // Sin resultados: se dice qué búsqueda quedó vacía y se ofrece aflojar el filtro que la vació
+  const locationText = filters.location.trim()
+  const hasGuestsFilter = filters.operation === 'temporario' && filters.guests > 0
+  const currentTitle = searchTitle(filters)
+  const emptyTitle = locationText
+    ? `No encontramos resultados para «${locationText}»`
+    : hasGuestsFilter
+      ? `No encontramos alquileres para ${guestsText(filters.guests)} o más`
+      : `Por ahora no hay ${currentTitle.charAt(0).toLowerCase()}${currentTitle.slice(1)}`
+  const emptyActions = [
+    locationText && { label: 'Borrar la ubicación', run: () => handleFilterChange('location', '') },
+    hasGuestsFilter && { label: 'Quitar filtro de personas', run: () => handleFilterChange('guests', 0) },
+    filters.operation === 'anual' && { label: 'Ver alquiler temporario', run: () => handleFilterChange('operation', 'temporario') },
+    filters.zona && { label: 'Ver todas las zonas', run: () => handleFilterChange('zona', '') },
+    filters.type && { label: 'Ver todos los tipos', run: () => handleFilterChange('type', '') },
+  ].filter(Boolean)
+
   return (
     <div className="search-page">
 
-      {/* Misma estructura que Alquileres y Lotes: hero + panel de filtros montado + resultados */}
+      {/* Hero con el título de la búsqueda + panel de filtros montado + resultados */}
       <div className="page-hero page-hero--with-panel">
         <div className="container">
           {/* El título dice siempre lo que se está viendo: «Casas en venta en Mar Azul» */}
           <h1>{searchTitle(filters)}</h1>
           <p>
-            {loading && properties.length === 0
+            {isSearching
               ? 'Buscando propiedades…'
-              : `${totalCount} ${totalCount === 1 ? 'propiedad disponible' : 'propiedades disponibles'}`}
+              : totalCount === 0
+                ? 'Sin propiedades con estos filtros'
+                : `${totalCount} ${totalCount === 1 ? 'propiedad disponible' : 'propiedades disponibles'}`}
           </p>
         </div>
       </div>
@@ -506,7 +531,7 @@ export default function PropertiesSearchNew() {
               </button>
               <button 
                 className={`seg-btn ${filters.operation !== 'venta' ? 'active' : ''}`}
-                onClick={() => handleFilterChange('operation', filters.operation === 'anual' ? 'anual' : 'temporario')}
+                onClick={() => handleFilterChange('operation', resolveOperation(filters.operation === 'anual' ? 'anual' : 'temporario', filters.type))}
               >
                 Alquilar
               </button>
@@ -601,6 +626,21 @@ export default function PropertiesSearchNew() {
                 </button>
               ))}
             </div>
+          </div>
+
+          {/* Zona en mobile: un select, igual que los tipos de propiedad (los chips ocupaban media pantalla) */}
+          <div className="search-zone-mobile">
+            <select
+              className="property-type-select"
+              value={filters.zona}
+              onChange={(e) => handleFilterChange('zona', e.target.value)}
+              aria-label="Zona"
+            >
+              <option value="">Todas las zonas</option>
+              {ZONE_OPTIONS.map((zone) => (
+                <option key={zone.key} value={zone.key}>{zone.label}</option>
+              ))}
+            </select>
           </div>
 
           {/* Cantidad de personas — solo en alquiler temporario */}
@@ -733,16 +773,16 @@ export default function PropertiesSearchNew() {
                     gridColumn: '1 / -1',
                     color: '#64748b'
                   }}>
-                    <p style={{ fontSize: '1.2rem', marginBottom: '0.5rem' }}>
-                      {filters.operation === 'temporario' && filters.guests > 0
-                        ? `No encontramos alquileres para ${guestsText(filters.guests)} o más`
-                        : 'No se encontraron propiedades con los filtros seleccionados'}
-                    </p>
-                    <p>Intenta ajustar los filtros para obtener más resultados</p>
-                    {filters.operation === 'temporario' && filters.guests > 0 && (
-                      <button type="button" className="guests-filter-reset" onClick={() => handleFilterChange('guests', 0)}>
-                        Quitar filtro de personas
-                      </button>
+                    <p style={{ fontSize: '1.2rem', marginBottom: '0.5rem' }}>{emptyTitle}</p>
+                    <p>{emptyActions.length > 0 ? 'Probá ampliando la búsqueda:' : 'Probá con otra combinación de filtros.'}</p>
+                    {emptyActions.length > 0 && (
+                      <div className="search-empty-actions">
+                        {emptyActions.map((action) => (
+                          <button key={action.label} type="button" className="guests-filter-reset" onClick={action.run}>
+                            {action.label}
+                          </button>
+                        ))}
+                      </div>
                     )}
                   </div>
                 )}

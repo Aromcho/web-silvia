@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { autocompleteProperties } from '../../services/propertyService';
 import { FaHome, FaMapMarkerAlt, FaUmbrellaBeach, FaTree } from 'react-icons/fa';
+import { searchHref, resolveOperation } from '../../helpers/searchFilters';
 import './Hero.css';
 
 const Hero = () => {
@@ -54,22 +55,14 @@ const Hero = () => {
 
   const handleSearch = (e) => {
     e.preventDefault();
-    
-    // Construir query params para redirección
-    const params = new URLSearchParams();
-    
-    if (searchForm.operation) {
-      params.append('operation', searchForm.operation);
-    }
-    if (searchForm.type) {
-      params.append('type', searchForm.type);
-    }
-    if (searchForm.location) {
-      params.append('location', searchForm.location);
-    }
-    
-    // Redirigir a página de búsqueda
-    router.push(`/propiedades?${params.toString()}`);
+
+    // Al único buscador, con lo elegido ya filtrado. «Alquiler» + «Local» es alquiler anual
+    // (los locales no se alquilan por temporada: antes esta búsqueda no devolvía nada).
+    router.push(searchHref({
+      operation: resolveOperation(searchForm.operation, searchForm.type),
+      type: searchForm.type,
+      location: searchForm.location.trim(),
+    }));
   };
 
   // Cerrar sugerencias al hacer click fuera
@@ -112,24 +105,17 @@ const Hero = () => {
     }
   ];
 
+  // Cada acceso rápido abre el buscador con su filtro puesto
+  const QUICK_ACCESS_FILTERS = {
+    alquiler: { operation: 'temporario' },
+    lotes: { type: 'Terreno' },
+    casas: { type: 'Casa' },
+    'mar-azul': { zona: 'mar-azul' },
+    'mar-de-las-pampas': { zona: 'mar-de-las-pampas' },
+  };
+
   const handleQuickAccess = (cardId) => {
-    if (cardId === 'alquiler') {
-      router.push('/alquiler-temporario');
-    } else if (cardId === 'lotes') {
-      router.push('/lotes-terrenos');
-    } else if (cardId === 'mar-azul' || cardId === 'mar-de-las-pampas') {
-      // Filtrar por localidad (igual que escribirlo en el input de ubicación)
-      const params = new URLSearchParams();
-      params.append('operation', 'venta');
-      params.append('location', cardId === 'mar-azul' ? 'Mar Azul' : 'Mar De Las Pampas');
-      router.push(`/propiedades?${params.toString()}`);
-    } else {
-      // Para casas
-      const params = new URLSearchParams();
-      params.append('operation', 'venta');
-      params.append('type', 'Casa');
-      router.push(`/propiedades?${params.toString()}`);
-    }
+    router.push(searchHref(QUICK_ACCESS_FILTERS[cardId]));
   };
 
   return (
@@ -173,8 +159,8 @@ const Hero = () => {
                     Venta
                   </button>
                   <button 
-                    className={`operation-tab ${searchForm.operation === 'alquiler' ? 'active' : ''}`}
-                    onClick={() => setSearchForm(prev => ({ ...prev, operation: 'alquiler' }))}
+                    className={`operation-tab ${searchForm.operation === 'temporario' ? 'active' : ''}`}
+                    onClick={() => setSearchForm(prev => ({ ...prev, operation: 'temporario' }))}
                   >
                     Alquiler
                   </button>

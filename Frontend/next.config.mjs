@@ -53,6 +53,30 @@ const nextConfig = {
         destination: '/propiedades',
         permanent: true,
       },
+      // Un solo buscador: los listados viejos abren /propiedades con su filtro puesto.
+      // (Las páginas por zona, /lotes-terrenos/mar-azul y demás, siguen existiendo.)
+      {
+        source: '/lotes-terrenos',
+        destination: '/propiedades?type=Terreno',
+        permanent: true,
+      },
+      // El listado viejo de alquileres tenía la pestaña «Anual» en ?tipo=anual
+      {
+        source: '/alquiler-temporario',
+        has: [{ type: 'query', key: 'tipo', value: 'anual' }],
+        destination: '/propiedades?operation=anual',
+        permanent: true,
+      },
+      {
+        source: '/alquiler-temporario',
+        destination: '/propiedades?operation=temporario',
+        permanent: true,
+      },
+      {
+        source: '/complejos',
+        destination: '/propiedades?type=Complejo',
+        permanent: true,
+      },
     ]
   },
 
