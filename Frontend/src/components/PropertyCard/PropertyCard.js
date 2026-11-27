@@ -134,6 +134,9 @@ const getCoords = (property) => {
   return { lat, lng }
 }
 
+// El CRM manda las superficies con dos decimales: 350.00 -> 350 · 1250.5 -> 1.250,5
+const formatSurface = (value) => Number(value).toLocaleString('es-AR', { maximumFractionDigits: 2 })
+
 // Corta el click para que no dispare el Link de la card
 const stopCardClick = (e) => {
   e.preventDefault()
@@ -211,6 +214,7 @@ export default function PropertyCard({ property }) {
   const petsFriendly = isRentalCard ? acceptsPets(property) : false
   // Capacidad de personas (la resuelve el CRM); solo tiene sentido en alquiler temporario
   const guestsLabel = temporaryRentalOperation ? property.guests_capacity_label : ''
+  const locationLabel = formatPropertyLocation(property) || 'Ubicación a confirmar'
 
   return (
     <Link href={`/propiedad/${property.id}`} className="modern-property-card">
@@ -218,25 +222,21 @@ export default function PropertyCard({ property }) {
         className={`property-image ${showMap ? 'property-image--map' : ''}`}
         onPointerLeave={(e) => { if (e.pointerType === 'mouse') setMapHover(false) }}
       >
-        {coords && (
+        {/* El pin del mapa ya no va sobre la foto: el mapa se abre desde la ubicación, abajo.
+            Acá queda solo el botón para cerrarlo cuando está fijo. */}
+        {coords && mapPinned && (
           <button
             type="button"
-            className={`property-map-pin ${showMap ? 'active' : ''}`}
-            title={mapPinned ? 'Cerrar mapa' : 'Ver ubicación en el mapa'}
-            aria-label={mapPinned ? 'Cerrar mapa' : 'Ver ubicación en el mapa'}
-            aria-pressed={mapPinned}
-            onPointerEnter={(e) => { if (e.pointerType === 'mouse') setMapHover(true) }}
+            className="property-map-pin active"
+            title="Cerrar mapa"
+            aria-label="Cerrar mapa"
             onClick={(e) => {
               stopCardClick(e)
-              if (mapPinned) {
-                setMapPinned(false)
-                setMapHover(false)
-              } else {
-                setMapPinned(true)
-              }
+              setMapPinned(false)
+              setMapHover(false)
             }}
           >
-            {mapPinned ? <FaTimes aria-hidden="true" /> : <FaMapMarkerAlt aria-hidden="true" />}
+            <FaTimes aria-hidden="true" />
           </button>
         )}
         {showMap && (
@@ -299,16 +299,6 @@ export default function PropertyCard({ property }) {
             <FaPlay aria-hidden="true" /> Video
           </div>
         )}
-        {(creditEligible || financingEligible) && (
-          <div className="property-eligibility-badges">
-            {creditEligible && (
-              <div className="credit-badge">Apto crédito</div>
-            )}
-            {financingEligible && (
-              <div className="financing-badge">Apto financiación</div>
-            )}
-          </div>
-        )}
         {property.status && property.status !== 'disponible' && (
           <div className={`status-ribbon ${property.status}`}>
             {property.status === 'vendida' ? 'VENDIDO' : property.status === 'alquilado' ? 'ALQUILADO' : 'RESERVADO'}
@@ -320,19 +310,24 @@ export default function PropertyCard({ property }) {
         <h4 className="property-title">
           {propertyTitle}
         </h4>
-        <p className="property-price">{getDisplayPrice()}</p>
+        {/* Precio y, al lado, lo que antes iba sobre la foto: apto crédito / financiación */}
+        <div className="property-price-row">
+          <p className="property-price">{getDisplayPrice()}</p>
+          {creditEligible && <span className="property-tag property-tag--credit">Apto crédito</span>}
+          {financingEligible && <span className="property-tag property-tag--financing">Apto financiación</span>}
+        </div>
         
         <div className="property-details">
           {!isRentalCard && property.surface > 0 && (
             <span className="detail-item">
               <FaHome className="detail-icon" />
-              {property.surface}m² tot.
+              {formatSurface(property.surface)}m² tot.
             </span>
           )}
           {!isRentalCard && property.roofed_surface > 0 && (
             <span className="detail-item">
               <FaHome className="detail-icon" />
-              {property.roofed_surface}m² cub.
+              {formatSurface(property.roofed_surface)}m² cub.
             </span>
           )}
           {guestsLabel && (
@@ -390,11 +385,34 @@ export default function PropertyCard({ property }) {
           )}
         </div>
         
-        <p className="property-location">
-          <FaMapMarkerAlt className="location-icon" />
-          {formatPropertyLocation(property) || 'Ubicación a confirmar'}
-        </p>
-        <p className="property-id">ID #{property.id}</p>
+        {/* Ubicación e ID en una misma línea, pegados a los botones. La ubicación abre el mapa
+            sobre la foto: con el mouse encima es vista previa, con click queda fijo. */}
+        <div className="property-meta">
+          {coords ? (
+            <button
+              type="button"
+              className={`property-location property-location--map ${showMap ? 'active' : ''}`}
+              title={mapPinned ? 'Cerrar mapa' : 'Ver ubicación en el mapa'}
+              aria-pressed={mapPinned}
+              onPointerEnter={(e) => { if (e.pointerType === 'mouse') setMapHover(true) }}
+              onPointerLeave={(e) => { if (e.pointerType === 'mouse') setMapHover(false) }}
+              onClick={(e) => {
+                stopCardClick(e)
+                setMapPinned((pinned) => !pinned)
+                setMapHover(false)
+              }}
+            >
+              <FaMapMarkerAlt className="location-icon" aria-hidden="true" />
+              <span className="property-location-text">{locationLabel}</span>
+            </button>
+          ) : (
+            <p className="property-location">
+              <FaMapMarkerAlt className="location-icon" aria-hidden="true" />
+              <span className="property-location-text">{locationLabel}</span>
+            </p>
+          )}
+          <p className="property-id">ID #{property.id}</p>
+        </div>
         
         <div className="property-actions">
           <button className="btn-view">
