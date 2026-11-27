@@ -693,22 +693,6 @@ export default function PropertiesSearchNew() {
             </select>
           </div>
           </>
-
-          {/* Filtro de orden — solo en "Comprar" (los alquileres no tienen precio) */}
-          {filters.operation === 'venta' && (
-          <div className="sort-filter">
-            <label className="sort-label">Ordenar por:</label>
-            <select 
-              className="sort-select"
-              value={filters.sort}
-              onChange={(e) => handleFilterChange('sort', e.target.value)}
-            >
-              <option value="recent">Más recientes</option>
-              <option value="price_desc">Mayor a menor precio</option>
-              <option value="price_asc">Menor a mayor precio</option>
-            </select>
-          </div>
-          )}
         </div>
 
         {/* Resultados */}
@@ -730,6 +714,24 @@ export default function PropertiesSearchNew() {
                 <FaList />
               </button>
             </div>
+
+            {/* Orden — fuera del panel, en la fila del selector de vista. Solo en "Comprar"
+                (los alquileres no tienen precio publicado) */}
+            {filters.operation === 'venta' && (
+              <div className="sort-filter">
+                <label className="sort-label" htmlFor="search-sort">Ordenar por:</label>
+                <select
+                  id="search-sort"
+                  className="sort-select"
+                  value={filters.sort}
+                  onChange={(e) => handleFilterChange('sort', e.target.value)}
+                >
+                  <option value="recent">Más recientes</option>
+                  <option value="price_desc">Mayor a menor precio</option>
+                  <option value="price_asc">Menor a mayor precio</option>
+                </select>
+              </div>
+            )}
           </div>
 
           {loading && properties.length === 0 ? (

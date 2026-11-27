@@ -385,7 +385,7 @@
   }
 }
 
-/* Filtro de orden: pegado a la derecha del panel */
+/* Filtro de orden: fuera del panel, a la derecha de la fila del selector de grilla / lista */
 .search-page .sort-filter {
   display: flex;
   align-items: center;
@@ -1001,14 +1001,10 @@
   }
 }
 
-/* Sin el orden por precio (alquileres), los tipos son la última fila del panel */
-.search-page .filters-section:not(:has(.sort-filter)) .property-types,
-.search-page .filters-section:not(:has(.sort-filter)) .property-types-mobile {
+/* Los tipos son la última fila del panel: «Ordenar por» va afuera, en la fila del selector de vista */
+.search-page .property-types,
+.search-page .property-types-mobile {
   margin-bottom: 0;
-}
-
-.search-page .property-types {
-  margin-bottom: 1.25rem;
 }
 
 .search-page .results-section {
@@ -1067,8 +1063,23 @@
 
   /* En mobile la vista lista no aporta (ya va una tarjeta por fila) y cortaba las tarjetas:
      se oculta el selector y las tarjetas quedan siempre en columna */
-  .search-page .results-header {
+  .search-page .view-toggle {
     display: none;
+  }
+
+  /* En esa fila queda solo «Ordenar por», a todo el ancho; sin orden (alquileres), la fila no existe */
+  .search-page .results-header {
+    flex-direction: row;
+    margin-bottom: 1rem;
+    padding-bottom: 0;
+  }
+
+  .search-page .results-header:not(:has(.sort-filter)) {
+    display: none;
+  }
+
+  .search-page .sort-filter {
+    flex: 1 1 auto;
   }
 
   .search-page .list-view .modern-property-card {
