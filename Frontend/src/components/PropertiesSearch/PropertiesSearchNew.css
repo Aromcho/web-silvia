@@ -568,16 +568,25 @@
 
 /* La tarjeta es la misma de todo el sitio: sus estilos viven solo en PropertyCard.css */
 
-/* Vista de lista */
+/* Vista de lista: la tarjeta crece con su contenido. Con alto fijo de 200px el contenido no
+   entraba y el título (lo único que podía achicarse) quedaba en 0: no se veía. */
 .search-page .list-view .modern-property-card {
   flex-direction: row;
-  height: 200px;
+  height: auto;
+  min-height: 200px;
 }
 
 .search-page .list-view .property-image {
   width: 250px;
-  height: 100%;
+  height: auto;
+  align-self: stretch;
   flex-shrink: 0;
+}
+
+/* La foto llena su columna sin estirar la tarjeta con su alto natural */
+.search-page .list-view .property-image img {
+  position: absolute;
+  inset: 0;
 }
 
 .search-page .list-view .property-content {

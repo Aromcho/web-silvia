@@ -359,7 +359,7 @@ export default function PropertyCard({ property }) {
           {(property.bathroom_amount || property.bathrooms) > 0 && (
             <span className="detail-item">
               <FaBath className="detail-icon" />
-              {property.bathroom_amount || property.bathrooms} baños
+              {property.bathroom_amount || property.bathrooms} {Number(property.bathroom_amount || property.bathrooms) === 1 ? 'baño' : 'baños'}
             </span>
           )}
 
@@ -373,14 +373,14 @@ export default function PropertyCard({ property }) {
           {frontMeasure && (
             <span className="detail-item">
               <FaHome className="detail-icon" />
-              {frontMeasure}m frente
+              {formatSurface(frontMeasure)}m frente
             </span>
           )}
 
           {depthMeasure && (
             <span className="detail-item">
               <FaHome className="detail-icon" />
-              {depthMeasure}m fondo
+              {formatSurface(depthMeasure)}m fondo
             </span>
           )}
         </div>
