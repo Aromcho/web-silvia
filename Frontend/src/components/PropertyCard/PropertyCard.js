@@ -222,21 +222,25 @@ export default function PropertyCard({ property }) {
         className={`property-image ${showMap ? 'property-image--map' : ''}`}
         onPointerLeave={(e) => { if (e.pointerType === 'mouse') setMapHover(false) }}
       >
-        {/* El pin del mapa ya no va sobre la foto: el mapa se abre desde la ubicación, abajo.
-            Acá queda solo el botón para cerrarlo cuando está fijo. */}
-        {coords && mapPinned && (
+        {coords && (
           <button
             type="button"
-            className="property-map-pin active"
-            title="Cerrar mapa"
-            aria-label="Cerrar mapa"
+            className={`property-map-pin ${showMap ? 'active' : ''}`}
+            title={mapPinned ? 'Cerrar mapa' : 'Ver ubicación en el mapa'}
+            aria-label={mapPinned ? 'Cerrar mapa' : 'Ver ubicación en el mapa'}
+            aria-pressed={mapPinned}
+            onPointerEnter={(e) => { if (e.pointerType === 'mouse') setMapHover(true) }}
             onClick={(e) => {
               stopCardClick(e)
-              setMapPinned(false)
-              setMapHover(false)
+              if (mapPinned) {
+                setMapPinned(false)
+                setMapHover(false)
+              } else {
+                setMapPinned(true)
+              }
             }}
           >
-            <FaTimes aria-hidden="true" />
+            {mapPinned ? <FaTimes aria-hidden="true" /> : <FaMapMarkerAlt aria-hidden="true" />}
           </button>
         )}
         {showMap && (
@@ -299,6 +303,16 @@ export default function PropertyCard({ property }) {
             <FaPlay aria-hidden="true" /> Video
           </div>
         )}
+        {(creditEligible || financingEligible) && (
+          <div className="property-eligibility-badges">
+            {creditEligible && (
+              <div className="credit-badge">Apto crédito</div>
+            )}
+            {financingEligible && (
+              <div className="financing-badge">Apto financiación</div>
+            )}
+          </div>
+        )}
         {property.status && property.status !== 'disponible' && (
           <div className={`status-ribbon ${property.status}`}>
             {property.status === 'vendida' ? 'VENDIDO' : property.status === 'alquilado' ? 'ALQUILADO' : 'RESERVADO'}
@@ -310,12 +324,7 @@ export default function PropertyCard({ property }) {
         <h4 className="property-title">
           {propertyTitle}
         </h4>
-        {/* Precio y, al lado, lo que antes iba sobre la foto: apto crédito / financiación */}
-        <div className="property-price-row">
-          <p className="property-price">{getDisplayPrice()}</p>
-          {creditEligible && <span className="property-tag property-tag--credit">Apto crédito</span>}
-          {financingEligible && <span className="property-tag property-tag--financing">Apto financiación</span>}
-        </div>
+        <p className="property-price">{getDisplayPrice()}</p>
         
         <div className="property-details">
           {!isRentalCard && property.surface > 0 && (
@@ -385,32 +394,13 @@ export default function PropertyCard({ property }) {
           )}
         </div>
         
-        {/* Ubicación e ID en una misma línea, pegados a los botones. La ubicación abre el mapa
-            sobre la foto: con el mouse encima es vista previa, con click queda fijo. */}
+        {/* Ubicación e ID en una misma línea, pegados a los botones (antes el ID iba solo en un
+            renglón y debajo quedaba un hueco) */}
         <div className="property-meta">
-          {coords ? (
-            <button
-              type="button"
-              className={`property-location property-location--map ${showMap ? 'active' : ''}`}
-              title={mapPinned ? 'Cerrar mapa' : 'Ver ubicación en el mapa'}
-              aria-pressed={mapPinned}
-              onPointerEnter={(e) => { if (e.pointerType === 'mouse') setMapHover(true) }}
-              onPointerLeave={(e) => { if (e.pointerType === 'mouse') setMapHover(false) }}
-              onClick={(e) => {
-                stopCardClick(e)
-                setMapPinned((pinned) => !pinned)
-                setMapHover(false)
-              }}
-            >
-              <FaMapMarkerAlt className="location-icon" aria-hidden="true" />
-              <span className="property-location-text">{locationLabel}</span>
-            </button>
-          ) : (
-            <p className="property-location">
-              <FaMapMarkerAlt className="location-icon" aria-hidden="true" />
-              <span className="property-location-text">{locationLabel}</span>
-            </p>
-          )}
+          <p className="property-location">
+            <FaMapMarkerAlt className="location-icon" aria-hidden="true" />
+            <span className="property-location-text">{locationLabel}</span>
+          </p>
           <p className="property-id">ID #{property.id}</p>
         </div>
         

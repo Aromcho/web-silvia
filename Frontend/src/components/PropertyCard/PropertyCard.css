@@ -76,6 +76,19 @@
   z-index: 2;
 }
 
+.credit-badge {
+  background: rgba(34, 139, 34, 0.92);
+  color: #fff;
+  padding: 4px 10px;
+  border-radius: 14px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  z-index: 2;
+  pointer-events: none;
+}
+
 /* Tiene video (YouTube, reel o MP4) */
 .property-video-badge {
   position: absolute;
@@ -98,6 +111,28 @@
 
 .property-video-badge svg {
   font-size: 0.65rem;
+}
+
+.property-eligibility-badges {
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.financing-badge {
+  background: rgba(234, 119, 10, 0.95);
+  color: #fff;
+  padding: 4px 10px;
+  border-radius: 14px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
 }
 
 /* Etiqueta diagonal de estado (vendido / reservado) */
@@ -480,6 +515,7 @@
 /* Con el mapa abierto se ocultan los carteles de la foto */
 .property-image--map .property-badge,
 .property-image--map .property-video-badge,
+.property-image--map .property-eligibility-badges,
 .property-image--map .status-ribbon {
   display: none;
 }
@@ -565,40 +601,9 @@
 }
 
 /* ── Cuerpo de la tarjeta más compacto ──
-   La foto queda con la operación y, si hay, «Video». Apto crédito / financiación pasan al lado
-   del precio, y el pin del mapa a la ubicación, que comparte línea con el ID (antes el ID iba
-   solo en un renglón y debajo quedaba un hueco hasta los botones). */
-.modern-property-card .property-price-row {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 6px 8px;
-  margin-bottom: 0.75rem;
-}
-
-.modern-property-card .property-price-row .property-price {
-  margin: 0 4px 0 0;
-}
-
-.modern-property-card .property-tag {
-  padding: 3px 9px;
-  border-radius: 999px;
-  font-size: 0.72rem !important;
-  font-weight: 700;
-  line-height: 1.3 !important;
-  white-space: nowrap;
-}
-
-.modern-property-card .property-tag--credit {
-  background: #e3f3e3;
-  color: #1b6b1b;
-}
-
-.modern-property-card .property-tag--financing {
-  background: #fdebd3;
-  color: #b45309;
-}
-
+   La foto no se toca: operación, pin del mapa, apto crédito / financiación y video siguen sobre ella.
+   Abajo, la ubicación y el ID comparten una línea pegada a los botones (antes el ID iba solo en
+   un renglón y debajo quedaba un hueco hasta los botones). */
 .modern-property-card .property-details {
   gap: 0.5rem 0.9rem;
 }
@@ -629,55 +634,6 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-/* Con coordenadas, la ubicación es el botón del mapa (antes era un pin sobre la foto) */
-.modern-property-card .property-location--map {
-  position: relative;
-  min-height: 28px;
-  padding: 4px 10px 4px 8px;
-  border: none;
-  border-radius: 999px;
-  background: #eaf5f0;
-  color: var(--primary-color);
-  font-family: inherit;
-  font-size: 0.8rem !important;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.2s ease, color 0.2s ease;
-}
-
-/* Área táctil de 44px sin agrandar el botón */
-.modern-property-card .property-location--map::after {
-  content: '';
-  position: absolute;
-  inset: -8px -4px;
-}
-
-.modern-property-card .property-location--map.active {
-  background: var(--primary-color);
-  color: var(--white-color);
-}
-
-.modern-property-card .property-location--map.active .location-icon {
-  color: var(--white-color);
-}
-
-/* Solo con mouse: en táctil el hover quedaba "pegado" después de cerrar el mapa */
-@media (hover: hover) {
-  .modern-property-card .property-location--map:hover {
-    background: var(--primary-color);
-    color: var(--white-color);
-  }
-
-  .modern-property-card .property-location--map:hover .location-icon {
-    color: var(--white-color);
-  }
-}
-
-.modern-property-card .property-location--map:focus-visible {
-  outline: 3px solid rgba(0, 129, 92, 0.45);
-  outline-offset: 2px;
 }
 
 .modern-property-card .property-meta .property-id {
