@@ -401,6 +401,25 @@ export default function PropertiesSearchNew() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [appliedFilters])
 
+  // Scroll infinito: cuando la marca del final del listado se acerca a la pantalla se carga la
+  // tanda siguiente. El observador se rearma al terminar cada carga, así sigue cargando si la
+  // marca todavía está a la vista (pantallas altas).
+  const loadNextPageRef = useRef(null)
+  loadNextPageRef.current = () => {
+    if (!hasMore || loading || loadingMore || properties.length === 0) return
+    loadProperties({ pageToLoad: page + 1, replace: false, filtersSnapshot: appliedFilters })
+  }
+
+  useEffect(() => {
+    const sentinel = loadMoreRef.current
+    if (!sentinel || loading || loadingMore || typeof IntersectionObserver === 'undefined') return undefined
+    const observer = new IntersectionObserver((entries) => {
+      if (entries.some((entry) => entry.isIntersecting)) loadNextPageRef.current()
+    }, { rootMargin: '0px 0px 600px 0px' })
+    observer.observe(sentinel)
+    return () => observer.disconnect()
+  }, [hasMore, loading, loadingMore, properties.length])
+
   const handleFilterChange = (key, value) => {
     setFilters(prev => {
       const next = { ...prev, [key]: value }
@@ -744,7 +763,9 @@ export default function PropertiesSearchNew() {
                     <div 
                       key={property.id || index}
                       style={skipEnterAnimation ? undefined : {
-                        animation: `fadeInUp 0.6s ease-out ${index * 0.1}s both`
+                        // Escalonado dentro de cada tanda de 12. Con el índice global, la segunda tanda
+                        // esperaba más de 1 s en blanco antes de aparecer (y cada tanda, 1 s más)
+                        animation: `fadeInUp 0.4s ease-out ${(index % PAGE_SIZE) * 0.04}s both`
                       }}
                     >
                       <PropertyCard property={property} />
@@ -772,23 +793,15 @@ export default function PropertiesSearchNew() {
                 )}
               </div>
 
-              {/* "Ver más" en lugar de scroll infinito: el footer queda siempre al alcance */}
-              {hasMore && !loadingMore && properties.length > 0 && (
-                <div className="load-more">
-                  <button
-                    type="button"
-                    className="load-more-btn"
-                    onClick={() => loadProperties({ pageToLoad: page + 1, replace: false, filtersSnapshot: appliedFilters })}
-                  >
-                    Ver más propiedades
-                  </button>
-                </div>
-              )}
-
               {loadingMore && (
                 <div className="loading-more-state">
                   {renderSkeletonGrid(3)}
                 </div>
+              )}
+
+              {/* Scroll infinito: cuando esta marca se acerca a la pantalla se carga la tanda siguiente */}
+              {hasMore && properties.length > 0 && (
+                <div ref={loadMoreRef} className="load-more-sentinel" aria-hidden="true" />
               )}
 
               {!hasMore && properties.length > 0 && (

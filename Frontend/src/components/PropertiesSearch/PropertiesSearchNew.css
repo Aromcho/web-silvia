@@ -971,6 +971,11 @@
   display: none;
 }
 
+/* Marca del final del listado que dispara la carga de la tanda siguiente (scroll infinito) */
+.search-page .load-more-sentinel {
+  height: 1px;
+}
+
 /* Sin resultados: botones para aflojar el filtro que dejó la búsqueda vacía */
 .search-page .search-empty-actions {
   display: flex;

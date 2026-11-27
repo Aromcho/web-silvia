@@ -568,10 +568,36 @@
   height: 44px;
 }
 
-/* Mismo alto en los dos botones (el borde de "Contactar" lo dejaba 2px más alto al apilarse) */
-.btn-view,
-.btn-contact {
-  min-height: 46px;
+/* Botones de la tarjeta: siempre en una línea y más bajos
+   ("Ver Detalles" se partía en dos renglones y los dos botones quedaban de ~60px) */
+.modern-property-card .property-content .property-actions {
+  gap: 0.5rem;
+  container-type: inline-size;
+}
+
+.modern-property-card .property-content .property-actions .btn-view,
+.modern-property-card .property-content .property-actions .btn-contact {
+  min-height: 40px;
+  padding: 8px 14px;
+  font-size: 0.9rem !important;
+  line-height: 1.2 !important;
+  white-space: nowrap;
+}
+
+.modern-property-card .property-content .property-actions .btn-contact {
+  flex: 0 0 auto;
+}
+
+/* Tarjetas angostas: sin la flecha y con menos relleno para que entren en una línea */
+@container (max-width: 270px) {
+  .modern-property-card .property-content .property-actions .btn-arrow {
+    display: none;
+  }
+
+  .modern-property-card .property-content .property-actions .btn-view,
+  .modern-property-card .property-content .property-actions .btn-contact {
+    padding: 8px 10px;
+  }
 }
 
 /* En pantallas táctiles no queda el hover "pegado" después de tocar */
