@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { autocompleteProperties } from '../../services/propertyService';
-import { FaHome, FaMapMarkerAlt, FaUmbrellaBeach, FaTree } from 'react-icons/fa';
+import { FaHome, FaMapMarkerAlt, FaBuilding, FaStore } from 'react-icons/fa';
 import { searchHref } from '../../helpers/searchFilters';
 import './Hero.css';
 
@@ -94,14 +94,14 @@ const Hero = () => {
       icon: <FaHome className="card-icon-element" />
     },
     { 
-      id: 'mar-azul', 
-      title: 'Mar Azul', 
-      icon: <FaUmbrellaBeach className="card-icon-element" />
+      id: 'departamentos', 
+      title: 'Departamentos', 
+      icon: <FaBuilding className="card-icon-element" />
     },
     { 
-      id: 'mar-de-las-pampas', 
-      title: 'Mar de las Pampas', 
-      icon: <FaTree className="card-icon-element" />
+      id: 'locales', 
+      title: 'Locales', 
+      icon: <FaStore className="card-icon-element" />
     }
   ];
 
@@ -110,8 +110,9 @@ const Hero = () => {
     alquiler: { operation: 'alquiler' },
     lotes: { type: 'Terreno' },
     casas: { type: 'Casa' },
-    'mar-azul': { zona: 'mar-azul' },
-    'mar-de-las-pampas': { zona: 'mar-de-las-pampas' },
+    departamentos: { type: 'Departamento' },
+    // Locales en alquiler: al alquilar, los locales solo aparecen eligiendo ese tipo
+    locales: { operation: 'alquiler', type: 'Local' },
   };
 
   const handleQuickAccess = (cardId) => {

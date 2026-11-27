@@ -6,30 +6,35 @@ import { usePathname, useSearchParams } from 'next/navigation';
 import WhatsAppChat from '../WhatsAppChat/WhatsAppChat';
 import './Header.css';
 
-// Un solo buscador: Departamentos, Locales y Complejos abren /propiedades con su filtro puesto.
-// Los alquileres para alojarse no tienen entrada propia: se eligen dentro del buscador
-// (Comprar / Alquilar). Los locales sí, porque en «Alquilar» solo aparecen al elegir ese tipo.
+// Un solo buscador: Mar Azul, Mar de las Pampas y Complejos abren /propiedades con su filtro puesto.
+// (Departamentos y Locales están en los accesos rápidos del home; los alquileres se eligen
+// dentro del buscador, Comprar / Alquilar.)
 const NAV_LINKS = [
   { href: '/propiedades', label: 'Propiedades', search: 'propiedades' },
-  { href: '/propiedades?type=Departamento', label: 'Departamentos', search: 'departamentos' },
-  { href: '/propiedades?operation=alquiler&type=Local', label: 'Locales', search: 'locales' },
+  { href: '/propiedades?zona=mar-azul', label: 'Mar Azul', search: 'mar-azul' },
+  { href: '/propiedades?zona=mar-de-las-pampas', label: 'Mar de las Pampas', search: 'mar-de-las-pampas' },
   { href: '/propiedades?type=Complejo', label: 'Complejos', search: 'complejos' },
   { href: '/videos', label: 'Videos' },
   { href: '/nosotros', label: 'Nosotros' },
 ];
 
-// A qué entrada del menú corresponde la búsqueda que se está viendo
-const TYPE_SECTION = { Departamento: 'departamentos', Local: 'locales', Complejo: 'complejos' };
-const searchSection = (search) => TYPE_SECTION[new URLSearchParams(search).get('type')] || 'propiedades';
+// Zonas con entrada propia en el menú
+const NAV_ZONES = ['mar-azul', 'mar-de-las-pampas'];
 
-// Las páginas por zona marcan la misma entrada que su búsqueda
-const LANDING_SECTION = {
-  venta: 'propiedades',
-  'casas-en-venta': 'propiedades',
-  'departamentos-en-venta': 'departamentos',
-  'lotes-terrenos': 'propiedades',
-  'alquiler-temporario': 'propiedades',
-  'alquiler-anual': 'locales',
+// A qué entrada del menú corresponde la búsqueda que se está viendo (la zona manda sobre el tipo)
+const searchSection = (search) => {
+  const params = new URLSearchParams(search);
+  const zona = params.get('zona');
+  if (NAV_ZONES.includes(zona)) return zona;
+  return params.get('type') === 'Complejo' ? 'complejos' : 'propiedades';
+};
+
+// Páginas por zona (/casas-en-venta/mar-azul…): marcan su zona si está en el menú; si no, Propiedades
+const LANDING_PATHS = ['venta', 'casas-en-venta', 'departamentos-en-venta', 'lotes-terrenos', 'alquiler-temporario', 'alquiler-anual'];
+const landingSection = (pathname) => {
+  const [, type, zona] = pathname.split('/');
+  if (!LANDING_PATHS.includes(type)) return null;
+  return NAV_ZONES.includes(zona) ? zona : 'propiedades';
 };
 
 // Avisa los filtros de la URL al header. Va aparte y dentro de un Suspense porque useSearchParams
@@ -92,7 +97,7 @@ const Header = () => {
   // Entrada marcada: en el buscador depende de los filtros; en una página por zona, de su tipo
   const activeSection = pathname === '/propiedades'
     ? (search === null ? null : searchSection(search))
-    : LANDING_SECTION[pathname.split('/')[1]] || null;
+    : landingSection(pathname);
   const isActive = (link) => (
     link.search
       ? link.search === activeSection
